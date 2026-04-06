@@ -19,6 +19,7 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven {
         url = "https://api.modrinth.com/maven"
     }
@@ -113,6 +114,10 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 // "optional", meaning it will not be pulled by dependents of this mod.
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+
+    configureEach {
+        resolutionStrategy.force 'net.jodah:typetools:0.6.3'
+    }
 }
 obfuscation {
     createRemappingConfiguration(configurations.localRuntime)
@@ -129,6 +134,8 @@ dependencies {
     modImplementation("maven.modrinth:youkaishomecoming:yq57nNdE")
     modImplementation("maven.modrinth:lets-do-vinery:2I4cH49O")
     modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
+    modImplementation("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
+    modImplementation("maven.modrinth:observable:QtSVNyjm")
   //modImplementation("maven.modrinth::")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'

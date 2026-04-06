@@ -5,6 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "frmc.refmap.json",
   "mixins": [
+    "manors_bounty.FruitLeavesBlockMixin",
+    "manors_bounty.HangingFruitLeavesBlockMixin",
     "manors_bounty.FruitEffectUsingProcedureMixin",
     "manors_bounty.PurpleSugarCaneBlockRandomTickProcedureMixin",
     "manors_bounty.YoungCoconutsRandomTickProcedureMixin"
