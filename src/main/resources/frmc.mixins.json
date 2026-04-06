@@ -5,11 +5,15 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "frmc.refmap.json",
   "mixins": [
+    "manors_bounty.BresseChickenTickProcedureMixin",
     "manors_bounty.FruitLeavesBlockMixin",
+    "manors_bounty.HappyAuraTickProcedureMixin",
     "manors_bounty.HangingFruitLeavesBlockMixin",
     "manors_bounty.FruitEffectUsingProcedureMixin",
     "manors_bounty.PurpleSugarCaneBlockRandomTickProcedureMixin",
-    "manors_bounty.YoungCoconutsRandomTickProcedureMixin"
+    "manors_bounty.YoungCoconutsRandomTickProcedureMixin",
+    "manors_bounty.VineStakeUpdateProcedureMixin",
+    "manors_bounty.VineArborUpdateProcedureMixin"
   ],
   "client": [],
   "server": []
