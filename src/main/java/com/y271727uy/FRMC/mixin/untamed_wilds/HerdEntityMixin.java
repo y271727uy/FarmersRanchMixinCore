@@ -1,17 +1,28 @@
 package com.y271727uy.FRMC.mixin.untamed_wilds;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import untamedwilds.entity.ComplexMob;
 
-import java.util.Iterator;
 import java.util.List;
 
-@Mixin(value = untamedwilds.entity.HerdEntity.class, remap = false)
+@Pseudo
+@Mixin(targets = "untamedwilds.entity.HerdEntity", remap = false)
 public abstract class HerdEntityMixin {
+	@Unique
+	private static final float FRMC$DEFAULT_RADIUS = 8.0F;
+	@Unique
+	private static final int FRMC$DEFAULT_MAX_HERD_SIZE = 8;
+	@Unique
+	private static final int FRMC$COMBINE_SCAN_STRIDE = 2;
+	@Unique
+	private int frmc$combineScanTicker;
+
 	@Inject(method = "tick", at = @At("HEAD"))
 	private void frmc$validateHerdState(CallbackInfo ci) {
 		List<ComplexMob> creatureList = this.frmc$getCreatureList();
@@ -19,10 +30,10 @@ public abstract class HerdEntityMixin {
 			return;
 		}
 
-		for (Iterator<ComplexMob> iterator = creatureList.iterator(); iterator.hasNext(); ) {
-			ComplexMob creature = iterator.next();
+		for (int index = creatureList.size() - 1; index >= 0; index--) {
+			ComplexMob creature = creatureList.get(index);
 			if (creature == null || !creature.isAlive() || creature.isRemoved()) {
-				iterator.remove();
+				creatureList.remove(index);
 			}
 		}
 
@@ -45,16 +56,27 @@ public abstract class HerdEntityMixin {
 		}
 
 		if (this.frmc$getRadius() <= 0.0F) {
-			this.frmc$setRadius(8.0F);
+			this.frmc$setRadius(FRMC$DEFAULT_RADIUS);
 		}
 
 		if (this.frmc$getMaxHerdSize() <= 0) {
-			this.frmc$setMaxHerdSize(creatureList.size());
-		} else if (this.frmc$getMaxHerdSize() < creatureList.size()) {
-			this.frmc$setMaxHerdSize(creatureList.size());
+			this.frmc$setMaxHerdSize(FRMC$DEFAULT_MAX_HERD_SIZE);
 		}
 
 		if (creatureList.size() >= this.frmc$getMaxHerdSize()) {
+			this.frmc$setOpenToCombine(false);
+		}
+	}
+
+	@Inject(method = "tick", at = @At("RETURN"))
+	private void frmc$throttleCombineScan(CallbackInfo ci) {
+		List<ComplexMob> creatureList = this.frmc$getCreatureList();
+		if (creatureList == null || creatureList.isEmpty() || creatureList.size() >= this.frmc$getMaxHerdSize()) {
+			return;
+		}
+
+		this.frmc$combineScanTicker++;
+		if (this.frmc$combineScanTicker % FRMC$COMBINE_SCAN_STRIDE != 0) {
 			this.frmc$setOpenToCombine(false);
 		}
 	}
@@ -65,8 +87,6 @@ public abstract class HerdEntityMixin {
 	@Accessor("leader")
 	abstract void frmc$setLeader(ComplexMob leader);
 
-	@Accessor("openToCombine")
-	abstract boolean frmc$isOpenToCombine();
 
 	@Accessor("openToCombine")
 	abstract void frmc$setOpenToCombine(boolean openToCombine);

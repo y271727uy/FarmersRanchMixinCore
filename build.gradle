@@ -139,6 +139,7 @@ dependencies {
     modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
     modImplementation("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
     modImplementation("maven.modrinth:observable:QtSVNyjm")
+    modImplementation("maven.modrinth:spark:4FXHDE9F")
   //modImplementation("maven.modrinth::")
     modImplementation("maven.modrinth:citadel:lTAAe4sZ")
     modImplementation("curse.maven:untamedwilds-457252:4779746")

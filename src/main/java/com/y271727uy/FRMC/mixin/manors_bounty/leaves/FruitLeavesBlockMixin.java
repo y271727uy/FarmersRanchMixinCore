@@ -1,4 +1,4 @@
-package com.y271727uy.FRMC.mixin.manors_bounty;
+package com.y271727uy.FRMC.mixin.manors_bounty.leaves;
 
 import net.mcreator.manors_bounty.FruitLeavesBlock;
 import net.mcreator.manors_bounty.FruitLeavesBlock.CanFruitProperty;

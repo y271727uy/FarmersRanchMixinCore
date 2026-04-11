@@ -1,4 +1,4 @@
-package com.y271727uy.FRMC.mixin.manors_bounty;
+package com.y271727uy.FRMC.mixin.manors_bounty.procedure;
 
 import net.mcreator.manors_bounty.init.ManorsBountyModBlocks;
 import net.mcreator.manors_bounty.network.ManorsBountyModVariables.MapVariables;
