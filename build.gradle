@@ -23,6 +23,9 @@ repositories {
     maven {
         url = "https://api.modrinth.com/maven"
     }
+    maven {
+        url = "https://cursemaven.com"
+    }
 }
 
 base {
@@ -137,6 +140,8 @@ dependencies {
     modImplementation("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
     modImplementation("maven.modrinth:observable:QtSVNyjm")
   //modImplementation("maven.modrinth::")
+    modImplementation("maven.modrinth:citadel:lTAAe4sZ")
+    modImplementation("curse.maven:untamedwilds-457252:4779746")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
