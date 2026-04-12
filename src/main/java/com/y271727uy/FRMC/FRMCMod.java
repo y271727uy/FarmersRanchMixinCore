@@ -14,6 +14,3 @@ public class FRMCMod {
         LOGGER.info("FRMC mod initialized");
     }
 }
-
-
-//我不知道
