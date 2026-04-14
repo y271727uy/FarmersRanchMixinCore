@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "frmc.refmap.json",
   "mixins": [
+    "fruits_delight.FDBlockItemMixin",
     "farmersdelight.ToolActionIngredientSerializerMixin",
     "manors_bounty.leaves.FruitLeavesBlockMixin",
     "manors_bounty.leaves.HangingFruitLeavesBlockMixin",

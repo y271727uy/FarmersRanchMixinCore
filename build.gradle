@@ -139,6 +139,8 @@ dependencies {
     modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
     modImplementation("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
     modImplementation("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
+    modImplementation("maven.modrinth:vintage-delight:q8Ght7Bo")
+    modImplementation("maven.modrinth:fruits-delight:qPyefm6m")
     //modImplementation("maven.modrinth:observable:QtSVNyjm")
     //modImplementation("maven.modrinth:spark:4FXHDE9F")
     //modImplementation("maven.modrinth::")
