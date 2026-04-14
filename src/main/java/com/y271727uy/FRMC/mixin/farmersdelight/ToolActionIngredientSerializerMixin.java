@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.common.ToolAction;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import vectorwing.farmersdelight.common.crafting.ingredient.ToolActionIngredient;
@@ -11,6 +12,7 @@ import vectorwing.farmersdelight.common.crafting.ingredient.ToolActionIngredient
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Pseudo
 @Mixin(value = ToolActionIngredient.Serializer.class, remap = false)
 public class ToolActionIngredientSerializerMixin {
 

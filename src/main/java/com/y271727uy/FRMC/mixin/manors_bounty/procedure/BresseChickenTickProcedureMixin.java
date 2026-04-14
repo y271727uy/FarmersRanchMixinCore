@@ -17,11 +17,13 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Objects;
 
+@Pseudo
 @Mixin(targets = "net.mcreator.manors_bounty.procedures.BresseChickenTickProcedure")
 public abstract class BresseChickenTickProcedureMixin {
     @Unique

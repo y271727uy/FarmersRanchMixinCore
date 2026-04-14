@@ -10,11 +10,13 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 
+@Pseudo
 @Mixin(targets = "net.mcreator.manors_bounty.procedures.HappyAuraTickProcedure")
 public abstract class HappyAuraTickProcedureMixin {
     @Unique

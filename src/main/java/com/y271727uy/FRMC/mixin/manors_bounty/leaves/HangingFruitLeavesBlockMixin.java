@@ -22,10 +22,12 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
+@Pseudo
 @Mixin(value = HangingFruitLeavesBlock.class, remap = false)
 public abstract class HangingFruitLeavesBlockMixin extends LeavesBlock implements BonemealableBlock {
     @Shadow

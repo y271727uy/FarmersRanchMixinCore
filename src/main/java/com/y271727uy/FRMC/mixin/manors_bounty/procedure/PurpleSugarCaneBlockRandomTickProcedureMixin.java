@@ -7,9 +7,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 
+@Pseudo
 @Mixin(targets = "net.mcreator.manors_bounty.procedures.PurpleSugarCaneBlockRandomTickProcedure")
 public abstract class PurpleSugarCaneBlockRandomTickProcedureMixin {
     @Unique

@@ -17,12 +17,14 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
+@Pseudo
 @Mixin(targets = "net.mcreator.manors_bounty.procedures.FruitEffectUsingProcedure")
 public abstract class FruitEffectUsingProcedureMixin {
     @Unique
