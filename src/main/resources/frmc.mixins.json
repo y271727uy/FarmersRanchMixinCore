@@ -6,6 +6,7 @@
   "refmap": "frmc.refmap.json",
   "mixins": [
     "fruits_delight.FDBlockItemMixin",
+    "fruits_delight.FDFoodItemMixin",
     "farmersdelight.ToolActionIngredientSerializerMixin",
     "manors_bounty.leaves.FruitLeavesBlockMixin",
     "manors_bounty.leaves.HangingFruitLeavesBlockMixin",

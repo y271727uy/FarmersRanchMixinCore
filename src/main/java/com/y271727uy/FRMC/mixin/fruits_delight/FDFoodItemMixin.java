@@ -1,18 +1,16 @@
 package com.y271727uy.FRMC.mixin.fruits_delight;
 
 import com.y271727uy.FRMC.util.FruitsDelightRemainderHelper;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 
 @Pseudo
-@Mixin(targets = "dev.xkmc.fruitsdelight.content.item.FDBlockItem", remap = false)
-public abstract class FDBlockItemMixin extends BlockItem {
-    protected FDBlockItemMixin(Block block, Item.Properties properties) {
-        super(block, properties);
+@Mixin(targets = "dev.xkmc.fruitsdelight.content.item.FDFoodItem", remap = false)
+public abstract class FDFoodItemMixin extends Item {
+    protected FDFoodItemMixin(Properties properties) {
+        super(properties);
     }
 
     @Override
@@ -20,5 +18,6 @@ public abstract class FDBlockItemMixin extends BlockItem {
         return FruitsDelightRemainderHelper.replaceGlassBottleRemainder(stack, super.getCraftingRemainingItem(stack));
     }
 }
+
 
 
