@@ -4,6 +4,7 @@
   "package": "com.y271727uy.FRMC.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "frmc.refmap.json",
+  "plugin": "com.y271727uy.FRMC.mixin.blacklist.FRMCMixinConfigPlugin",
   "mixins": [
     "fruits_delight.FDBlockItemMixin",
     "fruits_delight.FDFoodItemMixin",
@@ -20,9 +21,28 @@
     "manors_bounty.procedure.YoungCoconutsRandomTickProcedureMixin",
     "mooncake_delight.MooncakeDelightMixin",
     "untamed_wilds.HerdEntityMixin",
-    "untamed_wilds.ai.FindItemsGoalMixin"
+    "untamed_wilds.ai.FindItemsGoalMixin",
+    "untamed_wilds.ai.SmartLookAtGoalMixin",
+    "untamed_wilds.ai.target.HuntMobTargetMixin",
+    "untamed_wilds.ai.target.ProtectChildrenTargetMixin",
+    "untamed_wilds.util.SpawnDataListenerEventMixin",
+    "untamed_wilds.util.EntityDataListenerEventMixin",
+    "untamed_wilds.entity.ComplexMobTextureCacheMixin",
+    "untamed_wilds.entity.mammal.EntityBigCatTextureCacheMixin",
+    "minecraft.recipe.ServerResourcesMixin",
+    "minecraft.recipe.RecipeManagerAccessor",
+    "minecraft.recipe.IngredientAccessor",
+    "minecraft.recipe.ItemValueAccessor",
+    "minecraft.recipe.TagValueAccessor",
+    "minecraft.recipe.deduplicator.ItemMixin",
+    "minecraft.recipe.deduplicator.TagKeyMixin",
+    "minecraft.recipe.deduplicator.VanillaIngredientSerializerMixin",
+    "minecraft.recipe.sync.IngredientMixin"
   ],
-  "client": [],
+  "client": [
+    "minecraft.recipe.ClientPacketListenerMixin",
+    "opengl.RenderSystemMixin"
+  ],
   "server": []
 }
 

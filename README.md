@@ -27,3 +27,20 @@ Additional Resources:
 ==========
 Community Documentation: https://docs.neoforged.net/  
 NeoForged Discord: https://discord.neoforged.net/
+
+Mixin blacklist config
+==========
+
+FRMC now creates a dedicated config file at `config/frmc-mixin-blacklist.toml` during startup.
+
+Use `blacklisted_mixins` to disable specific external mixins by fully-qualified class name. Prefix wildcards ending in `*` are also supported.
+
+Example:
+
+```toml
+blacklisted_mixins = [
+	"example.mod.mixin.SomeSpecificMixin",
+	"example.mod.mixin.problematic.*"
+]
+```
+

@@ -1,0 +1,8 @@
+// {
+//   "modid": "examplecoremod",
+//   "name": "Example Core Mod",
+//   "version": "1.0",
+//   "mcversion": "1.20.1",
+//   "description": "An example Core Mod with no actual modifications.",
+//   "class": "com.y271727uy.FRMC.coremod.FRMCCoreMod"
+// }

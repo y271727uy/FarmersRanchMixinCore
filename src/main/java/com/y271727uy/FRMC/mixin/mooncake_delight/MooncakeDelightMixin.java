@@ -21,7 +21,7 @@ public abstract class MooncakeDelightMixin {
         }
 
         frmc$attemptedCroptopiaCompatAttach = true;
-        MooncakeDelightCroptopiaCompat.forceRegisterCroptopiaCompat();
+        MooncakeDelightCroptopiaCompat.forceRegisterCroptopiaCompat(MooncakeDelightCroptopiaCompat.getModEventBus());
     }
 }
 
