@@ -32,15 +32,26 @@ public final class MooncakeDelightCroptopiaCompat {
         modEventBus.addListener(MooncakeDelightCroptopiaCompat::onBuildCreativeModeTabContents);
     }
 
-    public static void forceRegisterCroptopiaCompat() {
-        if (frmc$forcedRegisterAttached || !shouldForceCroptopiaCompat()) {
+    public static IEventBus getModEventBus() {
+        try {
+            Object loadingContext = FMLJavaModLoadingContext.class.getMethod("get").invoke(null);
+            Method getModEventBusMethod = loadingContext.getClass().getMethod("getModEventBus");
+            Object eventBus = getModEventBusMethod.invoke(loadingContext);
+            return (IEventBus) eventBus;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("FRMC could not resolve the Forge mod event bus", exception);
+        }
+    }
+
+    public static void forceRegisterCroptopiaCompat(IEventBus modEventBus) {
+        if (frmc$forcedRegisterAttached || !ModList.get().isLoaded(MOONCAKE_DELIGHT_MODID) || ModList.get().isLoaded(CROPTOPIA_MODID)) {
             return;
         }
 
         try {
             Method registerMethod = Class.forName(CROPTOPIA_ITEMS_CLASS).getDeclaredMethod("register", IEventBus.class);
             registerMethod.setAccessible(true);
-            registerMethod.invoke(null, FMLJavaModLoadingContext.get().getModEventBus());
+            registerMethod.invoke(null, modEventBus);
             frmc$forcedRegisterAttached = true;
             LOGGER.info("FRMC forced Mooncake Delight Croptopia compat item registration without Croptopia installed");
         } catch (ReflectiveOperationException | LinkageError exception) {
@@ -52,7 +63,7 @@ public final class MooncakeDelightCroptopiaCompat {
     }
 
     private static void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsEvent event) {
-        if (!shouldForceCroptopiaCompat() || !isMooncakeDelightTab(event)) {
+        if (!ModList.get().isLoaded(MOONCAKE_DELIGHT_MODID) || ModList.get().isLoaded(CROPTOPIA_MODID) || !isMooncakeDelightTab(event)) {
             return;
         }
 
@@ -66,9 +77,6 @@ public final class MooncakeDelightCroptopiaCompat {
         }
     }
 
-    private static boolean shouldForceCroptopiaCompat() {
-        return ModList.get().isLoaded(MOONCAKE_DELIGHT_MODID) && !ModList.get().isLoaded(CROPTOPIA_MODID);
-    }
 
     private static boolean isMooncakeDelightTab(BuildCreativeModeTabContentsEvent event) {
         ResourceLocation tabId = event.getTabKey().location();
