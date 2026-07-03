@@ -1,6 +1,5 @@
 package com.y271727uy.FRMC.mixin.blacklist;
 
-import com.mojang.logging.LogUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,10 +11,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class FRMCMixinBlacklistConfig {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = Logger.getLogger(FRMCMixinBlacklistConfig.class.getName());
     static final Path CONFIG_PATH = Paths.get("config", "frmc-mixin-blacklist.toml");
 
     private static final Pattern BLACKLIST_PATTERN = Pattern.compile("(?s)blacklisted_mixins\\s*=\\s*\\[(.*?)]");
@@ -41,14 +41,17 @@ public final class FRMCMixinBlacklistConfig {
                 ensureConfigExists();
                 parsedBlacklist = parse(Files.readString(CONFIG_PATH, StandardCharsets.UTF_8));
                 LOGGER.info(
-                    "Loaded FRMC mixin blacklist from {} ({} exact entries, {} wildcard prefixes)",
-                    CONFIG_PATH.toAbsolutePath(),
-                    parsedBlacklist.exactMixins().size(),
-                    parsedBlacklist.packagePrefixes().size()
+                    "Loaded FRMC mixin blacklist from "
+                        + CONFIG_PATH.toAbsolutePath()
+                        + " ("
+                        + parsedBlacklist.exactMixins().size()
+                        + " exact entries, "
+                        + parsedBlacklist.packagePrefixes().size()
+                        + " wildcard prefixes)"
                 );
             } catch (Exception exception) {
                 parsedBlacklist = ParsedBlacklist.empty();
-                LOGGER.error("Failed to load FRMC mixin blacklist from {}", CONFIG_PATH.toAbsolutePath(), exception);
+                LOGGER.log(Level.SEVERE, "Failed to load FRMC mixin blacklist from " + CONFIG_PATH.toAbsolutePath(), exception);
             }
 
             loaded = true;
@@ -96,7 +99,7 @@ public final class FRMCMixinBlacklistConfig {
         }
 
         Files.writeString(CONFIG_PATH, defaultConfig(), StandardCharsets.UTF_8);
-        LOGGER.info("Created default FRMC mixin blacklist config at {}", CONFIG_PATH.toAbsolutePath());
+        LOGGER.info("Created default FRMC mixin blacklist config at " + CONFIG_PATH.toAbsolutePath());
     }
 
     private static String defaultConfig() {
