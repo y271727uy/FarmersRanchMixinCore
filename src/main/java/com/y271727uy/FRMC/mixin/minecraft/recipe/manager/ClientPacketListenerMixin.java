@@ -1,7 +1,7 @@
-package com.y271727uy.FRMC.mixin.minecraft.recipe;
+package com.y271727uy.FRMC.mixin.minecraft.recipe.manager;
 
 import com.mojang.authlib.GameProfile;
-import com.y271727uy.FRMC.recipe.RecipeManagement;
+import com.y271727uy.FRMC.recipe.manager.RecipeManagement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -10,6 +10,7 @@ import net.minecraft.client.telemetry.WorldSessionTelemetryManager;
 import net.minecraft.network.Connection;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Replaces the vanilla RecipeManagement on the client side
  * with the optimized RecipeManagement that uses decision tree acceleration.
  */
+@Pseudo
 @Mixin(value = ClientPacketListener.class, priority = 2000)
 public class ClientPacketListenerMixin {
 

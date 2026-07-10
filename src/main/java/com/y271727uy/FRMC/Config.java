@@ -7,6 +7,15 @@ public final class Config {
     /** Master switch for recipe search optimization */
     public static boolean recipeSearchEnabled = true;
 
+    /** Matches Fast-Recipe-Search's compatibility-safe default scope. */
+    public static boolean recipeSearchOptimizeOnlyVanilla = true;
+
+    /** Compact Ingredient network encoding; disabled by default for compatibility. */
+    public static boolean recipeIngredientSyncEnabled = false;
+
+    /** Ingredient instance deduplication; disabled by default for compatibility. */
+    public static boolean recipeIngredientDeduplicatorEnabled = false;
+
     /** Enables low-noise OpenGL diagnostic logging for frame stalls and context info. */
     public static boolean openglDiagnosticsEnabled = false;
 

@@ -135,11 +135,11 @@ dependencies {
     modCompileOnly("maven.modrinth:geckolib:HVdLnQMI")
     modCompileOnly("maven.modrinth:manors-bounty:D0TALYL6")
     modImplementation("maven.modrinth:youkaishomecoming:yq57nNdE")
-    modImplementation("maven.modrinth:lets-do-vinery:2I4cH49O")
+    modCompileOnly("maven.modrinth:lets-do-vinery:2I4cH49O")
     modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
     modImplementation("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
-    modImplementation("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
-    modImplementation("maven.modrinth:vintage-delight:q8Ght7Bo")
+    modCompileOnly("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
+    modCompileOnly("maven.modrinth:vintage-delight:q8Ght7Bo")
     modImplementation("maven.modrinth:fruits-delight:qPyefm6m")
     //modImplementation("maven.modrinth:observable:QtSVNyjm")
     //modImplementation("maven.modrinth:spark:4FXHDE9F")
@@ -148,10 +148,14 @@ dependencies {
     modImplementation("curse.maven:untamedwilds-457252:4779746")
     modCompileOnly("curse.maven:mooncake-delight-1490740:7866540")
     modImplementation("maven.modrinth:modern-ui:3.12.0.1")
+    modImplementation("maven.modrinth:mystiasizakaya:tDUctFCt")
+    modCompileOnly("curse.maven:polymorph-388800:6450982")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'it.unimi.dsi:fastutil:8.5.12'
+    testImplementation 'org.spongepowered:mixin:0.8.5'
 
 	
     // Example optional mod dependency with JEI
@@ -186,10 +190,46 @@ mixin {
     config "${mod_id}.mixins.json"
 }
 
+def devMixinManifest = layout.buildDirectory.file('classes/java/main/META-INF/MANIFEST.MF')
+
+tasks.register('syncDevMixinConfig', Copy) {
+    dependsOn tasks.named('compileJava'), tasks.named('processResources')
+    doFirst {
+        devMixinManifest.get().asFile.delete()
+    }
+    from("src/main/resources/${mod_id}.mixins.json")
+    from(layout.buildDirectory.file("mixin/${mod_id}.refmap.json"))
+    into layout.buildDirectory.dir('classes/java/main')
+}
+
+[
+        'prepareClientRun',
+        'prepareServerRun',
+        'prepareDataRun',
+        'prepareGameTestServerRun'
+].each { taskName ->
+    tasks.named(taskName) {
+        dependsOn tasks.named('syncDevMixinConfig')
+    }
+}
+
 jar {
+    def mixinConfigFile = "${project.mod_id}.mixins.json".toString()
+    def refmapFile = "${project.mod_id}.refmap.json".toString()
+
     manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json"
+            "MixinConfigs": mixinConfigFile
     ])
+    filesMatching([mixinConfigFile, refmapFile]) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+    from('third_party/Fast-Recipe-Search-LICENSE.txt') {
+        into 'META-INF/licenses'
+        rename { 'RecipeSearch-LICENSE.txt' }
+    }
+    from('third_party/RecipeSearch-NOTICE.txt') {
+        into 'META-INF'
+    }
 }
 
 // Uncomment the lines below if you wish to configure mixin. The mixin file should be named modid.mixins.json.

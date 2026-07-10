@@ -1,8 +1,12 @@
-package com.y271727uy.FRMC.recipe;
+package com.y271727uy.FRMC.recipe.manager;
 
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
-import com.y271727uy.FRMC.mixin.minecraft.recipe.RecipeManagerAccessor;
+import com.y271727uy.FRMC.Config;
+import com.y271727uy.FRMC.compat.polymorph.PolymorphCompat;
+import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.RecipeManagerAccessor;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -10,11 +14,13 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,6 +30,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * to use the pre-built RecipeDB decision tree instead of linear search.
  */
 public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeManager {
+
+    private static final Set<RecipeType<?>> VANILLA_TYPES = Util.make(() -> {
+        Set<RecipeType<?>> types = new ReferenceOpenHashSet<>();
+        types.add(RecipeType.CRAFTING);
+        types.add(RecipeType.SMELTING);
+        types.add(RecipeType.BLASTING);
+        types.add(RecipeType.SMOKING);
+        types.add(RecipeType.CAMPFIRE_COOKING);
+        types.add(RecipeType.STONECUTTING);
+        types.add(RecipeType.SMITHING);
+        return types;
+    });
 
     private final Map<RecipeType<?>, RecipeDB<?, ?>> cachedDBMap = new ConcurrentHashMap<>();
 
@@ -52,6 +70,15 @@ public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeMa
 
     @Override
     public <C extends Container, T extends Recipe<C>> Optional<T> getRecipeFor(RecipeType<T> type, C input, Level world) {
+        if (Config.recipeSearchOptimizeOnlyVanilla && !VANILLA_TYPES.contains(type)) {
+            return super.getRecipeFor(type, input, world);
+        }
+        if (PolymorphCompat.isLoaded() && input instanceof BlockEntity blockEntity) {
+            T recipe = PolymorphCompat.getBlockEntityRecipe(type, input, world, blockEntity);
+            if (recipe != null) {
+                return Optional.of(recipe);
+            }
+        }
         var cachedRecipeList = getDB(type);
         var holder = cachedRecipeList.get(input, world);
         if (holder != null) return Optional.of(holder.recipe);
@@ -61,6 +88,15 @@ public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeMa
     @Override
     public <C extends Container, T extends Recipe<C>> Optional<Pair<ResourceLocation, T>> getRecipeFor(
             RecipeType<T> type, C input, Level world, @Nullable ResourceLocation lastRecipe) {
+        if (Config.recipeSearchOptimizeOnlyVanilla && !VANILLA_TYPES.contains(type)) {
+            return super.getRecipeFor(type, input, world, lastRecipe);
+        }
+        if (PolymorphCompat.isLoaded() && input instanceof BlockEntity blockEntity) {
+            T recipe = PolymorphCompat.getBlockEntityRecipe(type, input, world, blockEntity);
+            if (recipe != null) {
+                return Optional.of(Pair.of(recipe.getId(), recipe));
+            }
+        }
         var accessor = (RecipeManagerAccessor) this;
         Map<ResourceLocation, T> map = accessor.frmc$byType(type);
         if (lastRecipe != null) {
@@ -78,6 +114,9 @@ public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeMa
 
     @Override
     public <C extends Container, T extends Recipe<C>> List<T> getRecipesFor(RecipeType<T> type, C input, Level world) {
+        if (Config.recipeSearchOptimizeOnlyVanilla && !VANILLA_TYPES.contains(type)) {
+            return super.getRecipesFor(type, input, world);
+        }
         var cachedRecipeList = getDB(type);
         return cachedRecipeList.getAll(input, world);
     }

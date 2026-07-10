@@ -44,3 +44,29 @@ blacklisted_mixins = [
 ]
 ```
 
+Recipe search config
+==========
+
+FRMC includes a source-level port of the `RecipeSearch 1.3` search tree and the
+Forge integration from `Fast-Recipe-Search-forge-1.20`. No nested RecipeSearch
+JAR is bundled. Recipe integration settings are created at
+`config/frmc-recipe-search.properties` during startup.
+
+The compatibility-safe upstream defaults are:
+
+```properties
+enable=true
+optimize_only_vanilla=true
+ingredient_sync=false
+ingredient_deduplicator=false
+```
+
+`enable` controls all recipe-search mixins. `optimize_only_vanilla` limits the
+optimized database to vanilla recipe types. Ingredient network encoding and
+ingredient deduplication are separate optional optimizations and remain off by
+default because every connected side or affected mod must be compatible.
+
+The ported implementation is distributed under the GNU Lesser General Public
+License, version 3 or later. Its license and attribution are included in
+`third_party/` and in the built mod JAR.
+

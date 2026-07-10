@@ -1,0 +1,9 @@
+RecipeSearch 1.3
+Copyright (c) 2025 nutant233
+Licensed under the GNU Lesser General Public License, version 3 or later.
+
+FRMC ports the RecipeSearch 1.3 search-tree implementation into source and
+adapts the Forge integration code from Fast-Recipe-Search-forge-1.20 to FRMC's
+package and Mixin configuration. FRMC does not bundle the RecipeSearch JAR.
+The complete license text is in Fast-Recipe-Search-LICENSE.txt and is also
+packaged as META-INF/licenses/RecipeSearch-LICENSE.txt in the FRMC artifact.

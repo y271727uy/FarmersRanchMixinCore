@@ -1,4 +1,4 @@
-package com.y271727uy.FRMC.mixin.farmersdelight;
+package com.y271727uy.FRMC.mixin.minecraft.recipe.deduplicator.farmersdelight;
 
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,8 +20,8 @@ public class ToolActionIngredientSerializerMixin {
     private static final Map<String, ToolActionIngredient> fastrecipesearch$CACHE = new ConcurrentHashMap<>();
 
     /**
-     * @author 1
-     * @reason 1
+     * @author nutant233
+     * @reason deduplicator
      */
     @Overwrite
     public ToolActionIngredient parse(JsonObject json) {
@@ -29,8 +29,8 @@ public class ToolActionIngredientSerializerMixin {
     }
 
     /**
-     * @author 1
-     * @reason 1
+     * @author nutant233
+     * @reason deduplicator
      */
     @Overwrite
     public ToolActionIngredient parse(FriendlyByteBuf buffer) {

@@ -6,9 +6,11 @@ import icyllis.modernui.mc.text.GlyphManager;
 import java.io.IOException;
 import java.io.InputStream;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+@Pseudo
 @Mixin(value = GlyphManager.class, remap = false)
 public abstract class GlyphManagerMixin {
     @Redirect(

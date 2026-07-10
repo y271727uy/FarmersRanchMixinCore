@@ -1,21 +1,23 @@
 package com.y271727uy.FRMC.mixin.minecraft.recipe.deduplicator;
 
-import com.y271727uy.FRMC.util.IngredientHolderUtil;
+import com.y271727uy.FRMC.recipe.ingredient.IngredientHolder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.stream.Stream;
 
 /**
- * Makes Item implement IngredientHolderUtil so that single-item Ingredients
+ * Makes Item implement IngredientHolder so that single-item Ingredients
  * are cached and reused instead of being created anew each time.
  */
+@Pseudo
 @Mixin(Item.class)
-public abstract class ItemMixin implements ItemLike, IngredientHolderUtil {
+public abstract class ItemMixin implements ItemLike, IngredientHolder {
 
     @Unique
     private Ingredient frmc$ingredient;

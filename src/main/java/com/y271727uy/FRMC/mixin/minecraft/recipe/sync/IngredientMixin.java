@@ -1,7 +1,7 @@
 package com.y271727uy.FRMC.mixin.minecraft.recipe.sync;
 
-import com.y271727uy.FRMC.mixin.minecraft.recipe.ItemValueAccessor;
-import com.y271727uy.FRMC.mixin.minecraft.recipe.TagValueAccessor;
+import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.ItemValueAccessor;
+import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.TagValueAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -9,6 +9,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * - ItemValue: writes -3 + item ID
  * This reduces network packet size compared to the default JSON-like encoding.
  */
+@Pseudo
 @Mixin(Ingredient.class)
 public abstract class IngredientMixin {
 

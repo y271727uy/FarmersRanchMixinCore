@@ -1,9 +1,13 @@
-package com.y271727uy.FRMC.recipe;
+package com.y271727uy.FRMC.recipe.manager;
 
+import com.y271727uy.FRMC.recipe.ingredient.RecipeSearchIntegration;
+import com.y271727uy.FRMC.recipe.search.AbstractRecipeDB;
+import com.y271727uy.FRMC.recipe.search.IntLongMap;
+import com.y271727uy.FRMC.recipe.search.IntMapContainer;
 import com.google.common.base.Stopwatch;
-import com.y271727uy.FRMC.mixin.minecraft.recipe.IngredientAccessor;
-import com.y271727uy.FRMC.mixin.minecraft.recipe.ItemValueAccessor;
-import com.y271727uy.FRMC.mixin.minecraft.recipe.TagValueAccessor;
+import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.IngredientAccessor;
+import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.ItemValueAccessor;
+import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.TagValueAccessor;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
@@ -26,14 +30,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/**
- * A recipe database that uses a decision tree to accelerate recipe lookups.
- * <p>
- * For each recipe type, it builds a tree where nodes split on item/tag hashes.
- * At query time, the input inventory's items are hashed and used to traverse
- * the tree, quickly eliminating non-matching recipes.
- */
-public class RecipeDB<C extends Container, T extends Recipe<C>> extends AbstractRecipe<RecipeHolder<C, T>> {
+final class RecipeDB<C extends Container, T extends Recipe<C>> extends AbstractRecipeDB<RecipeHolder<C, T>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("FRMC.RecipeDB");
 
@@ -46,16 +43,12 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
     private RecipeDB() {
     }
 
-    /**
-     * Create a new RecipeDB for the given recipe type and recipes.
-     */
     @SuppressWarnings("unchecked")
-    public static <C extends Container, T extends Recipe<C>> RecipeDB<C, T> create(RecipeType<?> type, Map<ResourceLocation, T> recipes) {
+    static <C extends Container, T extends Recipe<C>> RecipeDB<C, T> create(RecipeType<?> type, Map<ResourceLocation, T> recipes) {
         Stopwatch watch = Stopwatch.createStarted();
-        RecipeDB<C, T> db = new RecipeDB<>();
-        AbstractRecipe.build(db, recipes.entrySet().stream()
+        RecipeDB<C, T> db = AbstractRecipeDB.build(new RecipeDB<>(), recipes.entrySet().stream()
                 .map(e -> new RecipeHolder<>(e.getKey(), e.getValue()))
-                .collect(Collectors.toList()));
+                .toList());
         watch.stop();
         LOGGER.info("Constructed recipe list for {} in {}. {}/{} recipes in the tree.",
                 BuiltInRegistries.RECIPE_TYPE.getKey(type), watch,
@@ -63,10 +56,7 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
         return db;
     }
 
-    /**
-     * Find a single matching recipe for the given input inventory.
-     */
-    public RecipeHolder<C, T> get(C inv, Level world) {
+    RecipeHolder<C, T> get(C inv, Level world) {
         if (this.rootBranch != null) {
             var map = extractIntMap(inv);
             if (!map.isEmpty()) {
@@ -76,15 +66,11 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
         return findInSerial(this.serialRecipes, getPredicate(inv, world));
     }
 
-    /**
-     * Find all matching recipes for the given input inventory.
-     */
-    public List<T> getAll(C inv, Level world) {
+    List<T> getAll(C inv, Level world) {
         if (this.rootBranch != null) {
             var map = extractIntMap(inv);
             if (!map.isEmpty()) {
-                return search(map, map.toIntArray(), getPredicate(map, inv, world))
-                        .stream()
+                return search(map, map.toIntArray(), getPredicate(map, inv, world)).stream()
                         .sorted(COMPARATOR)
                         .map(r -> r.recipe)
                         .collect(Collectors.toList());
@@ -110,10 +96,6 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
         return r -> r.recipe.matches(inv, world);
     }
 
-    /**
-     * Extract an IntLongMap from the input inventory.
-     * Maps each item's registry name hash to its count in the inventory.
-     */
     private IntLongMap extractIntMap(C inv) {
         var map = new IntLongMap();
         var size = inv.getContainerSize();
@@ -132,11 +114,10 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
     }
 
     @Override
-    public void finishBuild() {
+    protected void finishBuild() {
         super.finishBuild();
-        // Convert IntSet to int[] for faster iteration
         rawHash.forEach((k, v) -> hash.put(k, v.toIntArray()));
-        rawHash = null; // Allow GC
+        rawHash = null;
         if (!serialRecipes.isEmpty()) {
             serialRecipes.sort(COMPARATOR);
         }
@@ -144,7 +125,7 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
 
     @Override
     protected boolean supportsParallel(RecipeHolder<C, T> recipe) {
-        return false; // All recipes go through the tree if they have ingredients
+        return false;
     }
 
     @Override
@@ -178,9 +159,20 @@ public class RecipeDB<C extends Container, T extends Recipe<C>> extends Abstract
                         }
                     }
                 }
+            } else {
+                var action = RecipeSearchIntegration.getCustomIngredientAction(ingredient.getClass());
+                if (action != null) {
+                    IntSet keys = new IntOpenHashSet();
+                    action.accept(ingredient, (item, key) -> {
+                        keys.add(key);
+                        rawHash.computeIfAbsent(item, ignored -> new IntOpenHashSet()).add(key);
+                    });
+                    keys.forEach(key -> map.add(key, 1));
+                    if (!keys.isEmpty()) {
+                        inputAmount++;
+                    }
+                }
             }
-            // Note: Custom ingredients (like PartialNBTIngredient) are not handled here.
-            // They will fall through to serial recipe search.
         }
         maxInputAmount = Math.max(maxInputAmount, inputAmount);
         return map;
