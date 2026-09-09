@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "mooncake_delight:mooncake_mold",
+    "list:ditalini_mold",
+    "list:lasagna_mold",
+    "list:pasta_mold",
+    "list:rigatoni_mold",
+    "list:spaghetti_mold",
+    "list:tagliatelle_mold"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#forge:eggs",
+      "required": false
+    },
+    "manors_bounty:pink_bresse_chicken_egg",
+    {
+      "id": "#forge:feathers",
+      "required": false
+    }
+  ]
+}

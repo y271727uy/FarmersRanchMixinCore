@@ -1,0 +1,7 @@
+{
+  "parent": "youkaishomecoming:table/sushi/base",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "rice": "manors_bounty:item/sumeshi"
+  }
+}

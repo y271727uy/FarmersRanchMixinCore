@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.opengl;
 
-import com.y271727uy.FRMC.Config;
+import com.y271727uy.FRMC.config.Config;
 import com.y271727uy.FRMC.mixin.opengl.FrameTimerMixinAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.FrameTimer;

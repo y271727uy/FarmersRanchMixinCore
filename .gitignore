@@ -24,3 +24,9 @@ runs
 run-data
 
 repo
+
+# refer
+refer/
+
+# ModDevGradle rewrites these with machine-local absolute paths
+.vscode/

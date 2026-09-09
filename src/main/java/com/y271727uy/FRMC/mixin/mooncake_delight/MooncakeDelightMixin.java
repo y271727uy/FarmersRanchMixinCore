@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.mooncake_delight;
 
-import com.y271727uy.FRMC.compat.MooncakeDelightCroptopiaCompat;
+import com.y271727uy.FRMC.integration.mooncakedelight.MooncakeDelightCroptopiaIntegration;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
@@ -21,7 +21,7 @@ public abstract class MooncakeDelightMixin {
         }
 
         frmc$attemptedCroptopiaCompatAttach = true;
-        MooncakeDelightCroptopiaCompat.forceRegisterCroptopiaCompat(MooncakeDelightCroptopiaCompat.getModEventBus());
+        MooncakeDelightCroptopiaIntegration.forceRegisterCroptopiaCompat(MooncakeDelightCroptopiaIntegration.getModEventBus());
     }
 }
 

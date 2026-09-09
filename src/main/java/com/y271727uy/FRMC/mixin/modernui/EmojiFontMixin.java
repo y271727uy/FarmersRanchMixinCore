@@ -1,7 +1,7 @@
 package com.y271727uy.FRMC.mixin.modernui;
 
-import com.y271727uy.FRMC.compat.modernui.EmojiFontExtension;
-import com.y271727uy.FRMC.compat.modernui.ModernUIFlagEmojiCompat;
+import com.y271727uy.FRMC.integration.modernui.EmojiFontExtension;
+import com.y271727uy.FRMC.integration.modernui.ModernUIFlagEmojiIntegration;
 import icyllis.modernui.graphics.text.EmojiFont;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -45,6 +45,6 @@ public abstract class EmojiFontMixin implements EmojiFontExtension {
 
     @Inject(method = "find", at = @At("RETURN"), remap = false)
     private void frmc$recordFlagLookup(char[] text, int start, int limit, CallbackInfoReturnable<Integer> cir) {
-        ModernUIFlagEmojiCompat.recordFlagLookup(text, start, limit, cir.getReturnValueI());
+        ModernUIFlagEmojiIntegration.recordFlagLookup(text, start, limit, cir.getReturnValueI());
     }
 }

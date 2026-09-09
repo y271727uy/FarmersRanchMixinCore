@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.recipe.search;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -101,6 +102,37 @@ class RecipeSearchCoreTest {
 
         IntLongMap input = map(keys);
         assertSame(deep, database.findAnyMatch(input, input.toIntArray(), recipe -> true));
+    }
+
+    @Test
+    void hashBranchReadsIndividualNodesFromFastutilStorage() {
+        Branch.HashBranch<String> branch = new Branch.HashBranch<>();
+        for (int key = 1; key <= 5; key++) {
+            branch.put(key, new Node.R<>("recipe-" + key));
+        }
+
+        Node<String> node = branch.get(5);
+        assertNotNull(node);
+    }
+
+    @Test
+    void fullSearchTraversesLargeHashBranches() {
+        List<DummyRecipe> recipes = List.of(
+                recipe("one", 1),
+                recipe("two", 2),
+                recipe("three", 3),
+                recipe("four", 4),
+                recipe("five", 5)
+        );
+        DummyDB database = AbstractRecipeDB.build(new DummyDB(), recipes);
+        IntLongMap input = map(1, 2, 3, 4, 5);
+
+        List<String> found = database.search(input, input.toIntArray(), recipe -> true)
+                .stream()
+                .map(recipe -> recipe.name)
+                .toList();
+
+        assertEquals(Set.of("one", "two", "three", "four", "five"), Set.copyOf(found));
     }
 
     private static DummyRecipe recipe(String name, int... keys) {

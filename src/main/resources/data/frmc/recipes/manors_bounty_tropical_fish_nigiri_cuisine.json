@@ -1,0 +1,13 @@
+{
+  "type": "youkaishomecoming:cuisine_unordered",
+  "base": "frmc:sumeshi",
+  "input": [
+    {
+      "item": "manors_bounty:tropical_fish_slice"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "manors_bounty:tropical_fish_nigiri"
+  }
+}

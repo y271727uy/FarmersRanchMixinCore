@@ -1,0 +1,16 @@
+{
+  "type": "youkaishomecoming:cuisine_ordered",
+  "base": "frmc:sumeshi",
+  "input": [
+    {
+      "item": "manors_bounty:surimi_crab_stick"
+    },
+    {
+      "item": "manors_bounty:nori"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "manors_bounty:surimi_crab_stick_nigiri"
+  }
+}

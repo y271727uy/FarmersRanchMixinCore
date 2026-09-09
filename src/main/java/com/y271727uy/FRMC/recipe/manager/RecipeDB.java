@@ -46,9 +46,11 @@ final class RecipeDB<C extends Container, T extends Recipe<C>> extends AbstractR
     @SuppressWarnings("unchecked")
     static <C extends Container, T extends Recipe<C>> RecipeDB<C, T> create(RecipeType<?> type, Map<ResourceLocation, T> recipes) {
         Stopwatch watch = Stopwatch.createStarted();
-        RecipeDB<C, T> db = AbstractRecipeDB.build(new RecipeDB<>(), recipes.entrySet().stream()
+        List<RecipeHolder<C, T>> holders = recipes.entrySet().stream()
                 .map(e -> new RecipeHolder<>(e.getKey(), e.getValue()))
-                .toList());
+                .toList();
+        RecipeDB<C, T> db = new RecipeDB<>();
+        AbstractRecipeDB.build(db, holders);
         watch.stop();
         LOGGER.info("Constructed recipe list for {} in {}. {}/{} recipes in the tree.",
                 BuiltInRegistries.RECIPE_TYPE.getKey(type), watch,
@@ -60,10 +62,13 @@ final class RecipeDB<C extends Container, T extends Recipe<C>> extends AbstractR
         if (this.rootBranch != null) {
             var map = extractIntMap(inv);
             if (!map.isEmpty()) {
-                return findAnyMatch(map, map.toIntArray(), getPredicate(map, inv, world));
+                RecipeHolder<C, T> holder = findAnyMatch(map, map.toIntArray(), getPredicate(map, inv, world));
+                if (holder != null) {
+                    return holder;
+                }
             }
         }
-        return findInSerial(this.serialRecipes, getPredicate(inv, world));
+        return findInSerial(serialRecipes, getPredicate(inv, world));
     }
 
     List<T> getAll(C inv, Level world) {

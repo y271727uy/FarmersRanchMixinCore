@@ -1,0 +1,19 @@
+{
+  "type": "youkaishomecoming:cuisine_ordered",
+  "base": "frmc:sumeshi",
+  "input": [
+    {
+      "item": "minecraft:beef"
+    },
+    {
+      "item": "manors_bounty:caviar"
+    },
+    {
+      "item": "minecraft:gold_nugget"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "manors_bounty:wagyu_with_caviar_nigiri"
+  }
+}

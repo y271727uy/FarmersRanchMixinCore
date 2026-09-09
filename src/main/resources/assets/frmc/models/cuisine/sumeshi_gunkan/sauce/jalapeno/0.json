@@ -1,0 +1,7 @@
+{
+  "parent": "frmc:table/gunkan/sauce_0",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "sauce": "frmc:block/table/sauce/jalapeno"
+  }
+}

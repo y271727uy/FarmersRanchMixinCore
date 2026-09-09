@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:sniffer_egg",
+    "manors_bounty:bresse_chicken_egg",
+    "manors_bounty:mallard_duck_egg",
+    "minecraft:turtle_egg",
+    "minecraft:egg"
+  ]
+}

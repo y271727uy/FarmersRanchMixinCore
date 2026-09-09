@@ -70,3 +70,43 @@ The ported implementation is distributed under the GNU Lesser General Public
 License, version 3 or later. Its license and attribution are included in
 `third_party/` and in the built mod JAR.
 
+Model gap fix
+==========
+
+FRMC includes the Forge-side item and block model gap fixes from the reference
+Model Gap Fix project as source code. It does not bundle or JiJ the original
+mod, Architectury, or its cross-loader configuration layer.
+
+Client settings are created at `config/frmc-model-gap-fix.toml`. The defaults
+match the reference Forge implementation, including its separate macOS atlas
+shrinking values. Changing this config while the game is running reloads the
+active resource packs so regenerated item models use the new values.
+
+Local NetMusic playlist
+==========
+
+When NetMusic is installed, FRMC creates `config/frmc/music-list.txt`. Put one
+NetEase Cloud Music URL on each line. Single-song URLs and DJ episode URLs such
+as `https://music.163.com/#/dj?id=3720311521` are supported; playlist pages and
+`163cn.tv` short links are intentionally ignored. The sample DJ episode is
+included in a newly created file and will play on the Minecraft title screen.
+
+In a world, use `/frmc_music reload` after editing the file, then
+`/frmc_music play` (or `/frmc_music reload_play`). Playback is client-local and
+does not send NetMusic's nearby-player broadcast packet.
+
+<!--
+Prefab custom structures are disabled for now.
+
+Enabled data packs can contribute standard Structure Block exports at
+`data/<namespace>/prefab/structures/<path>.nbt`. For example,
+`data/my_buildings/prefab/structures/ranch_house.nbt` is registered as
+`my_buildings:ranch_house`. The files are reloaded with `/reload`; use
+`/frmc prefab structures` as an operator to verify the currently loaded IDs,
+dimensions, and block counts.
+
+Run `/frmc prefab enable` while holding any Prefab building blueprint to make
+that individual stack open FRMC's dynamic data-pack structure selector. Other
+Prefab blueprints retain their original interface.
+-->
+

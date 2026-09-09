@@ -1,0 +1,399 @@
+Additional Attribution
+
+Copyright © 2026 y271727uy
+The copyright holder reserves all other rights to the extent permitted by law.
+
+Effective Date: September 9, 2026
+Licensor: y271727uy
+
+────────────────────────────────────
+
+Article 1 - Nature of the Agreement
+
+1.1 This "Additional Attribution" (hereinafter referred to as "this Supplementary Agreement") is an additional license term applicable to this Project.
+
+1.2 Except for matters expressly provided in this Supplementary Agreement, the licensing, copying, modification, linking, republication, and other related rights of the Project code remain subject to the GNU Lesser General Public License v3.0 (hereinafter referred to as "LGPL-3.0") and its applicable terms attached to the Project.
+
+1.3 This Supplementary Agreement is intended to stipulate the attribution, attribution, and related information retention requirements of the copyright owner of this Project, and should not be construed as granting third-party rights that the Licensor does not possess.
+
+1.4 For third-party code, materials, libraries, resources, or other content in this Project that do not belong to the Licensor, their respective copyrights and licenses continue to be controlled by their respective rights holders and licenses. This Supplementary Agreement shall not be construed as changing or expanding the scope of licenses for such third-party content.
+
+────────────────────────────────────
+
+Article 2 - Definitions
+
+2.1 "This Project" refers to mods, programs, source code, binary files, and related project files developed by the Licensor, copyrighted by the Licensor, or licensed by the Licensor, and clearly marked as subject to this Supplementary Agreement.
+
+2.2 "Licensed Content" refers to content in this Project that is copyrighted by the Licensor or for which the Licensor has the right to stipulate attribution requirements under this Supplementary Agreement.
+
+2.3 "Use" includes but is not limited to copying, integrating, linking, loading, modifying, adapting, repackaging, republishing, distributing, or publishing this Project as part of other software, mods, modpacks, or projects.
+
+2.4 "Distributed Work" refers to works that contain, integrate, accompany, repackage, or otherwise distribute Licensed Content, including but not limited to game modpacks, mod integration packages, software distribution packages, and derivative projects.
+
+2.5 "Attribution Information" refers to author names, organization names, project names, copyright notices, and other information designated by the Licensor to indicate the source of this Project or the identity of the author.
+
+2.6 "Attribution Waiver" refers to the Licensor's permission, in a clear and verifiable manner under this Supplementary Agreement, for a specific Distributed Work to be wholly or partially exempted from the attribution obligations stipulated in this Supplementary Agreement.
+
+2.7 "Waived Work" refers to a specific work, project, version, or distribution object that has been expressly granted an Attribution Waiver by the Licensor.
+
+────────────────────────────────────
+
+Article 3 - Default Attribution Obligations
+
+3.1 Unless otherwise expressly provided in this Supplementary Agreement, any Distributed Work that distributes Licensed Content shall fulfill the attribution obligations stipulated in this Article.
+
+3.2 Distributors may not claim automatic Attribution Waiver on the grounds that this Project is provided free of charge, publicly released, publicly downloadable, licensed under LGPL-3.0, or for other similar reasons.
+
+3.3 Distributors shall retain complete and accurate Attribution Information in Distributed Works, and shall not intentionally delete, hide, modify, or otherwise make it difficult for ordinary users to reasonably identify the authorship or source relationship between the Licensor and this Project.
+
+3.4 If a Distributed Work has Credits, acknowledgments, thanks, about this project, license description, mod list, project description page, or other pages or areas used to explain the sources of third-party software, the Attribution Information should in principle be placed in one of them, and should enable ordinary users to reasonably see and identify such attribution.
+
+3.5 For Distributed Works published through the Internet or other public channels, if the work has a public project homepage, release page, project description page, or similar page, the distributor shall provide Attribution Information on that page or in a description area directly associated with that page.
+
+3.6 The attribution requirement should not be construed as requiring the distributor to list the Licensor as the author of that Distributed Work. Distributors may clearly state their own contributions to the Distributed Work, but may not use such statements to replace, delete, or deny the identity of the Licensor as the original author or copyright owner of this Project.
+
+────────────────────────────────────
+
+Article 4 - Contributors and Author Identity
+
+4.1 Distributors may list their own names, those of other developers, or contributors in Distributed Works.
+
+4.2 Any newly added contributor information shall not delete, replace, or deny the attribution information of the original author and copyright owner of this Project.
+
+4.3 Unless expressly authorized in writing by the Licensor, no one may list the Licensor as a co-author, official maintainer, official partner, or other identity of their Distributed Work, modpack, or other derivative project that may cause ordinary users to have such misunderstandings.
+
+4.4 This Article does not limit distributors from truthfully describing their independent contributions to Distributed Works.
+
+────────────────────────────────────
+
+Article 5 - Attribution Waiver Mechanism
+
+5.1 The Licensor may decide at its own discretion whether to grant an Attribution Waiver to a specific Distributed Work.
+
+5.2 Attribution Waivers must be expressly granted by the Licensor.
+
+5.3 The Licensor's silence, non-response, failure to raise objections, failure to proactively request attribution, or failure to discover use shall not be construed as granting an Attribution Waiver.
+
+5.4 Unless expressly stated by the Licensor, no Distributed Work shall be presumed to be a Waived Work.
+
+5.5 Attribution Waivers may be granted separately for one or more of the following scopes:
+
+(a) Specific Distributed Work;
+(b) Specific modpack;
+(c) Specific project;
+(d) Specific version;
+(e) Specific distribution channel;
+(f) Specific user;
+(g) Specific distribution period;
+(h) Specific use method;
+(i) Other scopes expressly designated by the Licensor.
+
+5.6 Unless expressly provided in an Attribution Waiver, waivers granted for a work shall not automatically extend to:
+
+(a) Other versions of that work;
+(b) Other works by that author;
+(c) Other modpacks or projects;
+(d) Other distributors;
+(e) Other use methods.
+
+5.7 The Licensor may expressly grant permanent, time-limited, version-specific, or other limited-scope Attribution Waivers.
+
+────────────────────────────────────
+
+Article 6 - Form of Waiver
+
+6.1 To avoid disputes, Attribution Waivers should be made in a clear manner that can prove the Licensor's intention.
+
+6.2 The Licensor may grant Attribution Waivers through the following methods:
+
+(a) Clearly listing Waived Works on the official release page of this Project;
+(b) Publishing an official waiver statement;
+(c) Sending clear written permission to specific distributors;
+(d) Clearly expressing waiver in communication records that both parties can save and verify;
+(e) Making clear statements through official project pages controlled by the Licensor.
+
+6.3 General statements such as "can be used," "welcome to use," "free to use," or "no need to contact the author" should not be automatically construed as exempting from the attribution obligations stipulated in this Supplementary Agreement, unless such statements clearly indicate that they also constitute an Attribution Waiver.
+
+────────────────────────────────────
+
+Article 7 - Revocation and Modification of Waivers
+
+7.1 For works expressly granted permanent Attribution Waivers, the Licensor may not retroactively negate lawfully obtained permanent waivers solely due to a later change of intention.
+
+7.2 For Attribution Waivers expressly granted as time-limited, version-specific, or other limited scope, their effectiveness is limited to the scope and period designated by the Licensor.
+
+7.3 Unless otherwise expressly provided by the Licensor, Attribution Waivers do not affect previously lawfully obtained licenses or lawfully completed distribution acts.
+
+────────────────────────────────────
+
+Article 8 - No Circumvention of Attribution Obligations
+
+8.1 Distributors shall not intentionally circumvent the attribution obligations stipulated in this Supplementary Agreement through renaming, repackaging, deleting file information, modifying metadata, hiding Credits, removing copyright notices, or other technical or non-technical means.
+
+8.2 Distributors shall not deny the applicability of this Supplementary Agreement to their distribution acts by claiming that this Project is merely a dependency, library, component, prerequisite mod, internal component, or other technical classification.
+
+8.3 This Article does not limit rights expressly guaranteed by LGPL-3.0 or other applicable licenses.
+
+────────────────────────────────────
+
+Article 9 - Third-Party Content
+
+9.1 This Project may contain or depend on third-party software, code, materials, or other content protected by third-party licenses.
+
+9.2 Distributors must comply with the licenses and copyright requirements applicable to such third-party content.
+
+9.3 This Supplementary Agreement applies only to Licensed Content owned or controlled by the Licensor and its corresponding attribution requirements.
+
+9.4 If a third-party license imposes stricter requirements for attribution, copyright notices, or other attribution information, distributors shall still comply with that third-party license.
+
+────────────────────────────────────
+
+Article 10 - Relationship with the Base License
+
+10.1 This Supplementary Agreement should not be construed as granting distributors rights beyond those permitted by LGPL-3.0.
+
+10.2 If any provision of this Supplementary Agreement conflicts with mandatory legal provisions applicable to this Project or provisions in the base license that cannot be legally modified, this Supplementary Agreement shall be interpreted and applied to the maximum extent permitted by law.
+
+10.3 If any provision of this Supplementary Agreement is determined by a court of competent jurisdiction to be invalid, unenforceable, or in irreconcilable conflict with the base license, that provision shall be limited or adjusted to the minimum extent permitted by law, and the remaining provisions shall continue to be effective.
+
+────────────────────────────────────
+
+Article 11 - Copyright and Ownership Declarations
+
+11.1 This Supplementary Agreement does not transfer any copyright, authorship, or other intellectual property rights that the Licensor has in this Project.
+
+11.2 Unless otherwise expressly stated in writing, the Licensor retains all rights it possesses under law.
+
+11.3 The attribution requirements in this Supplementary Agreement shall not be construed as the Licensor asserting ownership over the Distributed Work itself.
+
+────────────────────────────────────
+
+Article 12 - Manner of Compliance
+
+12.1 Any user who wishes to distribute this Project but cannot meet the attribution requirements of this Supplementary Agreement should apply to the Licensor for an Attribution Waiver before distribution.
+
+12.2 The Licensor may freely decide whether to grant such waiver, and may independently decide the scope, duration, and conditions of the waiver.
+
+12.3 Unless expressly waived, users shall fulfill attribution obligations in accordance with this Supplementary Agreement.
+
+────────────────────────────────────
+
+Article 13 - Version and Interpretation
+
+13.1 The version number of this document is used to identify the specific text version of this Supplementary Agreement.
+
+13.2 The licenses and supplementary agreements applicable to a specific version of the project shall be based on the license files accompanying the project at the time of release.
+
+13.3 The Licensor may publish new versions of this Supplementary Agreement. New versions should not automatically change expressly granted permanent waivers for specific works, unless the relevant waiver expressly allows its scope to change.
+
+────────────────────────────────────
+
+Article 14 - Final Provisions
+
+14.1 Users may obtain corresponding rights in accordance with applicable licenses, subject to compliance with the base license and this Supplementary Agreement.
+
+14.2 Nothing in this Supplementary Agreement limits the inalienable rights granted to users by applicable law.
+
+14.3 The core purpose of this Supplementary Agreement is to ensure that when Licensed Content is publicly distributed, integrated, or reused, the Licensor, as the original author and copyright owner, can obtain appropriate, accurate, and identifiable attribution.
+
+────────────────────────────────────
+────────────────────────────────────
+
+附加署名（中文版本）
+Additional Attribution (Chinese Version)
+
+Copyright © 2026 y271727uy
+版权所有者保留法律允许范围内的其他权利。
+
+生效日期：2026/9/9
+许可方：y271727uy
+
+────────────────────────────────────
+
+第一条　协议性质
+
+1.1 本《Additional Attributio》（以下简称“本附加协议”）是适用于本项目的附加许可证条款。
+
+1.2 除本附加协议明确规定的事项外，本项目代码的许可、复制、修改、链接、再发布及其他相关权利，仍受项目所附 GNU Lesser General Public License v3.0（以下简称“LGPL-3.0”）及其适用条款约束。
+
+1.3 本附加协议旨在规定本项目版权所有者的署名、归属及相关信息保留要求，不应被解释为授予许可方并不拥有的第三方权利。
+
+1.4 对于本项目中不属于许可方所有的第三方代码、素材、库、资源或其他内容，其相应版权及许可证继续由其各自权利人和许可证控制。本附加协议不得解释为改变或扩大该等第三方内容的许可范围。
+
+────────────────────────────────────
+
+第二条　定义
+
+2.1 “本项目”是指由许可方开发、拥有版权或有权许可，并明确标示适用本附加协议的模组、程序、源代码、二进制文件及其相关项目文件。
+
+2.2 “受许可内容”是指本项目中由许可方拥有版权或有权依据本附加协议规定署名要求的内容。
+
+2.3 “使用”包括但不限于复制、集成、链接、加载、修改、改编、重新打包、再发布、分发，或将本项目作为其他软件、模组、整合包或项目的一部分进行发布。
+
+2.4 “分发作品”是指包含、集成、附带、重新打包或以其他方式分发受许可内容的作品，包括但不限于游戏整合包、模组整合包、软件发行包及其衍生项目。
+
+2.5 “署名信息”是指许可方指定的作者姓名、组织名称、项目名称、版权声明及其他用于表明本项目来源或作者身份的信息。
+
+2.6 “署名豁免”是指许可方依据本附加协议，以明确、可验证的方式，允许特定分发作品全部或部分免除本附加协议规定的署名义务。
+
+2.7 “豁免作品”是指已经由许可方明确授予署名豁免的特定作品、项目、版本或发行对象。
+
+────────────────────────────────────
+
+第三条　默认署名义务
+
+3.1 除非本附加协议另有明确规定，任何分发受许可内容的分发作品均应履行本条规定的署名义务。
+
+3.2 分发者不得因本项目免费提供、公开发布、可公开下载、采用 LGPL-3.0 许可或其他类似原因，而主张其自动获得署名豁免。
+
+3.3 分发者应在分发作品中保留完整且准确的署名信息，不得故意删除、隐藏、修改或以其他方式使普通用户难以合理识别许可方与本项目之间的作者或来源关系。
+
+3.4 如果分发作品具有 Credits、鸣谢、致谢、关于本项目、许可证说明、模组列表、项目说明页或其他用于说明第三方软件来源的页面或区域，则署名信息原则上应当置于其中之一，且应当使普通用户能够合理地看到并识别该署名。
+
+3.5 对于通过互联网或其他公开渠道发布的分发作品，若该作品具有公开项目主页、发布页面、项目说明页面或类似页面，分发者应在该页面或与该页面直接关联的说明区域提供署名信息。
+
+3.6 署名要求不应被解释为要求分发者将许可方列为该分发作品的作者。分发者可以明确说明其自身对分发作品所作的贡献，但不得以该等说明取代、删除或否认许可方作为本项目原作者或版权所有者的身份。
+
+────────────────────────────────────
+
+第四条　贡献者及作者身份
+
+4.1 分发者可以在分发作品中列出其自身、其他开发者或贡献者的姓名。
+
+4.2 任何新增贡献者信息不得删除、替换或否认本项目原作者及版权所有者的署名信息。
+
+4.3 除非获得许可方明确书面授权，任何人不得将许可方列为其分发作品、整合包或其他衍生项目的共同作者、官方维护者、官方合作方或其他可能导致普通用户产生此类误解的身份。
+
+4.4 本条不限制分发者如实说明其对分发作品所作的独立贡献。
+
+────────────────────────────────────
+
+第五条　署名豁免机制
+
+5.1 许可方可以自行决定是否对特定分发作品授予署名豁免。
+
+5.2 署名豁免必须由许可方明确授予。
+
+5.3 许可方的沉默、不回复、未提出异议、未主动要求署名、未发现使用行为，均不得被解释为授予署名豁免。
+
+5.4 除非许可方明确声明，任何分发作品均不得推定为豁免作品。
+
+5.5 署名豁免可以针对以下一个或多个范围单独授予：
+
+(a) 特定分发作品；
+(b) 特定整合包；
+(c) 特定项目；
+(d) 特定版本；
+(e) 特定发行渠道；
+(f) 特定使用者；
+(g) 特定发行期间；
+(h) 特定使用方式；
+(i) 许可方明确指定的其他范围。
+
+5.6 除非署名豁免明确规定，否则针对某一作品授予的豁免不得自动扩展至：
+
+(a) 该作品的其他版本；
+(b) 该作者的其他作品；
+(c) 其他整合包或项目；
+(d) 其他发行者；
+(e) 其他使用方式。
+
+5.7 许可方可以明确授予永久性、期限性、版本性或其他限定范围的署名豁免。
+
+────────────────────────────────────
+
+第六条　豁免的形式
+
+6.1 为避免争议，署名豁免应当以能够证明许可方意愿的明确方式作出。
+
+6.2 许可方可以通过以下方式授予署名豁免：
+
+(a) 在本项目官方发布页面明确列出豁免作品；
+(b) 发布正式豁免声明；
+(c) 向特定分发者发送明确的书面许可；
+(d) 在双方可保存和验证的通信记录中明确表示豁免；
+(e) 通过许可方控制的官方项目页面作出明确声明。
+
+6.3 仅有“可以使用”“欢迎使用”“自由使用”“无需联系作者”等一般性表述，不应自动被解释为免除本附加协议规定的署名义务，除非该表述明确说明其同时构成署名豁免。
+
+────────────────────────────────────
+
+第七条　豁免的撤回与变更
+
+7.1 对于明确授予为永久性署名豁免的作品，许可方不得仅因日后改变意愿而追溯否定已经合法获得的永久性豁免。
+
+7.2 对于明确授予为期限性、版本性或其他限定范围的署名豁免，其效力仅限于许可方指定的范围和期限。
+
+7.3 除非许可方另有明确规定，署名豁免不影响此前已经合法获得的许可或已经完成的合法分发行为。
+
+────────────────────────────────────
+
+第八条　不得规避署名义务
+
+8.1 分发者不得通过重新命名、重新打包、删除文件信息、修改元数据、隐藏 Credits、移除版权声明或其他技术或非技术手段，故意规避本附加协议规定的署名义务。
+
+8.2 分发者不得通过声称本项目仅作为依赖项、库、组件、前置模组、内部组件或其他技术分类，而否认本附加协议对其分发行为的适用。
+
+8.3 本条不限制 LGPL-3.0 或其他适用许可证所明确保障的权利。
+
+────────────────────────────────────
+
+第九条　第三方内容
+
+9.1 本项目可能包含或依赖第三方软件、代码、素材或其他受第三方许可证保护的内容。
+
+9.2 分发者必须同时遵守该等第三方内容适用的许可证及版权要求。
+
+9.3 本附加协议仅适用于许可方拥有或有权控制的受许可内容及其相应署名要求。
+
+9.4 如果第三方许可证对署名、版权声明或其他归属信息提出更严格要求，分发者仍应遵守该第三方许可证。
+
+────────────────────────────────────
+
+第十条　与基础许可证的关系
+
+10.1 本附加协议不应被解释为授予分发者超出 LGPL-3.0 所允许范围之外的权利。
+
+10.2 如果本附加协议的任何条款与适用于本项目的强制性法律规定或基础许可证中不可合法修改的条款发生冲突，应在法律允许的最大范围内解释和适用本附加协议。
+
+10.3 如果本附加协议中的任何条款被有管辖权的法院认定为无效、不可执行或与基础许可证发生不可调和的冲突，该条款应在法律允许的最小范围内进行限制或调整，其余条款仍继续有效。
+
+────────────────────────────────────
+
+第十一条　版权与所有权声明
+
+11.1 本附加协议不转让许可方对本项目所拥有的任何版权、著作权或其他知识产权。
+
+11.2 除非另有明确书面声明，许可方仍保留其依法拥有的全部权利。
+
+11.3 本附加协议中的署名要求不得被解释为许可方对分发作品本身主张所有权。
+
+────────────────────────────────────
+
+第十二条　遵守方式
+
+12.1 任何希望分发本项目但无法满足本附加协议署名要求的使用者，应在分发前向许可方申请署名豁免。
+
+12.2 许可方可以自由决定是否授予该豁免，并可以自行决定豁免的范围、期限及条件。
+
+12.3 除非获得明确豁免，使用者应当按照本附加协议履行署名义务。
+
+────────────────────────────────────
+
+第十三条　版本与解释
+
+13.1 本文件版本号用于标识本附加协议的具体文本版本。
+
+13.2 对于特定版本项目所适用的许可证及附加协议，应以该项目发布时随附的许可证文件为准。
+
+13.3 许可方可以发布本附加协议的新版本。新版本不应自动改变已经明确授予的、针对特定作品的永久性豁免，除非相关豁免明确允许其适用范围发生变化。
+
+────────────────────────────────────
+
+第十四条　最终条款
+
+14.1 使用者在符合基础许可证及本附加协议的前提下，可以依照适用许可证获得相应权利。
+
+14.2 本附加协议中的任何内容均不限制适用法律赋予使用者的不可放弃权利。
+
+14.3 本附加协议的核心目的，是确保在受许可内容被公开分发、集成或再利用时，许可方作为原作者及版权所有者能够获得适当、准确且可识别的归属。

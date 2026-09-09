@@ -29,6 +29,8 @@ public abstract class BresseChickenTickProcedureMixin {
     @Unique
     private static final int FRMC$MAX_EGG_LAY_TIME = 9000;
     @Unique
+    private static final int FRMC$TIMER_STEP = 20;
+    @Unique
     private static final String FRMC$CHARLIE_NAME = "CHARLIE";
     @Unique
     private static final String FRMC$BLUE_TEXTURE = "bresse_chicken_blue";
@@ -47,12 +49,20 @@ public abstract class BresseChickenTickProcedureMixin {
             return;
         }
 
-        frmc$updateTexture(chicken);
+        if (chicken.tickCount % FRMC$TIMER_STEP == 0) {
+            frmc$updateTexture(chicken);
+        }
 
         int eggTime = chicken.getEntityData().get(BresseChickenEntity.DATA_EggLayTime);
         if (eggTime > 0) {
-            chicken.getEntityData().set(BresseChickenEntity.DATA_EggLayTime, eggTime - 1);
-            return;
+            if (chicken.tickCount % FRMC$TIMER_STEP != 0 && eggTime > FRMC$TIMER_STEP) {
+                return;
+            }
+            int remaining = Math.max(0, eggTime - Math.min(FRMC$TIMER_STEP, eggTime));
+            chicken.getEntityData().set(BresseChickenEntity.DATA_EggLayTime, remaining);
+            if (remaining > 0) {
+                return;
+            }
         }
 
         ItemStack eggStack = frmc$getEggStack(chicken);

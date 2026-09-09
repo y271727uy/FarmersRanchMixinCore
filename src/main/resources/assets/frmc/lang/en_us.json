@@ -1,5 +1,24 @@
 {
+  "frmc.online_music.button": "Online Music",
+  "frmc.online_music.title": "Online Music Settings",
+  "frmc.online_music.enabled": "Music playback: %s",
+  "frmc.online_music.enabled_option": "Online music playback",
+  "frmc.online_music.mode": "Playback mode: %s",
+  "frmc.online_music.mode.list_loop": "List loop",
+  "frmc.online_music.mode.single_loop": "Single loop",
+  "frmc.online_music.mode.random": "Random",
+  "frmc.online_music.unavailable": "Music playback: NetMusic not installed",
+  "frmc.online_music.command.unavailable": "NetMusic is not installed.",
+  "frmc.online_music.command.reloaded": "Loaded %s songs from music-list.txt; ignored %s invalid links.",
+  "frmc.online_music.command.reload_failed": "Unable to read music list: %s",
+  "frmc.online_music.command.empty": "The music list is empty. Add NetEase song links to music-list.txt and reload it.",
+  "frmc.online_music.command.playing": "Playlist playback started.",
+  "frmc.online_music.command.stopped": "Playlist playback stopped.",
   "itemGroup.examplemod": "Example Mod Tab",
   "block.examplemod.example_block": "Example Block",
-  "item.examplemod.example_item": "Example Item"
+  "item.examplemod.example_item": "Example Item",
+  "frmc.jei.cooking_pot.lossless": "Lossless",
+  "tooltip.frmc.vinery.crusher": "Crushed by: %s",
+  "config.jade.plugin_manors_bounty.chicken_egg_timer": "Chicken egg timer",
+  "config.jade.plugin_manors_bounty.trimmed_bush": "Trimmed bush"
 }

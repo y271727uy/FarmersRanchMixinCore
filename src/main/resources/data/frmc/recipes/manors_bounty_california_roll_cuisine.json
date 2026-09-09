@@ -1,0 +1,25 @@
+{
+  "type": "youkaishomecoming:cuisine_ordered",
+  "base": "frmc:sumeshi_placed",
+  "input": [
+    {
+      "item": "manors_bounty:cucumber_slice"
+    },
+    {
+      "item": "manors_bounty:avocado_slice"
+    },
+    {
+      "item": "manors_bounty:surimi_crab_stick"
+    },
+    {
+      "item": "manors_bounty:ikura"
+    },
+    {
+      "item": "manors_bounty:nori"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "manors_bounty:california_roll"
+  }
+}

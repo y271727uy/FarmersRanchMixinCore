@@ -2,8 +2,8 @@ package com.y271727uy.FRMC.recipe.manager;
 
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
-import com.y271727uy.FRMC.Config;
-import com.y271727uy.FRMC.compat.polymorph.PolymorphCompat;
+import com.y271727uy.FRMC.config.Config;
+import com.y271727uy.FRMC.integration.polymorph.PolymorphIntegration;
 import com.y271727uy.FRMC.mixin.minecraft.recipe.accessor.RecipeManagerAccessor;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.Util;
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * Optimized RecipeManagement that uses a decision tree to accelerate recipe lookups.
@@ -30,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * to use the pre-built RecipeDB decision tree instead of linear search.
  */
 public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeManager {
+    private static final Logger LOGGER = Logger.getLogger(RecipeManagement.class.getName());
 
     private static final Set<RecipeType<?>> VANILLA_TYPES = Util.make(() -> {
         Set<RecipeType<?>> types = new ReferenceOpenHashSet<>();
@@ -73,10 +75,14 @@ public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeMa
         if (Config.recipeSearchOptimizeOnlyVanilla && !VANILLA_TYPES.contains(type)) {
             return super.getRecipeFor(type, input, world);
         }
-        if (PolymorphCompat.isLoaded() && input instanceof BlockEntity blockEntity) {
-            T recipe = PolymorphCompat.getBlockEntityRecipe(type, input, world, blockEntity);
-            if (recipe != null) {
-                return Optional.of(recipe);
+        if (PolymorphIntegration.isLoaded() && input instanceof BlockEntity blockEntity) {
+            try {
+                T recipe = PolymorphIntegration.getBlockEntityRecipe(type, input, world, blockEntity);
+                if (recipe != null) {
+                    return Optional.of(recipe);
+                }
+            } catch (RuntimeException exception) {
+                LOGGER.log(java.util.logging.Level.WARNING, "Polymorph recipe lookup failed for " + type + ", falling back to FRMC search.", exception);
             }
         }
         var cachedRecipeList = getDB(type);
@@ -91,17 +97,21 @@ public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeMa
         if (Config.recipeSearchOptimizeOnlyVanilla && !VANILLA_TYPES.contains(type)) {
             return super.getRecipeFor(type, input, world, lastRecipe);
         }
-        if (PolymorphCompat.isLoaded() && input instanceof BlockEntity blockEntity) {
-            T recipe = PolymorphCompat.getBlockEntityRecipe(type, input, world, blockEntity);
-            if (recipe != null) {
-                return Optional.of(Pair.of(recipe.getId(), recipe));
+        if (PolymorphIntegration.isLoaded() && input instanceof BlockEntity blockEntity) {
+            try {
+                T recipe = PolymorphIntegration.getBlockEntityRecipe(type, input, world, blockEntity);
+                if (recipe != null) {
+                    return Optional.of(Pair.of(recipe.getId(), recipe));
+                }
+            } catch (RuntimeException exception) {
+                LOGGER.log(java.util.logging.Level.WARNING, "Polymorph recipe lookup failed for " + type + ", falling back to FRMC search.", exception);
             }
         }
         var accessor = (RecipeManagerAccessor) this;
         Map<ResourceLocation, T> map = accessor.frmc$byType(type);
         if (lastRecipe != null) {
             T t = map.get(lastRecipe);
-            if (t != null && t.matches(input, world)) {
+            if (t != null && safeMatches(t, input, world)) {
                 return Optional.of(Pair.of(lastRecipe, t));
             }
         }
@@ -125,5 +135,14 @@ public class RecipeManagement extends net.minecraft.world.item.crafting.RecipeMa
     private <C extends Container, T extends Recipe<C>> RecipeDB<C, T> getDB(RecipeType<T> type) {
         var accessor = (RecipeManagerAccessor) this;
         return (RecipeDB<C, T>) cachedDBMap.computeIfAbsent(type, k -> RecipeDB.create(type, accessor.frmc$byType(type)));
+    }
+
+    private static <C extends Container, T extends Recipe<C>> boolean safeMatches(T recipe, C input, Level world) {
+        try {
+            return recipe.matches(input, world);
+        } catch (RuntimeException exception) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Recipe match failed in lastRecipe check, skipping.", exception);
+            return false;
+        }
     }
 }

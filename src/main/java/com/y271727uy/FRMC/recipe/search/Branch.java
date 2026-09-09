@@ -29,14 +29,16 @@ public interface Branch<R> {
         private Node<R>[] optimizedValues;
 
         @Override
+        @SuppressWarnings("unchecked")
         public Node<R> get(int requestedKey) {
             int[] keys = this.key;
+            Object[] values = this.value;
             int position = HashCommon.mix(requestedKey) & this.mask;
             int current = keys[position];
             if (current != 0) {
                 do {
                     if (current == requestedKey) {
-                        return this.value[position];
+                        return (Node<R>) values[position];
                     }
                 } while ((current = keys[position = position + 1 & this.mask]) != 0);
             }

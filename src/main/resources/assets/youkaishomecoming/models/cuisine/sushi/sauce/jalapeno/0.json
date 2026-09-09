@@ -1,0 +1,8 @@
+{
+  "parent": "youkaishomecoming:table/sushi/sauce_0",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "top": "frmc:block/table/sauce/jalapeno",
+    "sauce": "frmc:block/table/sauce/jalapeno"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " a ",
+    "bcb",
+    "bdb"
+  ],
+  "key": {
+    "a": {
+      "item": "manors_bounty:hay_nest"
+    },
+    "b": {
+      "item": "manors_bounty:vine_arbor"
+    },
+    "c": {
+      "item": "minecraft:air"
+    },
+    "d": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "result": {
+    "item": "manors_bounty:egg_incubator",
+    "count": 1
+  }
+}

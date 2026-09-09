@@ -1,0 +1,21 @@
+{
+  "frmc.online_music.button": "在线音乐设置",
+  "frmc.online_music.title": "在线音乐设置",
+  "frmc.online_music.enabled": "音乐播放：%s",
+  "frmc.online_music.enabled_option": "在线音乐播放",
+  "frmc.online_music.mode": "播放模式：%s",
+  "frmc.online_music.mode.list_loop": "列表循环",
+  "frmc.online_music.mode.single_loop": "单曲循环",
+  "frmc.online_music.mode.random": "随机播放",
+  "frmc.online_music.unavailable": "音乐播放：未安装 NetMusic",
+  "frmc.online_music.command.unavailable": "未安装 NetMusic。",
+  "frmc.online_music.command.reloaded": "已从 music-list.txt 加载 %s 首歌曲，忽略 %s 个无效链接。",
+  "frmc.online_music.command.reload_failed": "无法读取音乐列表：%s",
+  "frmc.online_music.command.empty": "音乐列表为空，请将网易云歌曲链接写入 music-list.txt 后重新加载。",
+  "frmc.online_music.command.playing": "已开始播放歌单。",
+  "frmc.online_music.command.stopped": "已停止播放歌单。",
+  "frmc.jei.cooking_pot.lossless": "不消耗",
+  "tooltip.frmc.vinery.crusher": "%s 足香风味",
+  "config.jade.plugin_manors_bounty.chicken_egg_timer": "鸡蛋计时器",
+  "config.jade.plugin_manors_bounty.trimmed_bush": "修剪后的灌木"
+}

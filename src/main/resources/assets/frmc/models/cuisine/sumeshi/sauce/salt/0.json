@@ -1,0 +1,8 @@
+{
+  "parent": "frmc:table/sushi/sauce_low",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "top": "frmc:block/table/sauce/salt",
+    "sauce": "frmc:block/table/sauce/salt"
+  }
+}

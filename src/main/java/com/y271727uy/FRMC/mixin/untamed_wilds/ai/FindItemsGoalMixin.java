@@ -25,7 +25,7 @@ public abstract class FindItemsGoalMixin extends Goal {
 
 
     // Prevent crashes when the goal starts with an invalid item target.
-    @Inject(method = "m_8056_", at = @At("HEAD"), cancellable = true, require = 0, expect = 0, remap = false)
+    @Inject(method = {"start", "m_8056_"}, at = @At("HEAD"), cancellable = true, require = 0, expect = 0, remap = false)
     @Dynamic
     @Unique
     private void frmc$guardStart(CallbackInfo ci) {
@@ -38,7 +38,7 @@ public abstract class FindItemsGoalMixin extends Goal {
     }
 
     // Reject targets whose FoodProperties were resolved as null, preventing follow-up NPEs in start/tick.
-    @Inject(method = "m_8036_", at = @At("RETURN"), cancellable = true, require = 0, expect = 0, remap = false)
+    @Inject(method = {"canUse", "m_8036_"}, at = @At("RETURN"), cancellable = true, require = 0, expect = 0, remap = false)
     @Dynamic
     @Unique
     private void frmc$validateChosenTarget(CallbackInfoReturnable<Boolean> cir) {
@@ -55,7 +55,7 @@ public abstract class FindItemsGoalMixin extends Goal {
     }
 
     // Prevent crashes when the goal ticks with an invalid item target.
-    @Inject(method = "m_8037_", at = @At("HEAD"), cancellable = true, require = 0, expect = 0, remap = false)
+    @Inject(method = {"tick", "m_8037_"}, at = @At("HEAD"), cancellable = true, require = 0, expect = 0, remap = false)
     @Dynamic
     @Unique
     private void frmc$guardTick(CallbackInfo ci) {
@@ -79,7 +79,7 @@ public abstract class FindItemsGoalMixin extends Goal {
     }
 
     // Prevent crashes when the goal is queried for continuation with an invalid target.
-    @Inject(method = "m_8045_", at = @At("HEAD"), cancellable = true, require = 0, expect = 0, remap = false)
+    @Inject(method = {"canContinueToUse", "m_8045_"}, at = @At("HEAD"), cancellable = true, require = 0, expect = 0, remap = false)
     @Dynamic
     @Unique
     private void frmc$guardContinue(CallbackInfoReturnable<Boolean> cir) {

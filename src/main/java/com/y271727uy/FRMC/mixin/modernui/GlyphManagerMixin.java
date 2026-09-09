@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.modernui;
 
-import com.y271727uy.FRMC.compat.modernui.ModernUIFlagEmojiCompat;
+import com.y271727uy.FRMC.integration.modernui.ModernUIFlagEmojiIntegration;
 import icyllis.modernui.ModernUI;
 import icyllis.modernui.mc.text.GlyphManager;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public abstract class GlyphManagerMixin {
     )
     private InputStream frmc$openBundledEmoji(ModernUI modernUI, String namespace, String path) throws IOException {
         if ("modernui".equals(namespace)) {
-            InputStream stream = ModernUIFlagEmojiCompat.openBundledEmoji(path);
+            InputStream stream = ModernUIFlagEmojiIntegration.openBundledEmoji(path);
             if (stream != null) {
                 return stream;
             }

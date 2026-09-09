@@ -13,6 +13,10 @@ import org.spongepowered.asm.mixin.transformer.ext.Extensions;
 import org.spongepowered.asm.mixin.transformer.ext.IExtension;
 import org.spongepowered.asm.mixin.transformer.ext.ITargetClassContext;
 
+/*
+ * 黑名单专用类
+ */
+
 public final class FRMCMixinBlacklistExtension implements IExtension, Predicate<IMixinInfo> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final FRMCMixinBlacklistExtension INSTANCE = new FRMCMixinBlacklistExtension();

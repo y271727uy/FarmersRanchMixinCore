@@ -1,0 +1,13 @@
+{
+  "type": "youkaishomecoming:cuisine_unordered",
+  "base": "frmc:sumeshi",
+  "input": [
+    {
+      "item": "manors_bounty:cooked_prawn"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "manors_bounty:shrimp_nigiri"
+  }
+}

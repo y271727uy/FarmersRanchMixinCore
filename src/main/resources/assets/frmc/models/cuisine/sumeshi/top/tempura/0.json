@@ -1,0 +1,7 @@
+{
+  "parent": "youkaishomecoming:table/sushi/top_0",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "top": "frmc:block/table/sushi/top/tempura"
+  }
+}

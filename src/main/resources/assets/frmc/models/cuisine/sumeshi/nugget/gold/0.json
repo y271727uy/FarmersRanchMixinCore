@@ -1,0 +1,7 @@
+{
+  "parent": "frmc:table/sushi/nugget_0",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "top": "minecraft:block/gold_block"
+  }
+}

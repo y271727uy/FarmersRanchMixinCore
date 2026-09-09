@@ -1,18 +1,16 @@
 package com.y271727uy.FRMC.recipe.config;
 
-import com.y271727uy.FRMC.Config;
+import com.y271727uy.FRMC.config.Config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class RecipeSearchConfig {
-    static final Path CONFIG_PATH = Paths.get("config", "frmc-recipe-search.properties");
     private static final Logger LOGGER = Logger.getLogger(RecipeSearchConfig.class.getName());
     private static volatile boolean loaded;
 
@@ -29,20 +27,21 @@ public final class RecipeSearchConfig {
             }
             Properties properties = defaultProperties();
             try {
-                Path directory = CONFIG_PATH.getParent();
+                Path configPath = configPath();
+                Path directory = configPath.getParent();
                 if (directory != null) {
                     Files.createDirectories(directory);
                 }
-                if (Files.exists(CONFIG_PATH)) {
-                    try (InputStream input = Files.newInputStream(CONFIG_PATH)) {
+                if (Files.exists(configPath)) {
+                    try (InputStream input = Files.newInputStream(configPath)) {
                         properties.load(input);
                     }
                 } else {
-                    writeDefaults(properties);
+                    writeDefaults(configPath, properties);
                 }
                 apply(properties);
             } catch (IOException exception) {
-                LOGGER.log(Level.SEVERE, "Failed to load recipe search config from " + CONFIG_PATH.toAbsolutePath(), exception);
+                LOGGER.log(Level.SEVERE, "Failed to load recipe search config", exception);
                 apply(defaultProperties());
             }
             loaded = true;
@@ -69,8 +68,12 @@ public final class RecipeSearchConfig {
         return properties;
     }
 
-    private static void writeDefaults(Properties properties) throws IOException {
-        try (OutputStream output = Files.newOutputStream(CONFIG_PATH)) {
+    private static Path configPath() {
+        return com.y271727uy.FRMC.config.FRMCConfigPaths.resolve("frmc-recipe-search.properties");
+    }
+
+    private static void writeDefaults(Path configPath, Properties properties) throws IOException {
+        try (OutputStream output = Files.newOutputStream(configPath)) {
             properties.store(output, "FRMC Fast-Recipe-Search compatibility settings");
         }
     }

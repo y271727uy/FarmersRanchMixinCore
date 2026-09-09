@@ -33,6 +33,24 @@ class FRMCMixinBlacklistConfigTest {
 
         assertFalse(parsed.matches("example.mod.mixin.AnyMixin"));
     }
+
+    @Test
+    void dynamicallyAddsExactAndWildcardEntries() {
+        assertTrue(FRMCMixinBlacklistConfig.addBlacklistedMixin("example.mod.mixin.DynamicMixin"));
+        assertTrue(FRMCMixinBlacklistConfig.addBlacklistedMixin("example.mod.mixin.dynamic.*"));
+
+        assertTrue(FRMCMixinBlacklistConfig.matchesDynamic("example.mod.mixin.DynamicMixin"));
+        assertTrue(FRMCMixinBlacklistConfig.matchesDynamic("example.mod.mixin.dynamic.SomeMixin"));
+        assertFalse(FRMCMixinBlacklistConfig.matchesDynamic("example.mod.mixin.OtherMixin"));
+    }
+
+    @Test
+    void rejectsDuplicateAndInvalidDynamicEntries() {
+        assertTrue(FRMCMixinBlacklistConfig.addBlacklistedMixin("example.mod.mixin.OnceMixin"));
+        assertFalse(FRMCMixinBlacklistConfig.addBlacklistedMixin("example.mod.mixin.OnceMixin"));
+        assertFalse(FRMCMixinBlacklistConfig.addBlacklistedMixin(null));
+        assertFalse(FRMCMixinBlacklistConfig.addBlacklistedMixin("   "));
+    }
 }
 
 

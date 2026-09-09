@@ -1,0 +1,13 @@
+{
+  "type": "youkaishomecoming:cuisine_unordered",
+  "base": "frmc:sumeshi",
+  "input": [
+    {
+      "item": "manors_bounty:raw_cod_slice"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "manors_bounty:cod_nigiri"
+  }
+}

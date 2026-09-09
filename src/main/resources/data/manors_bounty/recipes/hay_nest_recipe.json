@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "a a",
+    "aaa"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:hay_block"
+    }
+  },
+  "result": {
+    "item": "manors_bounty:hay_nest",
+    "count": 1
+  }
+}

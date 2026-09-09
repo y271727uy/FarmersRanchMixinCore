@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.modernui;
 
-import com.y271727uy.FRMC.compat.modernui.ModernUIFlagEmojiCompat;
+import com.y271727uy.FRMC.integration.modernui.ModernUIFlagEmojiIntegration;
 import icyllis.modernui.mc.FontResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +16,6 @@ public abstract class FontResourceManagerMixin {
     private static void frmc$registerFlagEmojis(ResourceManager resourceManager,
                                                 FontResourceManager.LoadResults loadResults,
                                                 CallbackInfo ci) {
-        ModernUIFlagEmojiCompat.registerFlagEmojis(loadResults.mEmojiFont);
+        ModernUIFlagEmojiIntegration.registerFlagEmojis(loadResults.mEmojiFont);
     }
 }

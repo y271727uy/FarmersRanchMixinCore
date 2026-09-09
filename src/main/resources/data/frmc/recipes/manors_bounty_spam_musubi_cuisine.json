@@ -1,0 +1,16 @@
+{
+  "type": "youkaishomecoming:cuisine_ordered",
+  "base": "youkaishomecoming:sushi",
+  "input": [
+    {
+      "item": "manors_bounty:cooked_spam_slice"
+    },
+    {
+      "item": "manors_bounty:nori"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "manors_bounty:spam_musubi"
+  }
+}

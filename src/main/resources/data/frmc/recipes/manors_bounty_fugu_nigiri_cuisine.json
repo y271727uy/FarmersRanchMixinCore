@@ -1,0 +1,16 @@
+{
+  "type": "youkaishomecoming:cuisine_unordered",
+  "base": "frmc:sumeshi",
+  "input": [
+    {
+      "item": "manors_bounty:fugu_slice"
+    },
+    {
+      "item": "manors_bounty:jalapeno_powder"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "manors_bounty:fugu_nigiri"
+  }
+}
