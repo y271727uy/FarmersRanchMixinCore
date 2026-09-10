@@ -1,18 +1,18 @@
-package com.y271727uy.FRMC.mixin.blacklist;
+package com.y271727uy.FRMC.config;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class OptionalMixinLoadConditionTest {
+class FRMCMixinLoadConfigTest {
     @Test
     void onlyAppliesExternalMixinWhenItsModIsLoaded() {
-        assertFalse(FRMCMixinConfigPlugin.isOptionalIntegrationAvailable(
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.mystiasizakaya.ItemFrameMixin",
             modId -> false
         ));
-        assertTrue(FRMCMixinConfigPlugin.isOptionalIntegrationAvailable(
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.mystiasizakaya.ItemFrameMixin",
             "mystias_izakaya"::equals
         ));
@@ -20,7 +20,7 @@ class OptionalMixinLoadConditionTest {
 
     @Test
     void keepsBaseMixinsEnabled() {
-        assertTrue(FRMCMixinConfigPlugin.isOptionalIntegrationAvailable(
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.minecraft.UtilMixin",
             modId -> false
         ));
@@ -28,7 +28,7 @@ class OptionalMixinLoadConditionTest {
 
     @Test
     void recognizesFarmersDelightMixinBelowMinecraftPackage() {
-        assertFalse(FRMCMixinConfigPlugin.isOptionalIntegrationAvailable(
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.minecraft.recipe.deduplicator.farmersdelight.ToolActionIngredientSerializerMixin",
             modId -> false
         ));
