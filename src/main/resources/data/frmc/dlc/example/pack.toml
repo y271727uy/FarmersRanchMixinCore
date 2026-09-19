@@ -1,0 +1,11 @@
+[[dlc]]
+DLCId="example"
+displayName="示例内容包"
+license="MIT"
+modpack_version="1.20.1"
+version="0.1.0"
+authors="name"
+description='''示例附加内容包。
+用来检查列表和右侧 icon 渲染。'''
+dlc_type="content"
+icon="textures/block/table/sushi/top/avocado.png"

@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.minecraft.recipe.deduplicator;
 
-import com.y271727uy.FRMC.recipe.ingredient.IngredientHolder;
+import com.y271727uy.FRMC.capability.recipe.ingredient.IngredientHolder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.spongepowered.asm.mixin.Mixin;

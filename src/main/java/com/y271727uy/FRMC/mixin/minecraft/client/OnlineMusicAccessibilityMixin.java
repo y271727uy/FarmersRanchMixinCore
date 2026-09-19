@@ -1,5 +1,6 @@
 package com.y271727uy.FRMC.mixin.minecraft.client;
 
+import com.y271727uy.FRMC.capability.downland.ui.AdditionalContentPackSettings;
 import com.y271727uy.FRMC.client.netmusic.OnlineMusicSettings;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.screens.SimpleOptionsSubScreen;
@@ -21,8 +22,9 @@ public abstract class OnlineMusicAccessibilityMixin {
         if (!((Object) this instanceof AccessibilityOptionsScreen)) {
             return options;
         }
-        OptionInstance<?>[] expanded = Arrays.copyOf(options, options.length + 1);
+        OptionInstance<?>[] expanded = Arrays.copyOf(options, options.length + 2);
         expanded[options.length] = OnlineMusicSettings.option();
+        expanded[options.length + 1] = AdditionalContentPackSettings.option();
         return expanded;
     }
 }

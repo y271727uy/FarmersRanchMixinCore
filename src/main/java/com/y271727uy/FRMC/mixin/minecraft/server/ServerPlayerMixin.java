@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ServerPlayerMixin {
     @Inject(method = "sendSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"), cancellable = true)
     private void frmc$suppressSdvfOptionalModReminder(Component message, CallbackInfo ci) {
-        if (message.getString().startsWith("[SDVF] Optional mods missing:")) {
+        String text = message.getString();
+        if (text.contains("[SDVF]") && text.contains("Optional mods missing")) {
             ci.cancel();
         }
     }

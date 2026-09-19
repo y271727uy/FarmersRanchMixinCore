@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.minecraft.entityactivity;
 
-import com.y271727uy.FRMC.entity.manager.entityactivity.EntityActivityManager;
+import com.y271727uy.FRMC.capability.entity.manager.entityactivity.EntityActivityManager;
 import net.minecraft.world.entity.Mob;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

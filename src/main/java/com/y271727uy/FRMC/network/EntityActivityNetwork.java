@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.network;
 
-import com.y271727uy.FRMC.entity.manager.entityactivity.EntityActivityManager;
+import com.y271727uy.FRMC.capability.entity.manager.entityactivity.EntityActivityManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;

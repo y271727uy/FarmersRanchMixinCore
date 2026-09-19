@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.y271727uy.FRMC.config.Config;
 import java.util.Properties;
+
+import com.y271727uy.FRMC.config.RecipeSearchConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

@@ -16,8 +16,8 @@ public final class Config {
     /** Ingredient instance deduplication; disabled by default for compatibility. */
     public static boolean recipeIngredientDeduplicatorEnabled = false;
 
-    /** Enables low-noise OpenGL diagnostic logging for frame stalls and context info. */
-    public static boolean openglDiagnosticsEnabled = false;
+    /** Enables low-noise OpenGL frame-probe logging for frame stalls and context info. */
+    public static boolean openglFrameProbeEnabled = false;
 
     /** Enables 1% low frame-time statistics derived from Minecraft's frame timer. */
     public static boolean openglLowPercentStatsEnabled = false;

@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.chloride.entityactivity;
 
-import com.y271727uy.FRMC.client.entityactivity.ChlorideVisibilityBridge;
+import com.y271727uy.FRMC.integration.chloride.ChlorideVisibilityBridge;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.entity.Entity;

@@ -3,7 +3,7 @@ package com.y271727uy.FRMC.mixin.blacklist.application;
 import com.y271727uy.FRMC.config.Config;
 import com.y271727uy.FRMC.mixin.blacklist.FRMCMixinBlacklistConfig;
 import com.y271727uy.FRMC.mixin.blacklist.FRMCMixinBlacklistExtension;
-import com.y271727uy.FRMC.recipe.config.RecipeSearchConfig;
+import com.y271727uy.FRMC.config.RecipeSearchConfig;
 
 public final class FRMCMixinBlacklistApplication {
     private FRMCMixinBlacklistApplication() {

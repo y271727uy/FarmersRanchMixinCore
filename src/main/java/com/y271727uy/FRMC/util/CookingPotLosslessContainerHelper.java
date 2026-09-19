@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 
 public final class CookingPotLosslessContainerHelper {
     public static final TagKey<Item> LOSSLESS_CONTAINERS =
-            ItemTags.create(ResourceLocation.fromNamespaceAndPath("farmersdelight", "lossless"));
+            ItemTags.create(new ResourceLocation("farmersdelight", "lossless"));
 
     private CookingPotLosslessContainerHelper() {
     }

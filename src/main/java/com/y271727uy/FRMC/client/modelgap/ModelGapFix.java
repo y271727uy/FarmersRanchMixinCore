@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModLoader;
 
 public final class ModelGapFix {
-    private static final ResourceLocation BLOCK_ATLAS = ResourceLocation.fromNamespaceAndPath(
+    private static final ResourceLocation BLOCK_ATLAS = new ResourceLocation(
         "minecraft",
         "textures/atlas/blocks.png"
     );

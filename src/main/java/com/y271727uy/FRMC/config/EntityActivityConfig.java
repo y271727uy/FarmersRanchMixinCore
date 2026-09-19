@@ -5,12 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /** Configuration for the experimental Chloride-assisted Mob AI sleep mode. */
 public final class EntityActivityConfig {
-    private static final Path CONFIG_PATH = FRMCConfigPaths.resolve("frmc-entity-activity.properties");
+    private static final String CONFIG_FILE = "frmc-entity-activity.properties";
 
     private static volatile boolean enabled = true;
     private static volatile int protectionChunks = 2;
@@ -26,14 +25,15 @@ public final class EntityActivityConfig {
 
     public static void load() {
         Properties properties = defaults();
+        Path configPath = FRMCConfigPaths.resolve(CONFIG_FILE);
         try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            if (Files.exists(CONFIG_PATH)) {
-                try (InputStream input = Files.newInputStream(CONFIG_PATH)) {
+            Files.createDirectories(configPath.getParent());
+            if (Files.exists(configPath)) {
+                try (InputStream input = Files.newInputStream(configPath)) {
                     properties.load(input);
                 }
             } else {
-                try (OutputStream output = Files.newOutputStream(CONFIG_PATH)) {
+                try (OutputStream output = Files.newOutputStream(configPath)) {
                     properties.store(output, "FRMC experimental entity activity settings");
                 }
             }

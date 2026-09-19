@@ -1,7 +1,7 @@
 package com.y271727uy.FRMC.mixin.minecraft.recipe.manager;
 
 import com.mojang.authlib.GameProfile;
-import com.y271727uy.FRMC.recipe.manager.RecipeManagement;
+import com.y271727uy.FRMC.capability.recipe.manager.RecipeManagement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;

@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.Set;
+
+import com.y271727uy.FRMC.capability.recipe.search.*;
 import org.junit.jupiter.api.Test;
 
 class RecipeSearchCoreTest {
@@ -108,7 +110,7 @@ class RecipeSearchCoreTest {
     void hashBranchReadsIndividualNodesFromFastutilStorage() {
         Branch.HashBranch<String> branch = new Branch.HashBranch<>();
         for (int key = 1; key <= 5; key++) {
-            branch.put(key, new Node.R<>("recipe-" + key));
+            branch.put(key, Node.recipe(List.of(), null, "recipe-" + key));
         }
 
         Node<String> node = branch.get(5);

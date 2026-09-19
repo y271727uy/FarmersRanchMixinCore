@@ -2,7 +2,7 @@ package com.y271727uy.FRMC.mixin.alexsmobs;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.y271727uy.FRMC.entity.manager.mobspawnactivity.SpawnRateReducer;
+import com.y271727uy.FRMC.capability.entity.manager.mobspawnactivity.SpawnRateReducer;
 import com.y271727uy.FRMC.config.MobSpawnRateConfig;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.spongepowered.asm.mixin.Mixin;

@@ -3,7 +3,7 @@ package com.y271727uy.FRMC.mixin.minecraft.recipe.deduplicator;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
-import com.y271727uy.FRMC.recipe.ingredient.IngredientHolder;
+import com.y271727uy.FRMC.capability.recipe.ingredient.IngredientHolder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;

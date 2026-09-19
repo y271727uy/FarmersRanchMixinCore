@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.minecraft.recipe.manager;
 
-import com.y271727uy.FRMC.recipe.manager.RecipeManagement;
+import com.y271727uy.FRMC.capability.recipe.manager.RecipeManagement;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.ReloadableServerResources;

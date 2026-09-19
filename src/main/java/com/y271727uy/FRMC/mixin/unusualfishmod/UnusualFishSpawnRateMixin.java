@@ -1,6 +1,6 @@
 package com.y271727uy.FRMC.mixin.unusualfishmod;
 
-import com.y271727uy.FRMC.entity.manager.mobspawnactivity.SpawnRateReducer;
+import com.y271727uy.FRMC.capability.entity.manager.mobspawnactivity.SpawnRateReducer;
 import com.y271727uy.FRMC.config.MobSpawnRateConfig;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.spongepowered.asm.mixin.Mixin;

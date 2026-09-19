@@ -1,5 +1,6 @@
 package com.y271727uy.FRMC.mixin.minecraft.server;
 
+import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import net.minecraft.server.Main;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +12,7 @@ public abstract class MainMixin {
     @Inject(method = "main", at = @At("HEAD"))
     private static void frmc$setGamePriority(CallbackInfo ci) {
         Thread.currentThread().setPriority(readInt("gamePriority", 5, 1, 10));
+        AiGuidanceLogInjector.injectOnce();
     }
 
     private static int readInt(String key, int fallback, int min, int max) {

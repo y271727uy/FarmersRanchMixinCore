@@ -178,10 +178,19 @@ dependencies {
     modCompileOnly 'unusualfishmod:unusualfishmod-1.1.8'
     modCompileOnly 'starlight:starlight-1.1.2+forge.1cda73c'
     modCompileOnly 'create:create-1.20.1-6.0.8'
+    modCompileOnly 'betterfoliage:betterfoliage-5.0.2'
+    modCompileOnly 'kaleidoscopetavern:kaleidoscopetavern-1.2.0-forge+mc1.20.1'
+    modCompileOnly 'kubejs:kubejs-forge-2001.6.5-build.26'
+    modImplementation 'xaeroworldmap:xaeroworldmap-forge-1.20.1-1.45.0'
+    modImplementation 'xaerominimap:xaerominimap-forge-1.20.1-26.4.2'
+    modCompileOnly 'SereneSeasons:SereneSeasons-forge-1.20.1-9.1.0.3'
+    modCompileOnly 'lumenized:lumenized-1.0.0'
+    modCompileOnly 'GlitchCore:GlitchCore-forge-1.20.1-0.0.1.1'
+    modImplementation 'xaerolib:xaerolib-forge-1.20.1-1.7.1'
     modImplementation 'netmusic:netmusic-1.5.1-forge+mc1.20.1'
-    modImplementation 'melody:melody_forge_1.0.3_MC_1.20.1-1.20.4'
-    modImplementation 'konkrete:konkrete_forge_1.8.0_MC_1.20-1.20.1'
-    modImplementation 'fancymenu:fancymenu_forge_3.9.12_MC_1.20.1'
+    modCompileOnly 'melody:melody_forge_1.0.3_MC_1.20.1-1.20.4'
+    modCompileOnly 'konkrete:konkrete_forge_1.8.0_MC_1.20-1.20.1'
+    modCompileOnly 'fancymenu:fancymenu_forge_3.9.12_MC_1.20.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'it.unimi.dsi:fastutil:8.5.12'
@@ -338,4 +347,44 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+
+
+// 先创建小的locator jar
+tasks.register('locatorJar', Jar) {
+    archiveBaseName = 'frmc-loader'
+    archiveVersion = ''
+    archiveClassifier = ''
+    
+    // 只包含locator相关的类
+    from(sourceSets.main.output) {
+        include 'com/y271727uy/FRMC/capability/downland/**'
+    }
+    
+    // 包含SERVICE文件
+    from('src/main/resources') {
+        include 'META-INF/services/**'
+    }
+}
+
+// 修改主jar：嵌入locator jar
+jar {
+    dependsOn locatorJar
+    
+    // 排除SERVICE文件（已在locator jar里）
+    exclude 'META-INF/services/net.minecraftforge.forgespi.locating.IModLocator'
+    
+    // 嵌入locator jar到jarjar
+    into('META-INF/jarjar') {
+        from(locatorJar.archiveFile)
+        rename { 'frmc-loader.jar' }
+    }
+    
+    // 不需要Embedded-Dependencies-Mod，因为这不是加载mod
+}
+
+// 让reobfJar也依赖locatorJar
+tasks.named('reobfJar') {
+    dependsOn locatorJar
 }

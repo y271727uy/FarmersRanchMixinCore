@@ -30,3 +30,7 @@ refer/
 
 # ModDevGradle rewrites these with machine-local absolute paths
 .vscode/
+
+frmc-network-lib/
+.claude/
+.agents/
