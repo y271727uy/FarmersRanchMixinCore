@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "overweight_farming:overweight_potato_block", "required": false },
+    { "id": "overweight_farming:overweight_baked_potato_block", "required": false },
+    { "id": "overweight_farming:overweight_poisonous_potato_block", "required": false },
+    { "id": "overweight_farming:overweight_beetroot_block", "required": false },
+    { "id": "overweight_farming:overweight_carrot_block", "required": false },
+    { "id": "overweight_farming:overweight_cabbage_block", "required": false },
+    { "id": "overweight_farming:overweight_onion_block", "required": false },
+    { "id": "overweight_farming:overweight_kiwi_block", "required": false },
+    { "id": "overweight_farming:overweight_sliced_kiwi_block", "required": false },
+    { "id": "overweight_farming:overweight_ginger_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_potato_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_beetroot_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_carrot_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_cabbage_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_onion_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_kiwi_block", "required": false },
+    { "id": "overweight_farming:peeled_overweight_ginger_block", "required": false },
+    { "id": "overweight_farming:seeded_peeled_melon", "required": false },
+    { "id": "overweight_farming:half_seeded_peeled_melon", "required": false },
+    { "id": "overweight_farming:seedless_peeled_melon", "required": false },
+    { "id": "overweight_farming:waxed_seeded_peeled_melon", "required": false },
+    { "id": "overweight_farming:waxed_half_seeded_peeled_melon", "required": false },
+    { "id": "overweight_farming:waxed_seedless_peeled_melon", "required": false }
+  ]
+}

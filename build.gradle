@@ -39,6 +39,17 @@ base {
     archivesName = mod_id
 }
 
+def mixinRuntimeSource = file('lib/MixinRuntime-mc1.20.1-1.0.jar')
+
+tasks.register('repackMixinRuntime', Jar) {
+    archiveFileName = mixinRuntimeSource.name
+    destinationDirectory = layout.buildDirectory.dir('embedded-libs')
+    from(zipTree(mixinRuntimeSource)) {
+        exclude 'META-INF/MANIFEST.MF'
+    }
+    manifest.attributes('Automatic-Module-Name': 'frmc.mixinruntime')
+}
+
 // Mojang ships Java 17 to end users in 1.20.1, so mods should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -90,6 +101,8 @@ legacyForge {
 
         // applies to all the run configs above
         configureEach {
+            // Mixin APIs are compile-time only until the runtime integration is re-enabled.
+
             // Recommended logging data for a userdev environment
             // The markers can be added/remove as needed separated by commas.
             // "SCAN": For mods scan.
@@ -130,6 +143,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 // "optional", meaning it will not be pulled by dependents of this mod.
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+    testCompileClasspath.extendsFrom compileClasspath
+    testRuntimeClasspath.extendsFrom runtimeClasspath
 
     configureEach {
         resolutionStrategy.force 'net.jodah:typetools:0.6.3'
@@ -146,31 +161,34 @@ dependencies {
     modImplementation("maven.modrinth:jei:p7yZWpEg")
     modImplementation 'geckolib:geckolib-forge-1.20.1-4.8.4'
     modCompileOnly 'mclib:mclib-20'
-    modCompileOnly("maven.modrinth:architectury-api:1MKTLiiG")
+    modCompileOnly 'xaerolib:xaerolib-forge-1.20.1-1.7.1'
+    modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
     modCompileOnly("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
     modCompileOnly("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
     modCompileOnly("maven.modrinth:vintage-delight:q8Ght7Bo")
     modCompileOnly("maven.modrinth:fruits-delight:qPyefm6m")
     //modImplementation("maven.modrinth:observable:QtSVNyjm")
     //modImplementation("maven.modrinth:spark:4FXHDE9F")
-    modImplementation("maven.modrinth:citadel:lTAAe4sZ")
+    modCompileOnly("maven.modrinth:citadel:lTAAe4sZ")
     modCompileOnly("curse.maven:untamedwilds-457252:4779746")
     modCompileOnly("curse.maven:mooncake-delight-1490740:7866540")
     modCompileOnly("maven.modrinth:mystiasizakaya:tDUctFCt")
     modCompileOnly 'extradelight:extradelight:1.0.3:all'
-    modImplementation 'youkaishomecoming:youkaishomecoming-2.7.0'
+    modCompileOnly 'youkaishomecoming:youkaishomecoming-2.7.0'
     modImplementation 'entityculling:entityculling-forge-1.10.1-mc1.20.1'
     modImplementation 'AI-Improvements:AI-Improvements-1.20-0.5.2'
     modImplementation 'chloride:chloride-FORGE-mc1.20.1-v1.8.1'
     modImplementation 'embeddium:embeddium-0.3.31+mc1.20.1'
     modImplementation 'oculus:oculus-mc1.20.1-1.8.0'
+    modImplementation 'modernfix:modernfix-forge-5.27.85+mc1.20.1'
+    modImplementation 'ferritecore:ferritecore-6.0.1-forge'
     modCompileOnly 'letsdo-vinery:letsdo-vinery-forge-1.4.41'
     modCompileOnly 'letsdo-nethervinery:letsdo-nethervinery-forge-1.2.19'
     modImplementation 'Jade:Jade-1.20.1-Forge-11.13.3'
     modCompileOnly 'StardewValleyFood:StardewValleyFood_1.20.1_0.3.3_Forge'
     modCompileOnly 'polymorph:polymorph-forge-0.49.10+1.20.1'
     modImplementation 'ModernUI:ModernUI-Forge-1.20.1-3.12.0.1-universal'
-    modImplementation 'manors_bounty:manors_bounty-0.3.3.1-forge-1.20.1'
+    modCompileOnly 'manors_bounty:manors_bounty-0.3.3.1-forge-1.20.1'
     modCompileOnly 'manors_bounty_machine:manors_bounty_machine_forge_1.20.1-1.0.8'
     modCompileOnly 'ThirstWasTaken:ThirstWasTaken-1.20.1-1.4.0'
     modCompileOnly 'alexsmobs:alexsmobs-1.22.9'
@@ -180,17 +198,60 @@ dependencies {
     modCompileOnly 'create:create-1.20.1-6.0.8'
     modCompileOnly 'betterfoliage:betterfoliage-5.0.2'
     modCompileOnly 'kaleidoscopetavern:kaleidoscopetavern-1.2.0-forge+mc1.20.1'
+    modImplementation 'kaleidoscopecookery:kaleidoscopecookery-1.5.0-forge+mc1.20.1'
     modCompileOnly 'kubejs:kubejs-forge-2001.6.5-build.26'
+    modCompileOnly 'rhino:rhino-forge-2001.2.3-build.10'
     modImplementation 'xaeroworldmap:xaeroworldmap-forge-1.20.1-1.45.0'
     modImplementation 'xaerominimap:xaerominimap-forge-1.20.1-26.4.2'
-    modCompileOnly 'SereneSeasons:SereneSeasons-forge-1.20.1-9.1.0.3'
-    modCompileOnly 'lumenized:lumenized-1.0.0'
-    modCompileOnly 'GlitchCore:GlitchCore-forge-1.20.1-0.0.1.1'
-    modImplementation 'xaerolib:xaerolib-forge-1.20.1-1.7.1'
-    modImplementation 'netmusic:netmusic-1.5.1-forge+mc1.20.1'
-    modCompileOnly 'melody:melody_forge_1.0.3_MC_1.20.1-1.20.4'
-    modCompileOnly 'konkrete:konkrete_forge_1.8.0_MC_1.20-1.20.1'
-    modCompileOnly 'fancymenu:fancymenu_forge_3.9.12_MC_1.20.1'
+    modImplementation 'lumenized:lumenized-1.0.0'
+    modImplementation 'GlitchCore:GlitchCore-forge-1.20.1-0.0.1.1'
+    modImplementation 'SereneSeasons:SereneSeasons-forge-1.20.1-9.1.0.3'
+    modImplementation 'netmusic:netmusic-1.5.2-forge+mc1.20.1'
+    modImplementation 'ForgifiedFabricAPI:fabric-api-0.92.6+1.11.15+1.20.1'
+    modCompileOnly 'Sinytraconnector:Connector-1.0.0-beta.49+1.20.1'
+    modCompileOnly 'ftb-library:ftb-library-forge-2001.2.13'
+    modImplementation 'acceleratedrendering:acceleratedrendering-1.0.14-1.20.1-alpha'
+    modCompileOnly 'astikorcartsredux:astikorcartsredux-1.2.5'
+    modCompileOnly 'foragersinsight:foragersinsight-1.20.1-ITW2-3.55'
+    modCompileOnly 'blueprint:blueprint-1.20.1-7.1.5'
+    modCompileOnly 'RegionsUnexplored:RegionsUnexploredForge-0.5.6+1.20.1'
+    modCompileOnly 'TerraBlender:TerraBlender-forge-1.20.1-3.0.1.10'
+    modCompileOnly 'neapolitan:neapolitan-1.20.1-5.1.0'
+    modCompileOnly 'Patchouli:Patchouli-1.20.1-85-FORGE'
+    modCompileOnly 'forestry:forestry-1.20.1-2.11.1'
+    modCompileOnly 'connected-paths:connected-paths-forge-1.0.2'
+    modCompileOnly 'cloth-config:cloth-config-11.1.136-forge'
+    modCompileOnly 'ruok:ruok-forge_1.20.1_Pre-Release_6-1.7.4'
+    modCompileOnly 'vietnam_delight:vietnam_delight-1.1.3'
+    modCompileOnly 'PrettyRain:PrettyRain-1.20.1-Forge-1.1.3'
+    //modImplementation 'BuildCraft:BuildCraft-Community-Edition-8.0.23+1.20.1+forge'
+    modCompileOnly 'BrewinAndChewin:BrewinAndChewin-1.20.1-3.2.1'
+    modCompileOnly 'nether-s-exoticism:nether-s-exoticism-1.20.1-1.2.9'
+    modImplementation 'ldlib:ldlib-forge-1.20.1-1.0.52.a'
+    modImplementation 'fastchunkgen:fastchunkgen-0.34-all'
+    modImplementation 'noisium:noisium-forge-2.3.0+mc1.20-1.20.1'
+    modCompileOnly 'EggDelight:EggDelight-v1.2-1.20.1'
+    modCompileOnly 'overweightfarming:overweightfarming-1.20.1-2.1.0-forge'
+    modImplementation 'oceanic_delight:oceanic_delight-1.0.4-forge-1.20.1'
+    modImplementation 'ftb-library:ftb-library-forge-2001.2.13'
+    modImplementation 'ftb-quests:ftb-quests-forge-2001.4.14'
+    modImplementation 'ftb-teams:ftb-teams-forge-2001.3.1'
+    modImplementation 'item-filters:item-filters-forge-2001.1.0-build.59'
+    //modImplementation ''
+    //modImplementation 'ImmediatelyFast:ImmediatelyFast-Forge-1.5.5+1.20.4'
+
+    modImplementation 'constancy:constancy:0.1.1+1.20.1.forge'
+    jarJar 'constancy:constancy:0.1.1+1.20.1.forge'
+
+    compileOnly files('lib/MixinRuntime-mc1.20.1-1.0.jar')
+    runtimeOnly files('lib/MixinRuntime-mc1.20.1-1.0.jar')
+    jarJar files(tasks.named('repackMixinRuntime'))
+    jarJar project(':MixinFabricExtras')
+    compileOnly project(':MixinFabricExtras')
+    runtimeOnly project(':MixinFabricExtras')
+    //compileOnly project(':MixinASMAPI')
+    compileOnly project(':MixinAgentAPI')
+    compileOnly project(':MixinCoremodAPI')
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'it.unimi.dsi:fastutil:8.5.12'
@@ -237,16 +298,29 @@ mixin {
 }
 
 def devMixinManifest = layout.buildDirectory.file('classes/java/main/META-INF/MANIFEST.MF')
+def devMixinConfigFile = "${mod_id}.mixins.json"
 
 tasks.register('syncDevMixinConfig', Copy) {
     dependsOn tasks.named('compileJava'), tasks.named('processResources')
     doFirst {
-        devMixinManifest.get().asFile.delete()
+
+        def manifestFile = devMixinManifest.get().asFile
+        manifestFile.parentFile.mkdirs()
+        manifestFile.text = "Manifest-Version: 1.0\nMixinConfigs: ${devMixinConfigFile}\n"
     }
-    from("src/main/resources/${mod_id}.mixins.json")
+    from("src/main/resources/${devMixinConfigFile}")
     from(layout.buildDirectory.file("mixin/${mod_id}.refmap.json"))
     into layout.buildDirectory.dir('classes/java/main')
 }
+
+tasks.named('jar') {
+    dependsOn tasks.named('syncDevMixinConfig')
+}
+
+tasks.named('compileTestJava') {
+    dependsOn tasks.named('syncDevMixinConfig')
+}
+
 
 [
         'prepareClientRun',
@@ -264,7 +338,7 @@ tasks.register('syncDevMixinConfig', Copy) {
     def refmapFile = "${project.mod_id}.refmap.json".toString()
 
     manifest.attributes([
-            "MixinConfigs": mixinConfigFile
+            "MixinConfigs": "${mixinConfigFile}"
     ])
     filesMatching([mixinConfigFile, refmapFile]) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -283,21 +357,18 @@ tasks.register('syncDevMixinConfig', Copy) {
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
     config "${mod_id}.mixins.json"
+    config "mixins.blueprintfix.json"
 }
 
 dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
-
-jar {
     manifest.attributes([
             "MixinConfigs": "${mod_id}.mixins.json"
     ])
 }
 */
 
-// This block of code expands all declared replace properties in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version        : minecraft_version,
@@ -317,13 +388,10 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
     from "src/main/templates"
     into "build/generated/sources/modMetadata"
 }
-// Include the output of "generateModMetadata" as an input directory for the build
-// this works with both building through Gradle and the IDE.
+
 sourceSets.main.resources.srcDir generateModMetadata
-// To avoid having to run "generateModMetadata" manually, make it run on every project reload
 legacyForge.ideSyncTask generateModMetadata
 
-// Example configuration to allow publishing using the maven-publish plugin
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
@@ -341,7 +409,7 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-// IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
+
 idea {
     module {
         downloadSources = true
@@ -382,6 +450,10 @@ jar {
     }
     
     // 不需要Embedded-Dependencies-Mod，因为这不是加载mod
+}
+
+tasks.named('locatorJar') {
+    dependsOn tasks.named('syncDevMixinConfig')
 }
 
 // 让reobfJar也依赖locatorJar

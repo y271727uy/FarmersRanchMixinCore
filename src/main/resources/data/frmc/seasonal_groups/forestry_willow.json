@@ -1,0 +1,11 @@
+﻿{
+    "group":  "frmc:forestry_willow",
+    "allowed_seasons":  [
+                            "EARLY_SPRING",
+                            "MID_SPRING",
+                            "LATE_SPRING",
+                            "EARLY_AUTUMN",
+                            "MID_AUTUMN",
+                            "LATE_AUTUMN"
+                        ]
+}

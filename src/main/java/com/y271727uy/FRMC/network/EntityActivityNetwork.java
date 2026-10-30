@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public final class EntityActivityNetwork {
-    public static final int CLIENT_PROTOCOL_VERSION = 2;
+    public static final int CLIENT_PROTOCOL_VERSION = 3;
     private static final String NETWORK_PROTOCOL_VERSION = Integer.toString(CLIENT_PROTOCOL_VERSION);
     private static final int MAX_TRACKED_ENTITIES_PER_PLAYER = 4096;
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
@@ -38,6 +38,9 @@ public final class EntityActivityNetwork {
         CHANNEL.registerMessage(id, EntityVisibilityBatchPacket.class,
                 EntityVisibilityBatchPacket::encode, EntityVisibilityBatchPacket::decode,
                 EntityVisibilityBatchPacket::handle);
+        CHANNEL.registerMessage(++id, EntityDistanceBatchPacket.class,
+                EntityDistanceBatchPacket::encode, EntityDistanceBatchPacket::decode,
+                EntityDistanceBatchPacket::handle);
     }
 
     public static void recordCapabilities(ServerPlayer player, ClientCapabilities capabilities) {
@@ -59,6 +62,21 @@ public final class EntityActivityNetwork {
         }
     }
 
+    public static void recordDistance(ServerPlayer player, int entityId, boolean inRange) {
+        ClientCapabilities capabilities = CAPABILITIES.get(player.getUUID());
+        if (capabilities == null || !capabilities.chlorideVisibility()) return;
+        if (capabilities.distance().size() >= MAX_TRACKED_ENTITIES_PER_PLAYER
+                && !capabilities.distance().containsKey(entityId)) return;
+        capabilities.distance().put(entityId, inRange);
+        if (inRange && player.serverLevel().getEntity(entityId) instanceof Mob mob) {
+            EntityActivityNetwork.wakeDistance(mob);
+        }
+    }
+
+    private static void wakeDistance(Mob mob) {
+        com.y271727uy.FRMC.capability.entity.manager.yaxisfreeze.YAxisFreezeManager.wake(mob);
+    }
+
     public static ClientCapabilities capabilities(ServerPlayer player) {
         return CAPABILITIES.get(player.getUUID());
     }
@@ -69,9 +87,10 @@ public final class EntityActivityNetwork {
     }
 
     public record ClientCapabilities(int protocolVersion, boolean hasChloride,
-                                     boolean chlorideVisibility, Map<Integer, Boolean> visibility) {
+                                     boolean chlorideVisibility, Map<Integer, Boolean> visibility,
+                                     Map<Integer, Boolean> distance) {
         public ClientCapabilities(int protocolVersion, boolean hasChloride, boolean chlorideVisibility) {
-            this(protocolVersion, hasChloride, chlorideVisibility, new HashMap<>());
+            this(protocolVersion, hasChloride, chlorideVisibility, new HashMap<>(), new HashMap<>());
         }
     }
 
@@ -134,6 +153,33 @@ public final class EntityActivityNetwork {
                     if (entityId >= 0) {
                         recordVisibility(sender, entityId, (state & 1L) != 0L);
                     }
+                }
+            });
+            context.setPacketHandled(true);
+        }
+    }
+
+    public record EntityDistanceBatchPacket(long[] states) {
+        private static final int MAX_ENTRIES = 128;
+        private static void encode(EntityDistanceBatchPacket packet, net.minecraft.network.FriendlyByteBuf buf) {
+            buf.writeVarInt(packet.states.length);
+            for (long state : packet.states) buf.writeVarLong(state);
+        }
+        private static EntityDistanceBatchPacket decode(net.minecraft.network.FriendlyByteBuf buf) {
+            int size = buf.readVarInt();
+            if (size < 0 || size > MAX_ENTRIES) throw new IllegalArgumentException("Invalid entity distance batch size: " + size);
+            long[] states = new long[size];
+            for (int i = 0; i < size; i++) states[i] = buf.readVarLong();
+            return new EntityDistanceBatchPacket(states);
+        }
+        private static void handle(EntityDistanceBatchPacket packet, Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                ServerPlayer sender = context.getSender();
+                if (sender == null) return;
+                for (long state : packet.states) {
+                    int entityId = (int) (state >>> 1);
+                    if (entityId >= 0) recordDistance(sender, entityId, (state & 1L) != 0L);
                 }
             });
             context.setPacketHandled(true);

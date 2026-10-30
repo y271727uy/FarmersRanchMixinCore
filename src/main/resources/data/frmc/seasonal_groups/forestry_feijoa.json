@@ -1,0 +1,11 @@
+﻿{
+    "group":  "frmc:forestry_feijoa",
+    "allowed_seasons":  [
+                            "EARLY_AUTUMN",
+                            "MID_AUTUMN",
+                            "LATE_AUTUMN",
+                            "EARLY_WINTER",
+                            "MID_WINTER",
+                            "LATE_WINTER"
+                        ]
+}

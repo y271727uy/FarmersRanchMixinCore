@@ -11,6 +11,8 @@ public final class BlockCheckingLimits {
     public static final int MAX_SAMPLE_INTERVAL_MILLIS = 10_000;
     public static final int MIN_CHUNK_SNAPSHOT_PERIOD_TICKS = 1;
     public static final int MAX_CHUNK_SNAPSHOT_PERIOD_TICKS = 1_200;
+    public static final int MIN_CHUNK_DETECTION_RADIUS = 1;
+    public static final int MAX_CHUNK_DETECTION_RADIUS = 16;
 
     private BlockCheckingLimits() {
     }

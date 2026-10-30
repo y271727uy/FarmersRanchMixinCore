@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.mixin.vinery;
 
 import com.y271727uy.FRMC.integration.vinery.GrapevinePotCrusherCache;
+import com.y271727uy.frmc.mixinfabricextras.injector.FabricInject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

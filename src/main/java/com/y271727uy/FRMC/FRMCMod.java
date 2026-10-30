@@ -20,7 +20,9 @@ import com.y271727uy.FRMC.config.BlockCheckingConfig;
 import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingCommands;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingRuntime;
+import com.y271727uy.FRMC.capability.data_group.DataGroupInit;
 import com.y271727uy.FRMC.network.BlockCheckingNetwork;
+import com.y271727uy.FRMC.integration.ftbquests.FtbQuestsIntegration;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 // import com.y271727uy.FRMC.prefab.PrefabStructureCommands;
@@ -82,6 +84,8 @@ public class FRMCMod {
         MinecraftForge.EVENT_BUS.register(EntityActivityManager.class);
         MinecraftForge.EVENT_BUS.register(BlockCheckingRuntime.class);
         MinecraftForge.EVENT_BUS.register(BlockCheckingCommands.class);
+        DataGroupInit.init();
+        FtbQuestsIntegration.register();
         // MinecraftForge.EVENT_BUS.addListener(PrefabStructureReloadListener::onAddReloadListeners);
         // MinecraftForge.EVENT_BUS.addListener(PrefabStructureCommands::onRegisterCommands);
         // MinecraftForge.EVENT_BUS.addListener(PrefabStructureNetwork::onDatapackSync);

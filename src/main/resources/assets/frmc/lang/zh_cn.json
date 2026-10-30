@@ -89,5 +89,12 @@
   "frmc.blockchecking.command.report.missing": "还没有完成的 FRMC 区块检测报告。",
   "frmc.blockchecking.command.report.header": "FRMC 报告：时长=%sms 游戏刻=%s 样本=%s 丢弃=%s",
   "frmc.blockchecking.command.report.metric": "%s：样本=%s 平均=%sms 最大=%sms",
-  "frmc.blockchecking.command.report.scope": "报告只包含计时/上下文采样，不含堆栈、线程转储、客户端/Xaero 数据或完整实体普查。"
+  "frmc.blockchecking.command.report.scope": "报告只包含计时/上下文采样，不含堆栈、线程转储、客户端/Xaero 数据或完整实体普查。",
+  "ftbquests.task.frmc.preview": "多方块预览",
+  "ftbquests.task.frmc.preview.recipe_type": "JEI 配方类型",
+  "ftbquests.task.frmc.preview.recipe": "JEI 配方",
+  "frmc.ftbquests.preview.unavailable": "这个多方块预览当前不可用。",
+  "frmc.ftbquests.guideme.hover": "打开指南：%s",
+  "frmc.ftbquests.guideme.missing": "这个指南页面当前不可用。",
+  "frmc.ftbquests.guideme.invalid": "这个指南链接无效。"
 }

@@ -159,4 +159,48 @@ class FRMCMixinLoadConfigTest {
             Set.of("youkaishomecoming", "vinery")::contains
         ));
     }
+
+    @Test
+    void skipsEggDelightMixinsWhenEggDelightIsAbsent() {
+        String mixin = "com.y271727uy.FRMC.mixin.eggdelight.RawOmeletUpdateTickProcedureMixin";
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, modId -> false));
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "eggdelight"::equals));
+    }
+    @Test
+    void skipsVietnamDelightWormMixinWithoutTheMcreatorClass() {
+        String mixin = "com.y271727uy.FRMC.mixin.vietnam_delight.WormDropHandlerMixin";
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, modId -> false));
+        // 1.1.3 keeps the mod id but deleted WormDropHandler. The test classpath is that jar.
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "vietnam_delight"::equals));
+    }
+
+    @Test
+    void loadsTerraBlenderCacheMixinOnlyWhenTheModIsPresent() {
+        String mixin = "com.y271727uy.FRMC.mixin.terrablender.AreaCacheMixin";
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, modId -> false));
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "terrablender"::equals));
+    }
+
+    @Test
+    void requiresRuokAndParticleRainForWeatherCullBypass() {
+        String mixin = "com.y271727uy.FRMC.mixin.ruok.particlerain.ParticleRenderMixin";
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "ruokmod"::equals));
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "particlerain"::equals));
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(
+            mixin, Set.of("ruokmod", "particlerain")::contains
+        ));
+    }
+
+    @Test
+    void loadsFastChunkGenCompatibilityMixinOnlyWhenModIsPresent() {
+        String mixin = "com.y271727uy.FRMC.mixin.fastchunkgen.TypeMixin";
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, modId -> false));
+    }
+
+    @Test
+    void loadsOverweightFarmingMixinOnlyWhenModIsPresent() {
+        String mixin = "com.y271727uy.FRMC.mixin.overweight_farming.FarmBlockMixin";
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, modId -> false));
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "overweight_farming"::equals));
+    }
 }

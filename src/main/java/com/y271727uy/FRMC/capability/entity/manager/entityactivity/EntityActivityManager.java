@@ -2,6 +2,7 @@ package com.y271727uy.FRMC.capability.entity.manager.entityactivity;
 
 import com.y271727uy.FRMC.capability.entity.manager.districtpressure.ChunkMobPressureTracker;
 import com.y271727uy.FRMC.capability.entity.manager.mobspawnclean.EntityOverloadCleanupManager;
+import com.y271727uy.FRMC.capability.entity.manager.yaxisfreeze.YAxisFreezeManager;
 import com.y271727uy.FRMC.config.EntityActivityConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,7 +60,7 @@ public final class EntityActivityManager {
      * skip one distributed step out of five, preserving an average 80% AI frequency.
      */
     public static boolean shouldSkipAiStep(Mob mob) {
-        if (SLEEPING.contains(mob)) {
+        if (SLEEPING.contains(mob) || YAxisFreezeManager.isFrozen(mob)) {
             return true;
         }
         return THROTTLED.contains(mob) && Math.floorMod(mob.tickCount + mob.getId(), 5) == 0;
@@ -68,6 +69,7 @@ public final class EntityActivityManager {
     public static void wake(Mob mob) {
         restoreFullAi(mob);
         HIDDEN_SINCE_TICK.remove(mob);
+        YAxisFreezeManager.wake(mob);
     }
 
     /**
@@ -116,6 +118,7 @@ public final class EntityActivityManager {
             SLEEPING.clear();
             THROTTLED.clear();
             HIDDEN_SINCE_TICK.clear();
+            YAxisFreezeManager.clear();
             return;
         }
         if (evaluationCountdown > 0) {
@@ -137,6 +140,11 @@ public final class EntityActivityManager {
                 if (mob.isRemoved() || mob.level() != level) {
                     iterator.remove();
                     wake(mob);
+                    continue;
+                }
+                if (YAxisFreezeManager.update(mob, players)) {
+                    SLEEPING.remove(mob);
+                    THROTTLED.remove(mob);
                     continue;
                 }
                 if (!isHiddenFromAll(mob, players)) {

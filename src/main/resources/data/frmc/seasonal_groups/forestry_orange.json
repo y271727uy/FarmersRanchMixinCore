@@ -1,0 +1,11 @@
+﻿{
+    "group":  "frmc:forestry_orange",
+    "allowed_seasons":  [
+                            "EARLY_SUMMER",
+                            "MID_SUMMER",
+                            "LATE_SUMMER",
+                            "EARLY_AUTUMN",
+                            "MID_AUTUMN",
+                            "LATE_AUTUMN"
+                        ]
+}

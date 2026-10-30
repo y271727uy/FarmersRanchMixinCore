@@ -30,7 +30,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -188,7 +187,9 @@ public abstract class FruitLeavesBlockMixin extends LeavesBlock implements Bonem
 
             ItemStack drop = this.frmc$getDropForState(blockstate).copy();
             drop.setCount(this.frmc$getRandomCount(world.random, this.getClickDropMin(), this.getClickDropMax()));
-            ItemHandlerHelper.giveItemToPlayer(entity, drop);
+            ItemEntity harvestedFruit = new ItemEntity(world, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, drop);
+            harvestedFruit.setPickUpDelay(10);
+            world.addFreshEntity(harvestedFruit);
 
             this.frmc$playSound(world, pos, FRMC$BERRY_PICK_SOUND, SoundSource.BLOCKS);
             this.frmc$playSound(world, pos, FRMC$ITEM_PICKUP_SOUND, SoundSource.PLAYERS);

@@ -1,0 +1,62 @@
+plugins {
+    id 'java-library'
+}
+
+group = rootProject.property('mod_group_id')
+version = rootProject.property('mod_version')
+
+base {
+    archivesName = 'MixinAgentAPI'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.minecraftforge.net' }
+}
+
+sourceSets {
+    bridge {
+        java.srcDir 'src/bridge/java'
+    }
+}
+
+dependencies {
+    api project(':MixinASMAPI')
+    compileOnly 'cpw.mods:modlauncher:10.0.9'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'cpw.mods:modlauncher:10.0.9'
+}
+
+tasks.register('bridgeJar', Jar) {
+    archiveFileName = 'substratum-bridge.jar'
+    destinationDirectory = layout.buildDirectory.dir('substratum')
+    from sourceSets.bridge.output
+    include 'com/y271727uy/frmc/mixinagent/bridge/**'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+tasks.named('jar', Jar).configure {
+    dependsOn tasks.named('bridgeJar')
+    from(layout.buildDirectory.file('substratum/substratum-bridge.jar')) {
+        into 'META-INF/substratum'
+    }
+    manifest {
+        attributes(
+                'Automatic-Module-Name': 'frmc.mixinagent',
+                'Premain-Class': 'com.y271727uy.frmc.mixinagent.SubstratumAgent',
+                'Agent-Class': 'com.y271727uy.frmc.mixinagent.SubstratumAgent',
+                'Can-Retransform-Classes': 'true',
+                'Can-Redefine-Classes': 'true'
+        )
+    }
+}

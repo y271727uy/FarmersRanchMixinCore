@@ -1,0 +1,14 @@
+﻿{
+    "group":  "frmc:forestry_pine",
+    "allowed_seasons":  [
+                            "EARLY_SPRING",
+                            "MID_SPRING",
+                            "LATE_SPRING",
+                            "EARLY_AUTUMN",
+                            "MID_AUTUMN",
+                            "LATE_AUTUMN",
+                            "EARLY_WINTER",
+                            "MID_WINTER",
+                            "LATE_WINTER"
+                        ]
+}

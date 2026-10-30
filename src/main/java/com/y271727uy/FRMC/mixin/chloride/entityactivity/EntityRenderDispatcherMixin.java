@@ -9,13 +9,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Observes the final client render decision; Chloride remains the source of that decision. */
+/** Observes the final client render decision for the existing activity manager. */
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
     @Inject(method = "shouldRender", at = @At("RETURN"))
-    private <E extends Entity> void frmc$observeChlorideDecision(E entity, Frustum frustum,
-                                                                  double camX, double camY, double camZ,
-                                                                  CallbackInfoReturnable<Boolean> cir) {
+    private <E extends Entity> void frmc$observeFinalDecision(E entity, Frustum frustum,
+                                                                double camX, double camY, double camZ,
+                                                                CallbackInfoReturnable<Boolean> cir) {
         ChlorideVisibilityBridge.observe(entity, cir.getReturnValue());
     }
 }

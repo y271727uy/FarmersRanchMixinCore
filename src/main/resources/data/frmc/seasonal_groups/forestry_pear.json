@@ -1,0 +1,8 @@
+﻿{
+    "group":  "frmc:forestry_pear",
+    "allowed_seasons":  [
+                            "EARLY_SPRING",
+                            "MID_SPRING",
+                            "LATE_SPRING"
+                        ]
+}

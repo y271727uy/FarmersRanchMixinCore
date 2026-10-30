@@ -92,5 +92,12 @@
   "frmc.blockchecking.command.report.missing": "No completed FRMC block-checking report is available.",
   "frmc.blockchecking.command.report.header": "FRMC report: duration=%sms ticks=%s samples=%s discarded=%s",
   "frmc.blockchecking.command.report.metric": "%s: samples=%s average=%sms max=%sms",
-  "frmc.blockchecking.command.report.scope": "Report is timing/context sampling only; it contains no stack traces, thread dumps, client/Xaero data, or full entity census."
+  "frmc.blockchecking.command.report.scope": "Report is timing/context sampling only; it contains no stack traces, thread dumps, client/Xaero data, or full entity census.",
+  "ftbquests.task.frmc.preview": "Multiblock Preview",
+  "ftbquests.task.frmc.preview.recipe_type": "JEI Recipe Type",
+  "ftbquests.task.frmc.preview.recipe": "JEI Recipe",
+  "frmc.ftbquests.preview.unavailable": "That multiblock preview is not available.",
+  "frmc.ftbquests.guideme.hover": "Open guide: %s",
+  "frmc.ftbquests.guideme.missing": "That guide page is not available.",
+  "frmc.ftbquests.guideme.invalid": "That guide link is invalid."
 }

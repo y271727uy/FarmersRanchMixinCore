@@ -34,3 +34,5 @@ refer/
 frmc-network-lib/
 .claude/
 .agents/
+MxinAgentAPI/
+MxinASMAPI/

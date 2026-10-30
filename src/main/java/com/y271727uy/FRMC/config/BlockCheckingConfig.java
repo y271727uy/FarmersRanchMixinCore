@@ -17,6 +17,7 @@ public final class BlockCheckingConfig {
     private static volatile int maximumSessionSeconds = 300;
     private static volatile int sampleIntervalMillis = 25;
     private static volatile int chunkSnapshotPeriodTicks = 20;
+    private static volatile int chunkDetectionRadius = 6;
     private static volatile int outputEntryLimit = 32;
 
     private BlockCheckingConfig() {
@@ -47,6 +48,8 @@ public final class BlockCheckingConfig {
                 BlockCheckingLimits.MIN_SAMPLE_INTERVAL_MILLIS, BlockCheckingLimits.MAX_SAMPLE_INTERVAL_MILLIS);
         chunkSnapshotPeriodTicks = bounded(properties, "chunk_snapshot_period_ticks", 100,
                 BlockCheckingLimits.MIN_CHUNK_SNAPSHOT_PERIOD_TICKS, BlockCheckingLimits.MAX_CHUNK_SNAPSHOT_PERIOD_TICKS);
+        chunkDetectionRadius = bounded(properties, "chunk_detection_radius", 6,
+                BlockCheckingLimits.MIN_CHUNK_DETECTION_RADIUS, BlockCheckingLimits.MAX_CHUNK_DETECTION_RADIUS);
         outputEntryLimit = bounded(properties, "output_entry_limit", 16, 1, BlockCheckingLimits.MAX_OUTPUT_ENTRIES);
     }
 
@@ -55,6 +58,7 @@ public final class BlockCheckingConfig {
     public static int maximumSessionSeconds() { return maximumSessionSeconds; }
     public static int sampleIntervalMillis() { return sampleIntervalMillis; }
     public static int chunkSnapshotPeriodTicks() { return chunkSnapshotPeriodTicks; }
+    public static int chunkDetectionRadius() { return chunkDetectionRadius; }
     public static int outputEntryLimit() { return outputEntryLimit; }
 
     private static Properties defaults() {
@@ -64,6 +68,7 @@ public final class BlockCheckingConfig {
         properties.setProperty("maximum_session_seconds", "300");
         properties.setProperty("sample_interval_millis", "25");
         properties.setProperty("chunk_snapshot_period_ticks", "20");
+        properties.setProperty("chunk_detection_radius", "6");
         properties.setProperty("output_entry_limit", "32");
         return properties;
     }

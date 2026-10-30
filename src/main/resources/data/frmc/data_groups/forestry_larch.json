@@ -1,0 +1,32 @@
+﻿{
+    "values":  [
+                   {
+                       "type":  "item_provider",
+                       "item":  "forestry:sapling",
+                       "provider":  "forestry",
+                       "field":  "tree_species",
+                       "value":  "forestry:tree_larch"
+                   },
+                   {
+                       "type":  "block_provider",
+                       "block":  "forestry:sapling_ge",
+                       "provider":  "forestry",
+                       "field":  "tree_species",
+                       "value":  "forestry:tree_larch"
+                   },
+                   {
+                       "type":  "block_provider",
+                       "block":  "forestry:tree_larch_default_leaves",
+                       "provider":  "forestry",
+                       "field":  "tree_species",
+                       "value":  "forestry:tree_larch"
+                   },
+                   {
+                       "type":  "block_provider",
+                       "block":  "forestry:tree_larch_default_leaves_fruit",
+                       "provider":  "forestry",
+                       "field":  "tree_species",
+                       "value":  "forestry:tree_larch"
+                   }
+               ]
+}

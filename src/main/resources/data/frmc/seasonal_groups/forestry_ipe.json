@@ -1,0 +1,8 @@
+﻿{
+    "group":  "frmc:forestry_ipe",
+    "allowed_seasons":  [
+                            "EARLY_SUMMER",
+                            "MID_SUMMER",
+                            "LATE_SUMMER"
+                        ]
+}

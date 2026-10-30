@@ -43,8 +43,10 @@ public final class XaeroWorldMapIntegration {
                     overlayEnabled = !overlayEnabled;
                     if (overlayEnabled) {
                         ClientBlockCheckingNetworkHandler.STATE.invalidateSnapshot();
+                        BlockCheckingNetwork.requestChunkSubscription(true);
                         BlockCheckingNetwork.requestAnalysis(true);
                     } else {
+                        BlockCheckingNetwork.requestChunkSubscription(false);
                         BlockCheckingNetwork.requestAnalysis(false);
                     }
                     if (button instanceof MapIconButton iconButton) {
@@ -93,7 +95,11 @@ public final class XaeroWorldMapIntegration {
         } else {
             return;
         }
+        boolean wasEnabled = overlayEnabled;
         setOverlayEnabled(true);
+        if (!wasEnabled) {
+            BlockCheckingNetwork.requestChunkSubscription(true);
+        }
         BlockCheckingNetwork.requestInspectChunk(dimId, ChunkPos.asLong(Math.floorDiv(blockX, 16), Math.floorDiv(blockZ, 16)));
     }
 

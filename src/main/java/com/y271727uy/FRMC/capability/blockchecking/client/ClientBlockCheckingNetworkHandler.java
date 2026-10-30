@@ -26,7 +26,7 @@ public final class ClientBlockCheckingNetworkHandler {
 
     @SubscribeEvent
     public static void onLogin(ClientPlayerNetworkEvent.LoggingIn event) {
-        BlockCheckingNetwork.requestSubscription();
+        STATE.clear();
     }
 
     @SubscribeEvent

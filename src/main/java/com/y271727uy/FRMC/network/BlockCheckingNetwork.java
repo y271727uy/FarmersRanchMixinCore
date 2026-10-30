@@ -38,7 +38,8 @@ public final class BlockCheckingNetwork {
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation("frmc", "blockchecking"), () -> PROTOCOL,
             NetworkRegistry.acceptMissingOr(PROTOCOL), NetworkRegistry.acceptMissingOr(PROTOCOL));
-    private static final Set<UUID> SUBSCRIBERS = new HashSet<>();
+    private static final Set<UUID> REPORT_SUBSCRIBERS = new HashSet<>();
+    private static final Set<UUID> CHUNK_VIEWERS = new HashSet<>();
     private static final AtomicLong REVISION = new AtomicLong();
     private static int nextId;
 
@@ -62,10 +63,17 @@ public final class BlockCheckingNetwork {
         CHANNEL.registerMessage(nextId++, UninspectChunkRequestPacket.class,
                 UninspectChunkRequestPacket::encode, UninspectChunkRequestPacket::decode,
                 UninspectChunkRequestPacket::handle);
+        CHANNEL.registerMessage(nextId++, ChunkSubscriptionRequestPacket.class,
+                ChunkSubscriptionRequestPacket::encode, ChunkSubscriptionRequestPacket::decode,
+                ChunkSubscriptionRequestPacket::handle);
     }
 
     public static void requestSubscription() {
         CHANNEL.sendToServer(new SubscriptionRequestPacket(true));
+    }
+
+    public static void requestChunkSubscription(boolean subscribe) {
+        CHANNEL.sendToServer(new ChunkSubscriptionRequestPacket(subscribe));
     }
 
     public static void requestAnalysis(boolean enabled) {
@@ -82,8 +90,14 @@ public final class BlockCheckingNetwork {
 
     public static void publishSnapshot(ChunkPressureSnapshot snapshot) {
         long revision = REVISION.incrementAndGet();
-        for (UUID uuid : subscribersCopy()) {
+        for (UUID uuid : chunkViewersCopy()) {
             sendTo(uuid, new ChunkSnapshotPacket(revision, snapshot.capturedAtMillis(), snapshot));
+        }
+    }
+
+    public static boolean hasChunkViewers() {
+        synchronized (CHUNK_VIEWERS) {
+            return !CHUNK_VIEWERS.isEmpty();
         }
     }
 
@@ -91,20 +105,29 @@ public final class BlockCheckingNetwork {
         if (report == null) return;
         long revision = REVISION.incrementAndGet();
         long timestamp = System.currentTimeMillis();
-        for (UUID uuid : subscribersCopy()) {
+        for (UUID uuid : reportSubscribersCopy()) {
             sendTo(uuid, new BlockCheckingReportPacket(revision, timestamp, report));
         }
     }
 
     public static void clearSubscriptions() {
-        synchronized (SUBSCRIBERS) {
-            SUBSCRIBERS.clear();
+        synchronized (REPORT_SUBSCRIBERS) {
+            REPORT_SUBSCRIBERS.clear();
+        }
+        synchronized (CHUNK_VIEWERS) {
+            CHUNK_VIEWERS.clear();
         }
     }
 
-    private static Set<UUID> subscribersCopy() {
-        synchronized (SUBSCRIBERS) {
-            return Set.copyOf(SUBSCRIBERS);
+    private static Set<UUID> reportSubscribersCopy() {
+        synchronized (REPORT_SUBSCRIBERS) {
+            return Set.copyOf(REPORT_SUBSCRIBERS);
+        }
+    }
+
+    private static Set<UUID> chunkViewersCopy() {
+        synchronized (CHUNK_VIEWERS) {
+            return Set.copyOf(CHUNK_VIEWERS);
         }
     }
 
@@ -117,10 +140,7 @@ public final class BlockCheckingNetwork {
         }
     }
 
-    private static void sendCurrent(ServerPlayer player) {
-        ChunkPressureSnapshot snapshot = BlockCheckingRuntime.lastChunks();
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                new ChunkSnapshotPacket(REVISION.incrementAndGet(), snapshot.capturedAtMillis(), snapshot));
+    private static void sendCurrentReport(ServerPlayer player) {
         BlockCheckingReport report = BlockCheckingRuntime.lastReport();
         if (report != null) {
             CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
@@ -128,10 +148,20 @@ public final class BlockCheckingNetwork {
         }
     }
 
+    private static void sendCurrentChunks(ServerPlayer player) {
+        ChunkPressureSnapshot snapshot = BlockCheckingRuntime.ensureChunkSnapshot();
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                new ChunkSnapshotPacket(REVISION.incrementAndGet(), snapshot.capturedAtMillis(), snapshot));
+    }
+
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        synchronized (SUBSCRIBERS) {
-            SUBSCRIBERS.remove(event.getEntity().getUUID());
+        UUID uuid = event.getEntity().getUUID();
+        synchronized (REPORT_SUBSCRIBERS) {
+            REPORT_SUBSCRIBERS.remove(uuid);
+        }
+        synchronized (CHUNK_VIEWERS) {
+            CHUNK_VIEWERS.remove(uuid);
         }
     }
 
@@ -143,11 +173,44 @@ public final class BlockCheckingNetwork {
             context.enqueueWork(() -> {
                 ServerPlayer sender = context.getSender();
                 if (sender == null || !sender.hasPermissions(2)) return;
-                synchronized (SUBSCRIBERS) {
-                    if (packet.subscribe) SUBSCRIBERS.add(sender.getUUID());
-                    else SUBSCRIBERS.remove(sender.getUUID());
+                synchronized (REPORT_SUBSCRIBERS) {
+                    if (packet.subscribe) REPORT_SUBSCRIBERS.add(sender.getUUID());
+                    else REPORT_SUBSCRIBERS.remove(sender.getUUID());
                 }
-                if (packet.subscribe) sendCurrent(sender);
+                if (packet.subscribe) sendCurrentReport(sender);
+            });
+            context.setPacketHandled(true);
+        }
+    }
+
+    public record ChunkSubscriptionRequestPacket(boolean subscribe) {
+        private static void encode(ChunkSubscriptionRequestPacket packet, FriendlyByteBuf buf) {
+            buf.writeBoolean(packet.subscribe);
+        }
+
+        private static ChunkSubscriptionRequestPacket decode(FriendlyByteBuf buf) {
+            return new ChunkSubscriptionRequestPacket(buf.readBoolean());
+        }
+
+        private static void handle(ChunkSubscriptionRequestPacket packet, Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                ServerPlayer sender = context.getSender();
+                if (sender == null || !sender.hasPermissions(2)) {
+                    return;
+                }
+                synchronized (CHUNK_VIEWERS) {
+                    if (packet.subscribe) {
+                        CHUNK_VIEWERS.add(sender.getUUID());
+                    } else {
+                        BlockCheckingRuntime.clearChunkView();
+                        CHUNK_VIEWERS.remove(sender.getUUID());
+                    }
+                }
+                if (packet.subscribe) {
+                    BlockCheckingRuntime.startChunkView(sender);
+                    sendCurrentChunks(sender);
+                }
             });
             context.setPacketHandled(true);
         }
@@ -170,11 +233,14 @@ public final class BlockCheckingNetwork {
                     return;
                 }
                 if (packet.enabled) {
-                    synchronized (SUBSCRIBERS) {
-                        SUBSCRIBERS.add(sender.getUUID());
+                    synchronized (REPORT_SUBSCRIBERS) {
+                        REPORT_SUBSCRIBERS.add(sender.getUUID());
                     }
                     BlockCheckingRuntime.startFor(sender);
                 } else {
+                    synchronized (REPORT_SUBSCRIBERS) {
+                        REPORT_SUBSCRIBERS.remove(sender.getUUID());
+                    }
                     BlockCheckingRuntime.stop();
                 }
             });
@@ -199,8 +265,8 @@ public final class BlockCheckingNetwork {
                 if (sender == null || !sender.hasPermissions(2)) {
                     return;
                 }
-                synchronized (SUBSCRIBERS) {
-                    SUBSCRIBERS.add(sender.getUUID());
+                synchronized (CHUNK_VIEWERS) {
+                    CHUNK_VIEWERS.add(sender.getUUID());
                 }
                 BlockCheckingRuntime.inspectChunk(
                         sender, packet.dimension, packet.packedChunk);
@@ -226,8 +292,8 @@ public final class BlockCheckingNetwork {
                 if (sender == null || !sender.hasPermissions(2)) {
                     return;
                 }
-                synchronized (SUBSCRIBERS) {
-                    SUBSCRIBERS.add(sender.getUUID());
+                synchronized (CHUNK_VIEWERS) {
+                    CHUNK_VIEWERS.add(sender.getUUID());
                 }
                 BlockCheckingRuntime.uninspectChunk(
                         sender, packet.dimension, packet.packedChunk);

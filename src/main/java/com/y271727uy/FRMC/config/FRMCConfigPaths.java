@@ -35,11 +35,10 @@ public final class FRMCConfigPaths {
         }
         String template = "# One NetEase Cloud Music song URL per line.\n"
                 + "# Exported lines may contain a title before or after the URL.\n"
-                + "# Supported examples:\n"
+                + "# Supported examples (commented out; add your own links below):\n"
                 + "# https://music.163.com/song?id=123\n"
                 + "# https://music.163.com/#/song?id=123\n"
-                + "# https://music.163.com/#/dj?id=3720311521\n"
-                + "https://music.163.com/#/dj?id=3720311521\n"
+                + "# https://music.163.com/#/dj?id=123\n"
                 + "# Playlist pages and 163cn.tv short links are ignored.\n";
         try {
             Files.writeString(path, template, StandardCharsets.UTF_8);

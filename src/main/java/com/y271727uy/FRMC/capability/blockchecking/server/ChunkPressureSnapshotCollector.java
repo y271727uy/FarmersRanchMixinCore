@@ -32,12 +32,14 @@ public final class ChunkPressureSnapshotCollector {
         for (ServerLevel level : server.getAllLevels()) {
             String dimension = level.dimension().location().toString();
             Map<Long, ChunkMobPressureTracker.ChunkPressure> byChunk = new HashMap<>();
-            for (ChunkMobPressureTracker.ChunkPressure pressure : ChunkMobPressureTracker.pressures(level)) {
-                byChunk.put(pressure.chunkPos(), pressure);
-            }
-            Map<Long, EntityCounts> entitiesByChunk = entityCounts(level);
-            Map<Long, Integer> scheduledByChunk = scheduledTickCounts(level);
             List<ServerPlayer> players = EntityActivityManager.activePlayers(level);
+            for (ChunkMobPressureTracker.ChunkPressure pressure : ChunkMobPressureTracker.pressures(level)) {
+                if (nearby(level, pressure.chunkPos(), players)) {
+                    byChunk.put(pressure.chunkPos(), pressure);
+                }
+            }
+            Map<Long, EntityCounts> entitiesByChunk = entityCounts(level, players);
+            Map<Long, Integer> scheduledByChunk = scheduledTickCounts(level, players);
             Set<Long> packedChunks = new HashSet<>(byChunk.keySet());
             for (Map.Entry<Long, EntityCounts> entities : entitiesByChunk.entrySet()) {
                 if (entities.getValue().items > 0) {
@@ -143,11 +145,11 @@ public final class ChunkPressureSnapshotCollector {
         return chunk.getBlockEntities().size();
     }
 
-    private static Map<Long, Integer> scheduledTickCounts(ServerLevel level) {
+    private static Map<Long, Integer> scheduledTickCounts(ServerLevel level, List<ServerPlayer> players) {
         Map<Long, Integer> counts = new HashMap<>();
         for (ChunkHolder holder : level.getChunkSource().chunkMap.getChunks()) {
             LevelChunk chunk = holder.getTickingChunk();
-            if (chunk == null) {
+            if (chunk == null || !nearby(level, chunk.getPos().toLong(), players)) {
                 continue;
             }
             int ticks = scheduledTicks(chunk);
@@ -171,13 +173,16 @@ public final class ChunkPressureSnapshotCollector {
         return Math.max(0, chunk.getBlockTicks().count()) + Math.max(0, chunk.getFluidTicks().count());
     }
 
-    private static Map<Long, EntityCounts> entityCounts(ServerLevel level) {
+    private static Map<Long, EntityCounts> entityCounts(ServerLevel level, List<ServerPlayer> players) {
         Map<Long, EntityCounts> counts = new HashMap<>();
         for (Entity entity : level.getAllEntities()) {
             if (!entity.isAlive() || entity instanceof Player) {
                 continue;
             }
             long packed = entity.chunkPosition().toLong();
+            if (!nearby(level, packed, players)) {
+                continue;
+            }
             if (entity instanceof ItemEntity) {
                 counts.computeIfAbsent(packed, ignored -> new EntityCounts()).items++;
             } else if (!(entity instanceof Mob)) {
@@ -217,6 +222,26 @@ public final class ChunkPressureSnapshotCollector {
             }
         });
         return count[0];
+    }
+
+    private static boolean nearby(ServerLevel level, long packedChunk, List<ServerPlayer> players) {
+        if (players.isEmpty()) {
+            return false;
+        }
+        int chunkX = ChunkPos.getX(packedChunk);
+        int chunkZ = ChunkPos.getZ(packedChunk);
+        int radius = com.y271727uy.FRMC.config.BlockCheckingConfig.chunkDetectionRadius();
+        for (ServerPlayer player : players) {
+            if (player.level() != level) {
+                continue;
+            }
+            int playerChunkX = player.chunkPosition().x;
+            int playerChunkZ = player.chunkPosition().z;
+            if (Math.abs(chunkX - playerChunkX) <= radius && Math.abs(chunkZ - playerChunkZ) <= radius) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static final class EntityCounts {

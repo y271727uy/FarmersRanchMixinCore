@@ -12,6 +12,9 @@ public final class FRMCMixinBlacklistApplication {
     public static void initialize() {
         RecipeSearchConfig.load();
         FRMCMixinBlacklistConfig.load();
+        FRMCMixinBlacklistConfig.addBlacklistedMixin(
+            "com.teamabnormals.blueprint.core.mixin.client.ReloadableResourceManagerMixin"
+        );
         FRMCMixinBlacklistExtension.register();
     }
 

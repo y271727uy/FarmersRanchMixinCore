@@ -2,6 +2,7 @@ package com.y271727uy.FRMC.capability.blockchecking.server;
 
 import com.y271727uy.FRMC.config.BlockCheckingConfig;
 import com.y271727uy.FRMC.capability.blockchecking.model.ChunkPressureSnapshot;
+import com.y271727uy.FRMC.capability.blockchecking.model.ChunkPressureEntry;
 import com.y271727uy.FRMC.capability.blockchecking.model.BlockCheckingReport;
 import com.y271727uy.FRMC.capability.blockchecking.model.WorkKind;
 import com.y271727uy.FRMC.network.BlockCheckingNetwork;
@@ -11,7 +12,10 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Server event bridge for bounded block-checking collection. No sampler operation touches game state. */
 public final class BlockCheckingRuntime {
@@ -23,6 +27,8 @@ public final class BlockCheckingRuntime {
     private static volatile Thread samplerThread;
     private static volatile long tickStartedAtNanos;
     private static volatile net.minecraft.server.MinecraftServer server;
+    private static final Set<ChunkKey> manuallyInspected = new HashSet<>();
+    private static final Set<ChunkKey> manuallyExcluded = new HashSet<>();
     private static int chunkSnapshotCountdown;
 
     private BlockCheckingRuntime() {
@@ -37,7 +43,6 @@ public final class BlockCheckingRuntime {
         if (started) {
             ensureSampler();
             chunkSnapshotCountdown = 0;
-            publishImmediateSnapshot();
         }
         return started;
     }
@@ -54,11 +59,7 @@ public final class BlockCheckingRuntime {
         if (player != null && player.getServer() != null) {
             server = player.getServer();
         }
-        boolean started = start(BlockCheckingConfig.defaultSessionSeconds());
-        if (!started) {
-            publishImmediateSnapshot();
-        }
-        return started;
+        return start(BlockCheckingConfig.defaultSessionSeconds());
     }
 
     public static boolean active() {
@@ -70,6 +71,28 @@ public final class BlockCheckingRuntime {
     }
 
     public static ChunkPressureSnapshot lastChunks() {
+        return lastChunks;
+    }
+
+    /** Marks the server-side chunk view as open without collecting until requested. */
+    public static void startChunkView(net.minecraft.server.level.ServerPlayer player) {
+        if (player != null && player.getServer() != null) {
+            server = player.getServer();
+        }
+        chunkSnapshotCountdown = 0;
+        synchronized (manuallyInspected) {
+            manuallyInspected.clear();
+            manuallyExcluded.clear();
+        }
+        lastChunks = new ChunkPressureSnapshot(System.currentTimeMillis(), List.of(), true);
+    }
+
+    /** Performs the first lazy collection when a chunk viewer opens. */
+    public static ChunkPressureSnapshot ensureChunkSnapshot() {
+        net.minecraft.server.MinecraftServer current = server;
+        if (current != null) {
+            lastChunks = applyOverrides(CHUNKS.collect(current, BlockCheckingConfig.outputEntryLimit()));
+        }
         return lastChunks;
     }
 
@@ -92,6 +115,11 @@ public final class BlockCheckingRuntime {
         if (one.entries().isEmpty()) {
             return;
         }
+        ChunkKey key = new ChunkKey(dimension, packedChunk);
+        synchronized (manuallyInspected) {
+            manuallyInspected.add(key);
+            manuallyExcluded.remove(key);
+        }
         lastChunks = ChunkPressureSnapshot.merge(lastChunks, one.entries().get(0), System.currentTimeMillis(),
                 BlockCheckingConfig.outputEntryLimit());
         BlockCheckingNetwork.publishSnapshot(lastChunks);
@@ -111,6 +139,11 @@ public final class BlockCheckingRuntime {
     public static void uninspectChunk(String dimension, long packedChunk) {
         if (dimension == null || dimension.isEmpty()) {
             return;
+        }
+        ChunkKey key = new ChunkKey(dimension, packedChunk);
+        synchronized (manuallyInspected) {
+            manuallyInspected.remove(key);
+            manuallyExcluded.add(key);
         }
         ChunkPressureSnapshot current = lastChunks;
         ChunkPressureSnapshot next = ChunkPressureSnapshot.without(current, dimension, packedChunk,
@@ -152,9 +185,11 @@ public final class BlockCheckingRuntime {
             return;
         }
         SESSION.recordTick(System.nanoTime() - tickStartedAtNanos);
-        if (++chunkSnapshotCountdown >= BlockCheckingConfig.chunkSnapshotPeriodTicks()) {
+        if (!BlockCheckingNetwork.hasChunkViewers()) {
             chunkSnapshotCountdown = 0;
-            lastChunks = CHUNKS.collect(event.getServer(), BlockCheckingConfig.outputEntryLimit());
+        } else if (++chunkSnapshotCountdown >= BlockCheckingConfig.chunkSnapshotPeriodTicks()) {
+            chunkSnapshotCountdown = 0;
+            lastChunks = applyOverrides(CHUNKS.collect(event.getServer(), BlockCheckingConfig.outputEntryLimit()));
             BlockCheckingNetwork.publishSnapshot(lastChunks);
         }
         if (SESSION.finishIfDue(System.nanoTime(), BlockCheckingConfig.outputEntryLimit())) {
@@ -170,6 +205,10 @@ public final class BlockCheckingRuntime {
     public static void clear() {
         SESSION.clear();
         CONTEXT.clear();
+        synchronized (manuallyInspected) {
+            manuallyInspected.clear();
+            manuallyExcluded.clear();
+        }
         lastChunks = new ChunkPressureSnapshot(0L, List.of(), true);
         chunkSnapshotCountdown = 0;
     }
@@ -186,12 +225,54 @@ public final class BlockCheckingRuntime {
         clear();
     }
 
+    public static void clearChunkView() {
+        synchronized (manuallyInspected) {
+            manuallyInspected.clear();
+            manuallyExcluded.clear();
+        }
+        lastChunks = new ChunkPressureSnapshot(System.currentTimeMillis(), List.of(), true);
+        BlockCheckingNetwork.publishSnapshot(lastChunks);
+    }
+
+    private static ChunkPressureSnapshot applyOverrides(ChunkPressureSnapshot collected) {
+        List<ChunkPressureEntry> merged = new ArrayList<>();
+        Set<ChunkKey> inspected;
+        Set<ChunkKey> excluded;
+        synchronized (manuallyInspected) {
+            inspected = Set.copyOf(manuallyInspected);
+            excluded = Set.copyOf(manuallyExcluded);
+        }
+        for (ChunkPressureEntry entry : lastChunks.entries()) {
+            if (inspected.contains(new ChunkKey(entry.dimension(), entry.packedChunk()))) {
+                merged.add(entry);
+            }
+        }
+        for (ChunkPressureEntry entry : collected.entries()) {
+            ChunkKey key = new ChunkKey(entry.dimension(), entry.packedChunk());
+            if (excluded.contains(key) || merged.stream().anyMatch(existing ->
+                    existing.dimension().equals(entry.dimension()) && existing.packedChunk() == entry.packedChunk())) {
+                continue;
+            }
+            merged.add(entry);
+            if (merged.size() >= BlockCheckingConfig.outputEntryLimit()) {
+                break;
+            }
+        }
+        if (merged.size() > BlockCheckingConfig.outputEntryLimit()) {
+            merged = new ArrayList<>(merged.subList(0, BlockCheckingConfig.outputEntryLimit()));
+        }
+        return new ChunkPressureSnapshot(collected.capturedAtMillis(), merged, collected.trackedMobCoverage());
+    }
+
+    private record ChunkKey(String dimension, long packedChunk) {
+    }
+
     private static void publishImmediateSnapshot() {
         net.minecraft.server.MinecraftServer current = server;
         if (current == null) {
             return;
         }
-        lastChunks = CHUNKS.collect(current, BlockCheckingConfig.outputEntryLimit());
+        lastChunks = applyOverrides(CHUNKS.collect(current, BlockCheckingConfig.outputEntryLimit()));
         BlockCheckingNetwork.publishSnapshot(lastChunks);
     }
 

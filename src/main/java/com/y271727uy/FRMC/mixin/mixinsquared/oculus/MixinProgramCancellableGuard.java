@@ -5,10 +5,9 @@ import com.bawnorton.mixinsquared.adjuster.tools.AdjustableInjectNode;
 import org.spongepowered.asm.mixin.injection.Inject;
 
 /**
- * Oculus {@code MixinProgram.iris$causeException} injects into
- * {@code compileShaderInternal} without {@code cancellable = true}, then
- * calls {@code cir.cancel()} when a shader fails. Mixin throws
- * {@code CancellationException} on top of the real compile error.
+ * Oculus 的 MixinProgram.iris$causeException注入到了
+ * compileShaderInternal中，但没有设置 cancellable = true，然后在着色器编译失败时调用 cir.cancel()
+ * Mixin 会在真正的编译错误之上抛出 CancellationException
  */
 public final class MixinProgramCancellableGuard {
     private static final String OCULUS_PROGRAM_MIXIN = "net.irisshaders.iris.mixin.MixinProgram";

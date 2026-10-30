@@ -27,4 +27,14 @@ public final class EntityVisibilityPolicy {
         }
         return true;
     }
+
+    public static boolean isDistanceCulledFromAll(Collection<ServerPlayer> players, int entityId) {
+        if (players.isEmpty()) return false;
+        for (ServerPlayer player : players) {
+            EntityActivityNetwork.ClientCapabilities capabilities = EntityActivityNetwork.capabilities(player);
+            if (capabilities == null || !capabilities.chlorideVisibility()
+                    || !Boolean.FALSE.equals(capabilities.distance().get(entityId))) return false;
+        }
+        return true;
+    }
 }
