@@ -24,6 +24,8 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("minecraft.recipe.deduplicator.farmersdelight.", "farmersdelight"),
         new OptionalMixinIntegration("alexsmobs.", "alexsmobs"),
         new OptionalMixinIntegration("aquaculture.", "aquaculture"),
+        new OptionalMixinIntegration("embeddium.citadel.", "embeddium", "citadel"),
+        new OptionalMixinIntegration("acceleratedrendering.citadel.", "acceleratedrendering", "citadel"),
         new OptionalMixinIntegration("acceleratedrendering.", "acceleratedrendering"),
         new OptionalMixinIntegration("betterfoliage.", "betterfoliage"),
         new OptionalMixinIntegration("braziliandelight.", "braziliandelight"),

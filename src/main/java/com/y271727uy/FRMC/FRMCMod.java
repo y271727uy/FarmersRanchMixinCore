@@ -2,6 +2,7 @@ package com.y271727uy.FRMC;
 
 import com.mojang.logging.LogUtils;
 import com.y271727uy.FRMC.client.modelgap.ModelGapFixConfig;
+import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelEmbeddiumConfig;
 import com.y271727uy.FRMC.client.FRMCClientSetup;
 import com.y271727uy.FRMC.integration.manors_bounty.ManorsBountyIntegration;
 import com.y271727uy.FRMC.integration.mooncakedelight.MooncakeDelightCroptopiaIntegration;
@@ -17,6 +18,7 @@ import com.y271727uy.FRMC.network.EntityActivityNetwork;
 import com.y271727uy.FRMC.config.OnlineMusicConfig;
 import com.y271727uy.FRMC.config.FRMCConfigPaths;
 import com.y271727uy.FRMC.config.BlockCheckingConfig;
+import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
 import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingCommands;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingRuntime;
@@ -65,6 +67,8 @@ public class FRMCMod {
         System.setProperty("frmc.smoothboot.ioPriority", Integer.toString(smoothBootConfig.threadPriority.io));
         System.setProperty("frmc.smoothboot.modLoading", Integer.toString(smoothBootConfig.threadPriority.modLoading));
         ModelGapFixConfig.register();
+        CitadelEmbeddiumConfig.register();
+        UntamedWildsAnimationConfig.register();
 
         var modEventBus = MooncakeDelightCroptopiaIntegration.getModEventBus();
         MooncakeDelightCroptopiaIntegration.registerListeners(modEventBus);

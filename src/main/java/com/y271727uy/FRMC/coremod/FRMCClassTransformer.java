@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 import java.util.function.BiFunction;
 
-
+ //1.12.2的，本质不可用
  //核心字节码转换器
  //此类通过 FRMCCoordinator 注册到 ModLauncher 的 TransformationService 中。
 
