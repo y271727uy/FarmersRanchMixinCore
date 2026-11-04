@@ -4,6 +4,7 @@ import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
 import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelArRenderer;
 import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelGeometryAccess;
 import com.y271727uy.FRMC.integration.diagnostics.EntityRenderDiagnostics;
@@ -23,6 +24,7 @@ import java.util.Map;
 import net.minecraft.util.FastColor.ARGB32;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
@@ -81,6 +83,65 @@ public abstract class AdvancedModelBoxMixin implements IAcceleratedRenderer<Void
             if (scaleX == 1.0F && scaleY == 1.0F && scaleZ == 1.0F) {
                 EntityRenderDiagnostics.recordUnitScale();
             }
+        }
+    }
+
+    @Unique
+    private float frmc$rotationX;
+    @Unique
+    private float frmc$rotationY;
+    @Unique
+    private float frmc$rotationZ;
+    @Unique
+    private final Quaternionf frmc$identityQuaternion = new Quaternionf();
+    @Unique
+    private final Quaternionf frmc$combinedQuaternion = new Quaternionf();
+    @Unique
+    private float frmc$cachedRotationX;
+    @Unique
+    private float frmc$cachedRotationY;
+    @Unique
+    private float frmc$cachedRotationZ;
+    @Unique
+    private boolean frmc$hasCachedRotation;
+
+    @Inject(method = "translateAndRotate", at = @At("HEAD"), remap = false)
+    private void frmc$resetCombinedRotation(PoseStack pose, CallbackInfo callback) {
+        frmc$rotationX = 0.0F;
+        frmc$rotationY = 0.0F;
+        frmc$rotationZ = 0.0F;
+    }
+
+    @Redirect(method = "translateAndRotate(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/math/Axis;rotation(F)Lorg/joml/Quaternionf;"), remap = false)
+    private Quaternionf frmc$captureAxisRotation(Axis axis, float angle) {
+        if (axis == Axis.XP) {
+            frmc$rotationX = angle;
+        } else if (axis == Axis.YP) {
+            frmc$rotationY = angle;
+        } else if (axis == Axis.ZP) {
+            frmc$rotationZ = angle;
+        }
+        return frmc$identityQuaternion.set(0.0F, 0.0F, 0.0F, 1.0F);
+    }
+
+    @Redirect(method = "translateAndRotate(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;mulPose(Lorg/joml/Quaternionf;)V"), remap = false)
+    private void frmc$suppressAxisMulPose(PoseStack pose, Quaternionf ignored) {
+    }
+
+    @Inject(method = "translateAndRotate", at = @At("RETURN"), remap = false)
+    private void frmc$applyCombinedRotation(PoseStack pose, CallbackInfo callback) {
+        if (frmc$rotationX != 0.0F || frmc$rotationY != 0.0F || frmc$rotationZ != 0.0F) {
+            if (!frmc$hasCachedRotation || frmc$cachedRotationX != frmc$rotationX
+                    || frmc$cachedRotationY != frmc$rotationY || frmc$cachedRotationZ != frmc$rotationZ) {
+                frmc$combinedQuaternion.rotationZYX(frmc$rotationZ, frmc$rotationY, frmc$rotationX);
+                frmc$cachedRotationX = frmc$rotationX;
+                frmc$cachedRotationY = frmc$rotationY;
+                frmc$cachedRotationZ = frmc$rotationZ;
+                frmc$hasCachedRotation = true;
+            }
+            pose.mulPose(frmc$combinedQuaternion);
         }
     }
 

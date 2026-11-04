@@ -20,6 +20,7 @@ import com.y271727uy.FRMC.config.FRMCConfigPaths;
 import com.y271727uy.FRMC.config.BlockCheckingConfig;
 import com.y271727uy.FRMC.config.EntityRenderDiagnosticsConfig;
 import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
+import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsFriendlyFireHandler;
 import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingCommands;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingRuntime;
@@ -88,6 +89,7 @@ public class FRMCMod {
         MobSpawnRateConfig.load();
         BlockCheckingConfig.load();
         MinecraftForge.EVENT_BUS.register(EntityActivityManager.class);
+        MinecraftForge.EVENT_BUS.register(UntamedWildsFriendlyFireHandler.class);
         MinecraftForge.EVENT_BUS.register(BlockCheckingRuntime.class);
         MinecraftForge.EVENT_BUS.register(BlockCheckingCommands.class);
         DataGroupInit.init();
