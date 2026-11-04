@@ -49,7 +49,8 @@ public final class RecipeSearchConfig {
 
     public static void apply(Properties properties) {
         Config.recipeSearchEnabled = booleanProperty(properties, "enable", true);
-        Config.recipeSearchOptimizeOnlyVanilla = booleanProperty(properties, "optimize_only_vanilla", true);
+        Config.recipeSearchOptimizeOnlyVanilla = booleanProperty(properties, "optimize_only_vanilla", false);
+        Config.recipeSearchOptimizeOnlyVanillaRecipeClasses = booleanProperty(properties, "optimize_only_vanilla_recipe_classes", false);
         Config.recipeIngredientSyncEnabled = booleanProperty(properties, "ingredient_sync", false);
         Config.recipeIngredientDeduplicatorEnabled = booleanProperty(properties, "ingredient_deduplicator", false);
     }
@@ -61,7 +62,8 @@ public final class RecipeSearchConfig {
     private static Properties defaultProperties() {
         Properties properties = new Properties();
         properties.setProperty("enable", "true");
-        properties.setProperty("optimize_only_vanilla", "true");
+        properties.setProperty("optimize_only_vanilla", "false");
+        properties.setProperty("optimize_only_vanilla_recipe_classes", "false");
         properties.setProperty("ingredient_sync", "false");
         properties.setProperty("ingredient_deduplicator", "false");
         return properties;

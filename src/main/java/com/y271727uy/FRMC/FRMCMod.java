@@ -18,6 +18,7 @@ import com.y271727uy.FRMC.network.EntityActivityNetwork;
 import com.y271727uy.FRMC.config.OnlineMusicConfig;
 import com.y271727uy.FRMC.config.FRMCConfigPaths;
 import com.y271727uy.FRMC.config.BlockCheckingConfig;
+import com.y271727uy.FRMC.config.EntityRenderDiagnosticsConfig;
 import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
 import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingCommands;
@@ -69,6 +70,7 @@ public class FRMCMod {
         ModelGapFixConfig.register();
         CitadelEmbeddiumConfig.register();
         UntamedWildsAnimationConfig.register();
+        EntityRenderDiagnosticsConfig.load();
 
         var modEventBus = MooncakeDelightCroptopiaIntegration.getModEventBus();
         MooncakeDelightCroptopiaIntegration.registerListeners(modEventBus);

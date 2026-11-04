@@ -4,11 +4,16 @@ package com.y271727uy.FRMC.config;
  * Mod configuration for FRMC.
  */
 public final class Config {
-    /** Master switch for recipe search optimization */
+    /** Enables low-overhead aggregated UW/Citadel/AR render diagnostics. */
+    public static boolean entityRenderDiagnosticsEnabled = false;
+
     public static boolean recipeSearchEnabled = true;
 
-    /** Matches Fast-Recipe-Search's compatibility-safe default scope. */
-    public static boolean recipeSearchOptimizeOnlyVanilla = true;
+    /** Restricts indexed searches to vanilla RecipeTypes; disabled by default to match the generic search scope. */
+    public static boolean recipeSearchOptimizeOnlyVanilla = false;
+
+    /** Restricts indexed recipes to vanilla implementation classes; disabled by default. */
+    public static boolean recipeSearchOptimizeOnlyVanillaRecipeClasses = false;
 
     /** Compact Ingredient network encoding; disabled by default for compatibility. */
     public static boolean recipeIngredientSyncEnabled = false;

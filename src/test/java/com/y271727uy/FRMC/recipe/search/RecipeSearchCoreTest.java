@@ -1,15 +1,19 @@
 package com.y271727uy.FRMC.recipe.search;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.y271727uy.computatio.api.multisetindex.FeatureCounts;
+import com.y271727uy.computatio.api.multisetindex.FeatureMultiset;
+import com.y271727uy.computatio.api.multisetindex.MultisetIndex;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
-
-import com.y271727uy.FRMC.capability.recipe.search.*;
-import org.junit.jupiter.api.Test;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class RecipeSearchCoreTest {
     @Test
@@ -18,37 +22,46 @@ class RecipeSearchCoreTest {
         DummyRecipe second = recipe("second", 10, 12);
         DummyRecipe third = recipe("third", 10, 13);
         DummyRecipe fourth = recipe("fourth", 10, 14);
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), List.of(first, second, third, fourth));
+        MultisetIndex<DummyRecipe> index = build(List.of(first, second, third, fourth));
 
-        IntLongMap input = map(10, 14);
-        DummyRecipe result = database.findAnyMatch(input, input.toIntArray(), recipe -> recipe == fourth);
+        assertSame(fourth, index.findAny(map(10, 14), recipe -> recipe.name.equals("fourth")));
+    }
 
-        assertSame(fourth, result);
+    @Test
+    void findAnyStopsAfterTheFirstPredicateMatch() {
+        DummyRecipe first = recipe("first", 60);
+        DummyRecipe second = recipe("second", 60);
+        DummyRecipe third = recipe("third", 60);
+        MultisetIndex<DummyRecipe> index = build(List.of(first, second, third));
+        AtomicInteger calls = new AtomicInteger();
+
+        DummyRecipe result = index.findAny(map(60), candidate -> {
+            calls.incrementAndGet();
+            return true;
+        });
+
+        assertSame(first, result);
+        assertEquals(1, calls.get());
     }
 
     @Test
     void fallsBackToRecipesWithoutIndexableKeys() {
         DummyRecipe indexed = recipe("indexed", 20);
         DummyRecipe fallback = recipe("fallback");
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), List.of(indexed, fallback));
+        MultisetIndex<DummyRecipe> index = build(List.of(indexed, fallback));
 
-        IntLongMap input = map(20);
-        DummyRecipe result = database.findAnyMatch(input, input.toIntArray(), recipe -> recipe == fallback);
-
-        assertSame(fallback, result);
+        assertSame(fallback, index.findAny(map(20), recipe -> recipe.name.equals("fallback")));
+        assertEquals(1, index.indexedSize());
+        assertEquals(1, index.fallbackSize());
     }
 
     @Test
     void fullSearchIncludesIndexedAndFallbackRecipes() {
         DummyRecipe indexed = recipe("indexed", 30);
         DummyRecipe fallback = recipe("fallback");
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), List.of(indexed, fallback));
+        MultisetIndex<DummyRecipe> index = build(List.of(indexed, fallback));
 
-        IntLongMap input = map(30);
-        List<String> results = database.search(input, input.toIntArray(), recipe -> true)
-                .stream()
-                .map(recipe -> recipe.name)
-                .toList();
+        List<String> results = index.findAll(map(30), recipe -> true).stream().map(recipe -> recipe.name).toList();
 
         assertEquals(List.of("indexed", "fallback"), results);
     }
@@ -58,122 +71,89 @@ class RecipeSearchCoreTest {
         DummyRecipe first = recipe("first", 40);
         DummyRecipe second = recipe("second", 40);
         DummyRecipe third = recipe("third", 40);
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), List.of(first, second, third));
+        MultisetIndex<DummyRecipe> index = build(List.of(first, second, third));
 
-        IntLongMap input = map(40);
-        List<String> results = database.search(input, input.toIntArray(), recipe -> true)
-                .stream()
-                .map(recipe -> recipe.name)
-                .toList();
+        List<String> results = index.findAll(map(40), recipe -> true).stream().map(recipe -> recipe.name).toList();
 
         assertEquals(3, results.size());
         assertEquals(Set.of("first", "second", "third"), Set.copyOf(results));
     }
 
     @Test
-    void recipeContainerPreservesRequiredItemCounts() {
-        IntLongMap required = new IntLongMap();
-        required.add(50, 2);
-        DummyRecipe recipe = new DummyRecipe("double", required);
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), List.of(recipe));
+    void preservesRequiredFeatureCounts() {
+        DummyRecipe recipe = recipe("double", new int[]{50, 50});
+        MultisetIndex<DummyRecipe> index = build(List.of(recipe));
 
-        IntLongMap insufficient = map(50);
-        assertNull(database.findAnyMatch(
-                insufficient,
-                insufficient.toIntArray(),
-                candidate -> candidate.container.match(insufficient)
-        ));
+        assertNull(index.findAny(map(50), candidate -> true));
+        assertFalse(recipe.counts.matches(map(50)));
+        assertSame(recipe, index.findAny(map(50, 50), candidate -> true));
+        assertTrue(recipe.counts.matches(map(50, 50)));
+    }
 
-        IntLongMap sufficient = new IntLongMap();
-        sufficient.add(50, 2);
-        assertSame(recipe, database.findAnyMatch(
-                sufficient,
-                sufficient.toIntArray(),
-                candidate -> candidate.container.match(sufficient)
-        ));
+    @Test
+    void sortsFeaturelessFallbackValuesWithConfiguredComparator() {
+        DummyRecipe later = recipe("z-last");
+        DummyRecipe earlier = recipe("a-first");
+        MultisetIndex<DummyRecipe> index = MultisetIndex.build(
+                List.of(later, earlier),
+                recipe -> recipe.features,
+                MultisetIndex.Options.<DummyRecipe>defaults()
+                        .supportsParallel(recipe -> false)
+                        .fallbackComparator(java.util.Comparator.comparing(recipe -> recipe.name)));
+
+        assertSame(earlier, index.findAny(map(), recipe -> true));
     }
 
     @Test
     void searchesPathsDeeperThanOneMachineWord() {
         int[] keys = new int[70];
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = 100 + i;
-        }
+        for (int i = 0; i < keys.length; i++) keys[i] = 100 + i;
         DummyRecipe deep = recipe("deep", keys);
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), List.of(deep));
+        MultisetIndex<DummyRecipe> index = build(List.of(deep));
 
-        IntLongMap input = map(keys);
-        assertSame(deep, database.findAnyMatch(input, input.toIntArray(), recipe -> true));
+        assertSame(deep, index.findAny(map(keys), recipe -> true));
     }
 
     @Test
-    void hashBranchReadsIndividualNodesFromFastutilStorage() {
-        Branch.HashBranch<String> branch = new Branch.HashBranch<>();
-        for (int key = 1; key <= 5; key++) {
-            branch.put(key, Node.recipe(List.of(), null, "recipe-" + key));
-        }
-
-        Node<String> node = branch.get(5);
-        assertNotNull(node);
-    }
-
-    @Test
-    void fullSearchTraversesLargeHashBranches() {
+    void findsAllValuesAcrossWideBranches() {
         List<DummyRecipe> recipes = List.of(
-                recipe("one", 1),
-                recipe("two", 2),
-                recipe("three", 3),
-                recipe("four", 4),
-                recipe("five", 5)
-        );
-        DummyDB database = AbstractRecipeDB.build(new DummyDB(), recipes);
-        IntLongMap input = map(1, 2, 3, 4, 5);
+                recipe("one", 1), recipe("two", 2), recipe("three", 3),
+                recipe("four", 4), recipe("five", 5));
+        MultisetIndex<DummyRecipe> index = build(recipes);
 
-        List<String> found = database.search(input, input.toIntArray(), recipe -> true)
-                .stream()
-                .map(recipe -> recipe.name)
-                .toList();
+        List<String> found = index.findAll(map(1, 2, 3, 4, 5), recipe -> true)
+                .stream().map(recipe -> recipe.name).toList();
 
         assertEquals(Set.of("one", "two", "three", "four", "five"), Set.copyOf(found));
+    }
+
+    private static MultisetIndex<DummyRecipe> build(List<DummyRecipe> recipes) {
+        return MultisetIndex.build(
+                recipes,
+                recipe -> recipe.features,
+                MultisetIndex.Options.<DummyRecipe>defaults()
+                        .supportsParallel(recipe -> false)
+                        .onFeatureCountTable((recipe, counts) -> recipe.counts = counts));
     }
 
     private static DummyRecipe recipe(String name, int... keys) {
         return new DummyRecipe(name, map(keys));
     }
 
-    private static IntLongMap map(int... keys) {
-        IntLongMap map = new IntLongMap();
-        for (int key : keys) {
-            map.add(key, 1L);
-        }
-        return map;
-    }
-
-    private static final class DummyDB extends AbstractRecipeDB<DummyRecipe> {
-        @Override
-        protected IntLongMap extractIntMap(DummyRecipe recipe) {
-            return recipe.keys;
-        }
-
-        @Override
-        protected void setRecipeContainer(DummyRecipe recipe, IntMapContainer container) {
-            recipe.container = container;
-        }
-
-        @Override
-        protected boolean supportsParallel(DummyRecipe recipe) {
-            return false;
-        }
+    private static FeatureMultiset map(int... keys) {
+        FeatureMultiset features = new FeatureMultiset();
+        for (int key : keys) features.add(key, 1);
+        return features;
     }
 
     private static final class DummyRecipe {
         private final String name;
-        private final IntLongMap keys;
-        private IntMapContainer container;
+        private final FeatureMultiset features;
+        private FeatureCounts counts;
 
-        private DummyRecipe(String name, IntLongMap keys) {
+        private DummyRecipe(String name, FeatureMultiset features) {
             this.name = name;
-            this.keys = keys;
+            this.features = features;
         }
     }
 }

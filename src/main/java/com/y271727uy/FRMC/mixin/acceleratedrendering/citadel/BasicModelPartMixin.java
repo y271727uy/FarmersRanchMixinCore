@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelArRenderer;
+import com.y271727uy.FRMC.integration.diagnostics.EntityRenderDiagnostics;
 import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelGeometryAccess;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.util.Map;
@@ -41,6 +42,36 @@ public abstract class BasicModelPartMixin implements IAcceleratedRenderer<Void> 
     @Unique
     private Map<MeshData, IMesh> frmc$mergedMeshes;
 
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;II)V", at = @At("HEAD"), remap = false)
+    private void frmc$diagnosticBoneRender(PoseStack pose, VertexConsumer buffer, int light, int overlay,
+                                           CallbackInfo callback) {
+        EntityRenderDiagnostics.recordBoneRender();
+    }
+
+    @Unique
+    private long frmc$transformStart;
+
+    @Inject(method = "translateRotate", at = @At("HEAD"), remap = false)
+    private void frmc$diagnosticTransformStart(PoseStack pose, CallbackInfo callback) {
+        frmc$transformStart = EntityRenderDiagnostics.startTransform();
+    }
+
+    @Inject(method = "translateRotate", at = @At("RETURN"), remap = false)
+    private void frmc$diagnosticTransformEnd(PoseStack pose, CallbackInfo callback) {
+        EntityRenderDiagnostics.recordTransform(frmc$transformStart);
+    }
+
+    @Inject(method = "doRender", at = @At("HEAD"), cancellable = true, remap = false)
+    private void frmc$skipEmptyGeometry(PoseStack.Pose pose, VertexConsumer buffer,
+                                         int packedLight, int packedOverlay,
+                                         float red, float green, float blue, float alpha,
+                                         CallbackInfo callback) {
+        if (cubeList.isEmpty()) {
+            EntityRenderDiagnostics.recordEmptyGeometry();
+            callback.cancel();
+        }
+    }
+
     @Inject(method = "doRender", at = @At("HEAD"), cancellable = true, remap = false)
     private void frmc$renderWithAcceleratedPipeline(PoseStack.Pose pose, VertexConsumer buffer,
                                                      int packedLight, int packedOverlay,
@@ -52,6 +83,7 @@ public abstract class BasicModelPartMixin implements IAcceleratedRenderer<Void> 
                 || !AcceleratedEntityRenderingFeature.isEnabled()
                 || !CitadelGeometryAccess.isAvailable()
                 || !accelerated.isAccelerated()) {
+            EntityRenderDiagnostics.recordCitadelFallback();
             return;
         }
 
@@ -90,7 +122,9 @@ public abstract class BasicModelPartMixin implements IAcceleratedRenderer<Void> 
                 frmc$mergedMeshes.put(data, mesh);
             }
 
+            long diagnosticsStart = EntityRenderDiagnostics.start();
             mesh.write(accelerated, color, light, overlay);
+            EntityRenderDiagnostics.recordArMeshWrite(diagnosticsStart);
         } finally {
             accelerated.endTransform();
         }

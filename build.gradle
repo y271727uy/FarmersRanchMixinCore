@@ -40,6 +40,7 @@ base {
 }
 
 def mixinRuntimeSource = file('lib/MixinRuntime-mc1.20.1-1.0.jar')
+def computatioSource = file('lib/computatio-0.1.0.jar')
 
 tasks.register('repackMixinRuntime', Jar) {
     archiveFileName = mixinRuntimeSource.name
@@ -48,6 +49,15 @@ tasks.register('repackMixinRuntime', Jar) {
         exclude 'META-INF/MANIFEST.MF'
     }
     manifest.attributes('Automatic-Module-Name': 'frmc.mixinruntime')
+}
+
+tasks.register('repackComputatio', Jar) {
+    archiveFileName = computatioSource.name
+    destinationDirectory = layout.buildDirectory.dir('embedded-libs')
+    from(zipTree(computatioSource)) {
+        exclude 'META-INF/MANIFEST.MF'
+    }
+    manifest.attributes('Automatic-Module-Name': 'com.y271727uy.computatio')
 }
 
 // Mojang ships Java 17 to end users in 1.20.1, so mods should target Java 17.
@@ -228,8 +238,10 @@ dependencies {
     modCompileOnly 'BrewinAndChewin:BrewinAndChewin-1.20.1-3.2.1'
     modCompileOnly 'nether-s-exoticism:nether-s-exoticism-1.20.1-1.2.9'
     modImplementation 'ldlib:ldlib-forge-1.20.1-1.0.52.a'
-    modImplementation 'fastchunkgen:fastchunkgen-0.34-all'
+    modImplementation 'fastchunkgen:fastchunkgen-0.40-all'
     modImplementation 'noisium:noisium-forge-2.3.0+mc1.20-1.20.1'
+    modImplementation 'astikorcartsredux:astikorcartsredux-1.2.5'
+    modImplementation 'FastEvent:FastEvent-1.20.1-1.1.1'
     modCompileOnly 'EggDelight:EggDelight-v1.2-1.20.1'
     modCompileOnly 'overweightfarming:overweightfarming-1.20.1-2.1.0-forge'
     modImplementation 'oceanic_delight:oceanic_delight-1.0.4-forge-1.20.1'
@@ -246,6 +258,10 @@ dependencies {
     compileOnly files('lib/MixinRuntime-mc1.20.1-1.0.jar')
     runtimeOnly files('lib/MixinRuntime-mc1.20.1-1.0.jar')
     jarJar files(tasks.named('repackMixinRuntime'))
+    compileOnly files('lib/computatio-0.1.0.jar')
+    runtimeOnly files('lib/computatio-0.1.0.jar')
+    clientAdditionalRuntimeClasspath files('lib/computatio-0.1.0.jar')
+    jarJar files(tasks.named('repackComputatio'))
     jarJar project(':MixinFabricExtras')
     compileOnly project(':MixinFabricExtras')
     runtimeOnly project(':MixinFabricExtras')

@@ -14,17 +14,19 @@ class RecipeSearchConfigTest {
     @AfterEach
     void restoreDefaults() {
         Config.recipeSearchEnabled = true;
-        Config.recipeSearchOptimizeOnlyVanilla = true;
+        Config.recipeSearchOptimizeOnlyVanilla = false;
+        Config.recipeSearchOptimizeOnlyVanillaRecipeClasses = false;
         Config.recipeIngredientSyncEnabled = false;
         Config.recipeIngredientDeduplicatorEnabled = false;
     }
 
     @Test
-    void appliesUpstreamCompatibleDefaultsForMissingProperties() {
+    void appliesGenericSearchDefaultsForMissingProperties() {
         RecipeSearchConfig.apply(new Properties());
 
         assertTrue(Config.recipeSearchEnabled);
-        assertTrue(Config.recipeSearchOptimizeOnlyVanilla);
+        assertFalse(Config.recipeSearchOptimizeOnlyVanilla);
+        assertFalse(Config.recipeSearchOptimizeOnlyVanillaRecipeClasses);
         assertFalse(Config.recipeIngredientSyncEnabled);
         assertFalse(Config.recipeIngredientDeduplicatorEnabled);
     }

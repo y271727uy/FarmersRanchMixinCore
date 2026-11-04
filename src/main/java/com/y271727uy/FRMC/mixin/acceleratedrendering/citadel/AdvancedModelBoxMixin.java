@@ -1,10 +1,12 @@
 package com.y271727uy.FRMC.mixin.acceleratedrendering.citadel;
 
 import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelArRenderer;
 import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelGeometryAccess;
+import com.y271727uy.FRMC.integration.diagnostics.EntityRenderDiagnostics;
 import com.github.argon4w.acceleratedrendering.core.CoreFeature;
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.IBufferGraph;
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.IAcceleratedVertexConsumer;
@@ -27,6 +29,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Pseudo
@@ -40,6 +43,87 @@ public abstract class AdvancedModelBoxMixin implements IAcceleratedRenderer<Void
     @Unique
     private Map<MeshData, IMesh> frmc$mergedMeshes;
 
+    @Shadow
+    public float scaleX;
+    @Shadow
+    public float scaleY;
+    @Shadow
+    public float scaleZ;
+    @Shadow
+    public ObjectList<BasicModelPart> childModels;
+
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V",
+            at = @At("HEAD"), cancellable = true, remap = false)
+    private void frmc$renderIdentityEmptyParent(PoseStack pose, VertexConsumer buffer, int light, int overlay,
+                                                 float red, float green, float blue, float alpha,
+                                                 CallbackInfo callback) {
+        BasicModelPart part = (BasicModelPart)(Object)this;
+        if (!part.showModel || !cubeList.isEmpty() || childModels.isEmpty()
+                || part.rotationPointX != 0.0F || part.rotationPointY != 0.0F || part.rotationPointZ != 0.0F
+                || part.rotateAngleX != 0.0F || part.rotateAngleY != 0.0F || part.rotateAngleZ != 0.0F
+                || scaleX != 1.0F || scaleY != 1.0F || scaleZ != 1.0F) {
+            return;
+        }
+
+        for (int i = 0, size = childModels.size(); i < size; i++) {
+            childModels.get(i).render(pose, buffer, light, overlay, red, green, blue, alpha);
+        }
+        callback.cancel();
+    }
+
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V", at = @At("HEAD"), remap = false)
+    private void frmc$diagnosticBoneRender(PoseStack pose, VertexConsumer buffer, int light, int overlay,
+                                           float red, float green, float blue, float alpha,
+                                           CallbackInfo callback) {
+        if (EntityRenderDiagnostics.enabled()) {
+            EntityRenderDiagnostics.logBigCatBoneTree((AdvancedModelBox)(Object)this);
+            EntityRenderDiagnostics.recordBoneRender();
+            if (scaleX == 1.0F && scaleY == 1.0F && scaleZ == 1.0F) {
+                EntityRenderDiagnostics.recordUnitScale();
+            }
+        }
+    }
+
+    @Unique
+    private long frmc$transformStart;
+
+    @Inject(method = "translateAndRotate", at = @At("HEAD"), remap = false)
+    private void frmc$diagnosticTransformStart(PoseStack pose, CallbackInfo callback) {
+        frmc$transformStart = EntityRenderDiagnostics.startTransform();
+    }
+
+    @Inject(method = "translateAndRotate", at = @At("RETURN"), remap = false)
+    private void frmc$diagnosticTransformEnd(PoseStack pose, CallbackInfo callback) {
+        EntityRenderDiagnostics.recordTransform(frmc$transformStart);
+    }
+
+    @Redirect(method = "translateAndRotate(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V"), remap = false)
+    private void frmc$skipIdentityTransformScale(PoseStack pose, float x, float y, float z) {
+        if (x != 1.0F || y != 1.0F || z != 1.0F) {
+            pose.scale(x, y, z);
+        }
+    }
+
+    @Redirect(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V"), remap = false)
+    private void frmc$skipIdentityChildScale(PoseStack pose, float x, float y, float z) {
+        if (x != 1.0F || y != 1.0F || z != 1.0F) {
+            pose.scale(x, y, z);
+        }
+    }
+
+    @Inject(method = "doRender", at = @At("HEAD"), cancellable = true, remap = false)
+    private void frmc$skipEmptyGeometry(PoseStack.Pose pose, VertexConsumer buffer,
+                                         int packedLight, int packedOverlay,
+                                         float red, float green, float blue, float alpha,
+                                         CallbackInfo callback) {
+        if (cubeList.isEmpty()) {
+            EntityRenderDiagnostics.recordEmptyGeometry();
+            callback.cancel();
+        }
+    }
+
     @Inject(method = "doRender", at = @At("HEAD"), cancellable = true, remap = false)
     private void frmc$renderWithAcceleratedPipeline(PoseStack.Pose pose, VertexConsumer buffer,
                                                      int packedLight, int packedOverlay,
@@ -51,6 +135,7 @@ public abstract class AdvancedModelBoxMixin implements IAcceleratedRenderer<Void
                 || !AcceleratedEntityRenderingFeature.isEnabled()
                 || !CitadelGeometryAccess.isAvailable()
                 || !accelerated.isAccelerated()) {
+            EntityRenderDiagnostics.recordCitadelFallback();
             return;
         }
 
@@ -89,7 +174,9 @@ public abstract class AdvancedModelBoxMixin implements IAcceleratedRenderer<Void
                 frmc$mergedMeshes.put(data, mesh);
             }
 
+            long diagnosticsStart = EntityRenderDiagnostics.start();
             mesh.write(accelerated, color, light, overlay);
+            EntityRenderDiagnostics.recordArMeshWrite(diagnosticsStart);
         } finally {
             accelerated.endTransform();
         }

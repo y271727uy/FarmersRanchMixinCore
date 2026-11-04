@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.mixin.untamed_wilds.client.model;
 
 import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
+import com.y271727uy.FRMC.integration.diagnostics.EntityRenderDiagnostics;
 import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsBobCache;
 import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,13 +19,24 @@ import untamedwilds.entity.arthropod.EntityTarantula;
 @Mixin(value = ModelTarantula.class, remap = false)
 public abstract class ModelTarantulaMixin {
     @Unique
-    private final ThreadLocal<UntamedWildsBobCache> frmc$bobCache = ThreadLocal.withInitial(UntamedWildsBobCache::new);
+    private long frmc$diagnosticStart;
+
+    @Unique
+    private final UntamedWildsBobCache frmc$bobCache = new UntamedWildsBobCache();
 
     @Inject(method = "setupAnim", at = @At("HEAD"), remap = false)
     private void frmc$resetBobCache(EntityTarantula entity, float limbSwing, float limbSwingAmount,
                                      float ageInTicks, float netHeadYaw, float headPitch,
                                      CallbackInfo callback) {
-        frmc$bobCache.get().valid = false;
+        frmc$diagnosticStart = EntityRenderDiagnostics.start();
+        frmc$bobCache.valid = false;
+    }
+
+    @Inject(method = "setupAnim", at = @At("RETURN"), remap = false)
+    private void frmc$recordDiagnostics(EntityTarantula entity, float limbSwing, float limbSwingAmount,
+                                        float ageInTicks, float netHeadYaw, float headPitch,
+                                        CallbackInfo callback) {
+        EntityRenderDiagnostics.recordTarantula(frmc$diagnosticStart);
     }
 
     @Redirect(
@@ -40,7 +52,7 @@ public abstract class ModelTarantulaMixin {
             part.bob(speed, degree, bounce, offset, weight);
             return;
         }
-        UntamedWildsBobCache cache = frmc$bobCache.get();
+        UntamedWildsBobCache cache = frmc$bobCache;
         float movementScale = part.getModel().getMovementScale();
         if (!cache.valid || cache.speed != speed || cache.degree != degree || cache.bounce != bounce
                 || cache.offset != offset || cache.weight != weight || cache.movementScale != movementScale) {
