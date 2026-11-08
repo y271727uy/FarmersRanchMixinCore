@@ -31,6 +31,7 @@ refer/
 # ModDevGradle rewrites these with machine-local absolute paths
 .vscode/
 
+.gradle-user-home/
 frmc-network-lib/
 .claude/
 .agents/
