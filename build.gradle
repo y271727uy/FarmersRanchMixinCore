@@ -271,9 +271,6 @@ dependencies {
     jarJar project(':MixinFabricExtras')
     compileOnly project(':MixinFabricExtras')
     runtimeOnly project(':MixinFabricExtras')
-    //compileOnly project(':MixinASMAPI')
-    compileOnly project(':MixinAgentAPI')
-    compileOnly project(':MixinCoremodAPI')
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'it.unimi.dsi:fastutil:8.5.12'

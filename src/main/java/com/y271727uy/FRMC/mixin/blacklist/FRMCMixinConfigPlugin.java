@@ -3,7 +3,6 @@ package com.y271727uy.FRMC.mixin.blacklist;
 import com.y271727uy.FRMC.config.FRMCMixinLoadConfig;
 import com.y271727uy.FRMC.mixin.blacklist.application.FRMCMixinBlacklistApplication;
 import com.y271727uy.FRMC.bootstrap.MixinsquaredBootstrap;
-import com.y271727uy.frmc.mixinagent.Substratum;
 
 import java.util.List;
 import java.util.Set;
@@ -33,13 +32,6 @@ public final class FRMCMixinConfigPlugin implements IMixinConfigPlugin {
             MixinsquaredBootstrap.initialize();
         } catch (Throwable exception) {
             System.err.println("[FRMC] Failed to initialize MixinSquared integration: " + exception);
-        }
-        try {
-            // JarJar copy of the substratum. If the early service already installed the
-            // launch plugin, this call only fills this loader's registry and publishes across.
-            Substratum.install();
-        } catch (Throwable exception) {
-            System.err.println("[FRMC] Failed to install substratum: " + exception);
         }
     }
 

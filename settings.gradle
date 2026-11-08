@@ -3,6 +3,3 @@ plugins {
 }
 
 include 'MixinFabricExtras'
-include 'MixinASMAPI'
-include 'MixinAgentAPI'
-include 'MixinCoremodAPI'

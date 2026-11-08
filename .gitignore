@@ -36,4 +36,5 @@ frmc-network-lib/
 .agents/
 MxinAgentAPI/
 MxinASMAPI/
+libs/
 lib/
