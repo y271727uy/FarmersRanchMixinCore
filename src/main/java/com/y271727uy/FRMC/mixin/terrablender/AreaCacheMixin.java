@@ -1,5 +1,6 @@
 package com.y271727uy.FRMC.mixin.terrablender;
 
+import com.y271727uy.FRMC.integration.terrablender.AreaCacheDiagnostics;
 import it.unimi.dsi.fastutil.HashCommon;
 import net.minecraft.world.level.ChunkPos;
 import org.spongepowered.asm.mixin.Final;
@@ -44,35 +45,51 @@ public abstract class AreaCacheMixin {
      */
     @Overwrite(remap = false)
     public int get(int x, int z) {
+        boolean sampled = AreaCacheDiagnostics.shouldSample();
         long key = ChunkPos.asLong(x, z);
         int index = (int) HashCommon.mix(key) & this.mask;
 
         long stamp = this.lock.tryOptimisticRead();
         int value = this.values[index];
         if (this.keys[index] == key && this.lock.validate(stamp)) {
+            if (sampled) {
+                AreaCacheDiagnostics.recordOptimisticHit();
+            }
             return value;
         }
 
+        long start = sampled ? System.nanoTime() : 0L;
         stamp = this.lock.readLock();
+        long readWait = sampled ? System.nanoTime() - start : 0L;
         try {
             if (this.keys[index] == key) {
                 return this.values[index];
             }
         } finally {
             this.lock.unlockRead(stamp);
+            if (sampled) {
+                AreaCacheDiagnostics.recordReadLock(readWait);
+            }
         }
 
+        start = sampled ? System.nanoTime() : 0L;
         stamp = this.lock.writeLock();
+        long writeWait = sampled ? System.nanoTime() - start : 0L;
+        boolean miss = false;
         try {
             if (this.keys[index] == key) {
                 return this.values[index];
             }
+            miss = true;
             value = this.operator.apply(x, z);
             this.values[index] = value;
             this.keys[index] = key;
             return value;
         } finally {
             this.lock.unlockWrite(stamp);
+            if (sampled) {
+                AreaCacheDiagnostics.recordWriteLock(writeWait, miss);
+            }
         }
     }
 }

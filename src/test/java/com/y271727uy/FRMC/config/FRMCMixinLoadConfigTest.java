@@ -8,6 +8,42 @@ import org.junit.jupiter.api.Test;
 
 class FRMCMixinLoadConfigTest {
     @Test
+    void keepsBothDependenciesForMovedCitadelRenderMixins() {
+        String prefix = "com.y271727uy.FRMC.mixin.";
+        for (String mixin : Set.of(
+                "acceleratedrendering.buffer.AcceleratedBufferBuilderCitadelMixin",
+                "acceleratedrendering.buffer.AcceleratedRingBuffersCitadelMixin",
+                "acceleratedrendering.mesh.MeshUploadingDispatcherCitadelMixin",
+                "acceleratedrendering.mesh.ServerMeshBuilderCitadelMixin",
+                "acceleratedrendering.render.LevelRendererCitadelMixin",
+                "acceleratedrendering.render.LivingEntityRendererCitadelLodMixin")) {
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin, "citadel"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin, "acceleratedrendering"::equals));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin,
+                    Set.of("citadel", "acceleratedrendering")::contains));
+        }
+
+        String boarLod = prefix + "acceleratedrendering.render.RendererBoarLodMixin";
+        assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(boarLod,
+                Set.of("citadel", "acceleratedrendering")::contains));
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(boarLod,
+                Set.of("citadel", "acceleratedrendering", "untamedwilds")::contains));
+    }
+
+    @Test
+    void allowsCitadelEmbeddiumFallbackWithoutAcceleratedRendering() {
+        String prefix = "com.y271727uy.FRMC.mixin.citadel.model.";
+        for (String mixin : Set.of("EmbeddiumAdvancedModelBoxMixin", "EmbeddiumBasicModelPartMixin")) {
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin, "citadel"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin, "embeddium"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin,
+                    Set.of("citadel", "acceleratedrendering")::contains));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin,
+                    Set.of("citadel", "embeddium")::contains));
+        }
+    }
+
+    @Test
     void onlyAppliesExternalMixinWhenItsModIsLoaded() {
         assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.mystiasizakaya.ItemFrameMixin",
@@ -195,6 +231,20 @@ class FRMCMixinLoadConfigTest {
     void loadsFastChunkGenCompatibilityMixinOnlyWhenModIsPresent() {
         String mixin = "com.y271727uy.FRMC.mixin.fastchunkgen.TypeMixin";
         assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, modId -> false));
+    }
+
+    @Test
+    void loadsAsyncParticlesThreadSafetyMixinsOnlyWithAllThreeMods() {
+        String animateMixin = "com.y271727uy.FRMC.mixin.asyncparticles.AnimateTickThreadSafetyMixin";
+        String rainMixin = "com.y271727uy.FRMC.mixin.asyncparticles.PrettyRainThreadSafetyMixin";
+        for (String mixin : Set.of(animateMixin, rainMixin)) {
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "asyncparticles"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "fastchunkgen"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "particlerain"::equals));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(
+                mixin, Set.of("asyncparticles", "fastchunkgen", "particlerain")::contains
+            ));
+        }
     }
 
     @Test

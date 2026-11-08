@@ -11,7 +11,8 @@ public final class UntamedWildsFriendlyFireHandler {
 
     @SubscribeEvent
     public static void onLivingAttack(LivingAttackEvent event) {
-        if (!(event.getEntity() instanceof ComplexMob)
+        if (!UntamedWildsFriendlyFireConfig.isEnabled()
+                || !(event.getEntity() instanceof ComplexMob)
                 || !(event.getSource().getEntity() instanceof ComplexMob)) {
             return;
         }

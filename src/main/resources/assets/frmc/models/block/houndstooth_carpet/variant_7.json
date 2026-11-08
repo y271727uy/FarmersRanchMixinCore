@@ -1,0 +1,6 @@
+{
+  "parent": "frmc:block/houndstooth_carpet/base",
+  "textures": {
+    "carpet": "manors_bounty:block/houndstooth_infinite_carpet_downleft"
+  }
+}

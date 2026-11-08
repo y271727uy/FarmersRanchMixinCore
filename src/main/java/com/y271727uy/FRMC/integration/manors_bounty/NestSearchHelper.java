@@ -1,11 +1,12 @@
 package com.y271727uy.FRMC.integration.manors_bounty;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import net.mcreator.manors_bounty.init.ManorsBountyModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -17,10 +18,18 @@ public final class NestSearchHelper {
     private NestSearchHelper() {
     }
 
-    public static BlockPos findNearestAvailableNest(Mob mob) {
-        Level level = mob.level();
-        if (!(level instanceof ServerLevel)) {
-            return null;
+    public static int failedSearchCooldown(Mob mob) {
+        return 8 + searchStagger(mob);
+    }
+
+    public static int searchStagger(Mob mob) {
+        // Spread nest searches from flocks that become ready to lay together.
+        return mob.getId() & 7;
+    }
+
+    public static Set<BlockPos> findAvailableNests(Mob mob) {
+        if (!(mob.level() instanceof ServerLevel level)) {
+            return Set.of();
         }
 
         BlockPos origin = mob.blockPosition();
@@ -28,16 +37,15 @@ public final class NestSearchHelper {
         int maxChunkX = (origin.getX() + HORIZONTAL_RANGE) >> 4;
         int minChunkZ = (origin.getZ() - HORIZONTAL_RANGE) >> 4;
         int maxChunkZ = (origin.getZ() + HORIZONTAL_RANGE) >> 4;
-        BlockPos nearest = null;
-        double nearestDistance = Double.MAX_VALUE;
+        Set<BlockPos> nests = new HashSet<>();
 
         for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
             for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
-                if (!level.hasChunk(chunkX, chunkZ)) {
+                LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
+                if (chunk == null) {
                     continue;
                 }
 
-                LevelChunk chunk = level.getChunk(chunkX, chunkZ);
                 for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
                     BlockPos pos = entry.getKey();
                     int dx = pos.getX() - origin.getX();
@@ -46,23 +54,28 @@ public final class NestSearchHelper {
                     if (Math.abs(dx) > HORIZONTAL_RANGE || Math.abs(dy) > VERTICAL_RANGE || Math.abs(dz) > HORIZONTAL_RANGE) {
                         continue;
                     }
-                    if (dx * dx + dz * dz > nearestDistance || !level.getBlockState(pos).is(ManorsBountyModBlocks.HAY_NEST.get())) {
-                        continue;
-                    }
-                    if (!hasEmptyEggSlot(entry.getValue())) {
-                        continue;
-                    }
-
-                    double distance = mob.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D);
-                    if (distance < nearestDistance) {
-                        nearestDistance = distance;
-                        nearest = pos.immutable();
+                    if (isAvailableNest(chunk, pos, entry.getValue())) {
+                        nests.add(pos.immutable());
                     }
                 }
             }
         }
 
-        return nearest;
+        return nests;
+    }
+
+    public static boolean isAvailableNest(Mob mob, BlockPos pos) {
+        if (!(mob.level() instanceof ServerLevel level)) {
+            return false;
+        }
+        LevelChunk chunk = level.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+        return chunk != null && isAvailableNest(chunk, pos, chunk.getBlockEntity(pos));
+    }
+
+    private static boolean isAvailableNest(LevelChunk chunk, BlockPos pos, BlockEntity blockEntity) {
+        return blockEntity != null && !blockEntity.isRemoved()
+                && chunk.getBlockState(pos).is(ManorsBountyModBlocks.HAY_NEST.get())
+                && hasEmptyEggSlot(blockEntity);
     }
 
     private static boolean hasEmptyEggSlot(BlockEntity blockEntity) {

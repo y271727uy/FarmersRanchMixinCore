@@ -7,6 +7,45 @@ public final class Config {
     /** Enables low-overhead aggregated UW/Citadel/AR render diagnostics. */
     public static boolean entityRenderDiagnosticsEnabled = false;
 
+    /** Enables combined ZYX rotations and per-part quaternion reuse for Citadel models. */
+    public static volatile boolean citadelCombinedRotationEnabled = true;
+
+    /** Enables the experimental recursive Citadel traversal on the AR path. */
+    public static boolean citadelFastTraversalEnabled = false;
+
+    /** Enables the diagnostic-only Citadel SoA transform shadow evaluator. */
+    public static volatile boolean citadelSoaShadowEnabled = false;
+
+    /** Enables diagnostic-only multi-entity batch snapshot and reference validation. */
+    public static volatile boolean citadelBatchValidationEnabled = false;
+
+    /** Runs a one-shot GPU pose comparison when entity render diagnostics are enabled. */
+    public static boolean citadelGpuPoseValidationEnabled = false;
+
+    /** Uses the experimental Citadel GPU pose path. */
+    public static volatile boolean citadelGpuPoseRenderingEnabled = false;
+
+    /** Extends GPU pose rendering to other compatible Citadel models with a merged material mesh. */
+    public static volatile boolean citadelGpuGeneralModelsEnabled = false;
+
+    /** Submits one mesh per material on the supported GPU pose path. */
+    public static volatile boolean citadelGpuModelBatchingEnabled = true;
+
+    /** Measures boar underside visibility once on the GPU material path. */
+    public static boolean citadelBottomFaceProbeEnabled = false;
+
+    /** Skips rasterization of boar undersides fully covered by terrain depth. */
+    public static volatile boolean citadelBottomFaceCullingEnabled = false;
+
+    /** Tests each supported Citadel part against the current frustum and terrain depth. */
+    public static volatile boolean citadelPartCullingEnabled = false;
+
+    /** Selects reduced meshes for small on-screen boars on the AR material path. */
+    public static volatile boolean citadelBoarLodEnabled = false;
+
+    /** Omits small projected details on compatible Citadel material batches. */
+    public static volatile boolean citadelGeneralLodEnabled = false;
+
     public static boolean recipeSearchEnabled = true;
 
     /** Restricts indexed searches to vanilla RecipeTypes; disabled by default to match the generic search scope. */

@@ -2,7 +2,7 @@ package com.y271727uy.FRMC;
 
 import com.mojang.logging.LogUtils;
 import com.y271727uy.FRMC.client.modelgap.ModelGapFixConfig;
-import com.y271727uy.FRMC.integration.acceleratedrendering.citadel.CitadelEmbeddiumConfig;
+import com.y271727uy.FRMC.integration.citadel.render.embeddium.CitadelEmbeddiumConfig;
 import com.y271727uy.FRMC.client.FRMCClientSetup;
 import com.y271727uy.FRMC.integration.manors_bounty.ManorsBountyIntegration;
 import com.y271727uy.FRMC.integration.mooncakedelight.MooncakeDelightCroptopiaIntegration;
@@ -21,12 +21,14 @@ import com.y271727uy.FRMC.config.BlockCheckingConfig;
 import com.y271727uy.FRMC.config.EntityRenderDiagnosticsConfig;
 import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
 import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsFriendlyFireHandler;
+import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsFriendlyFireConfig;
 import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingCommands;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingRuntime;
 import com.y271727uy.FRMC.capability.data_group.DataGroupInit;
 import com.y271727uy.FRMC.network.BlockCheckingNetwork;
 import com.y271727uy.FRMC.integration.ftbquests.FtbQuestsIntegration;
+import com.y271727uy.FRMC.integration.terrablender.AreaCacheDiagnostics;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 // import com.y271727uy.FRMC.prefab.PrefabStructureCommands;
@@ -70,10 +72,12 @@ public class FRMCMod {
         System.setProperty("frmc.smoothboot.modLoading", Integer.toString(smoothBootConfig.threadPriority.modLoading));
         ModelGapFixConfig.register();
         CitadelEmbeddiumConfig.register();
+        UntamedWildsFriendlyFireConfig.register();
         UntamedWildsAnimationConfig.register();
         EntityRenderDiagnosticsConfig.load();
 
         var modEventBus = MooncakeDelightCroptopiaIntegration.getModEventBus();
+        AreaCacheDiagnostics.register(modEventBus);
         MooncakeDelightCroptopiaIntegration.registerListeners(modEventBus);
         ManorsBountyIntegration.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(VineryGrapejuiceTooltip.class);

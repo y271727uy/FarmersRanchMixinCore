@@ -1,0 +1,63 @@
+#version 450 core
+
+struct Vertex {
+    float x;
+    float y;
+    float z;
+    uint color;
+    float u;
+    float v;
+    uint overlay;
+    uint light;
+    uint normal;
+};
+
+struct MeshInfo {
+    uint vertexOffset;
+    uint varyingOffset;
+    int sharing;
+    int shouldCull;
+    uint color;
+    uint overlay;
+    uint light;
+};
+
+struct Pose {
+    mat4 position;
+    mat3 normal;
+};
+
+layout(local_size_x = 128) in;
+layout(std430, binding = 1) writeonly buffer Vertices { Vertex vertices[]; };
+layout(std430, binding = 2) readonly buffer Poses { Pose poses[]; };
+layout(std430, binding = 4) writeonly buffer Varyings { ivec4 varyings[]; };
+layout(std430, binding = 7) readonly buffer Meshes { Vertex meshVertices[]; };
+layout(std430, binding = 8) readonly buffer Instances { MeshInfo instances[]; };
+layout(location = 0) uniform uint meshCount;
+layout(location = 1) uniform uint meshSize;
+layout(location = 2) uniform uint meshOffset;
+
+void main() {
+    uint index = gl_GlobalInvocationID.x;
+    uint instance = index / meshSize;
+    if (instance >= meshCount) {
+        return;
+    }
+    uint vertexIndex = index % meshSize;
+    MeshInfo info = instances[instance];
+    Vertex vertex = meshVertices[meshOffset + vertexIndex];
+    // The stored overlay word is unused by AR's dense source mesh.
+    int sharing = info.sharing + int(vertex.overlay);
+    Pose pose = poses[sharing];
+    vec4 position = pose.position * vec4(vertex.x, vertex.y, vertex.z, 1.0);
+    vec3 normal = pose.normal * unpackSnorm4x8(vertex.normal).xyz;
+    uint color = packUnorm4x8(unpackUnorm4x8(info.color) * unpackUnorm4x8(vertex.color));
+    uvec2 light = max(floatBitsToUint(unpackSnorm2x16(info.light)),
+                     floatBitsToUint(unpackSnorm2x16(vertex.light)));
+    vertices[info.vertexOffset + vertexIndex] = Vertex(
+        position.x, position.y, position.z, color, vertex.u, vertex.v,
+        info.overlay, packSnorm2x16(uintBitsToFloat(light)),
+        packSnorm4x8(vec4(normalize(normal), 0.0))
+    );
+    varyings[info.varyingOffset + vertexIndex] = ivec4(0, sharing, -1, info.shouldCull);
+}

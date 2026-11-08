@@ -73,10 +73,6 @@ public abstract class HangingFruitLeavesBlockMixin extends LeavesBlock implement
             return true;
         }
 
-        if (state.getValue(AGE_7) != 0) {
-            return true;
-        }
-
         return state.getValue(CAN_FRUIT) != CanFruitProperty.FALSE;
     }
 

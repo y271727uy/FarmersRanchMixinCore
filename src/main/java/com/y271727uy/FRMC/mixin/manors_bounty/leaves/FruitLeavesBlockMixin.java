@@ -108,10 +108,6 @@ public abstract class FruitLeavesBlockMixin extends LeavesBlock implements Bonem
             return true;
         }
 
-        if (state.getValue(AGE_2) != 0) {
-            return true;
-        }
-
         return state.getValue(CAN_FRUIT) != CanFruitProperty.FALSE;
     }
 
@@ -128,17 +124,13 @@ public abstract class FruitLeavesBlockMixin extends LeavesBlock implements Bonem
             return;
         }
 
-        if (!this.frmc$isExposed(world, pos)) {
+        CanFruitProperty canFruit = currentState.getValue(CAN_FRUIT);
+        if (canFruit == CanFruitProperty.FALSE || !this.frmc$isExposed(world, pos)) {
             return;
         }
 
-        CanFruitProperty canFruit = currentState.getValue(CAN_FRUIT);
         if (canFruit == CanFruitProperty.UNINITIALIZED) {
             this.frmc$initCanFruit(world, pos, currentState, random);
-            return;
-        }
-
-        if (canFruit != CanFruitProperty.TRUE) {
             return;
         }
 

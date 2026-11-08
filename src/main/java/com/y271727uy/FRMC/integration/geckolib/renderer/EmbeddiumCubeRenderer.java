@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.integration.geckolib.renderer;
 
+import com.y271727uy.FRMC.integration.embeddium.vertex.EntityVertex;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.caffeinemc.mods.sodium.api.util.ColorABGR;
 import net.caffeinemc.mods.sodium.api.util.NormI8;

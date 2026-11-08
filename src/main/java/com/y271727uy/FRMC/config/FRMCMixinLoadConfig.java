@@ -18,22 +18,32 @@ public final class FRMCMixinLoadConfig {
     private static final String VIETNAM_WORM_TARGET = "net.mcreator.vietnamdelight.WormDropHandler";
     private static final String FASTCHUNKGEN_DFU_MIXIN = "fastchunkgen.TypeMixin";
     private static final String FASTCHUNKGEN_DFU_TARGET = "com.misanthropy.fastchunkgen.base.common.util.CFUtil";
+    private static final String OCULUS_ENTITY_MIXIN = MIXIN_PACKAGE + "oculus.EmbeddiumEntityRenderMixin";
 
     private static final List<OptionalMixinIntegration> OPTIONAL_MIXIN_INTEGRATIONS = List.of(
         new OptionalMixinIntegration("constancy.", "constancy", "modernfix"),
         new OptionalMixinIntegration("minecraft.recipe.deduplicator.farmersdelight.", "farmersdelight"),
         new OptionalMixinIntegration("alexsmobs.", "alexsmobs"),
         new OptionalMixinIntegration("aquaculture.", "aquaculture"),
-        new OptionalMixinIntegration("embeddium.citadel.", "embeddium", "citadel"),
-        new OptionalMixinIntegration("acceleratedrendering.citadel.", "acceleratedrendering", "citadel"),
+        new OptionalMixinIntegration("oculus.", "oculus", "embeddium"),
+        new OptionalMixinIntegration("acceleratedrendering.render.RendererBoarLodMixin", "acceleratedrendering", "citadel", "untamedwilds"),
+        new OptionalMixinIntegration("acceleratedrendering.render.LevelRendererCitadelMixin", "acceleratedrendering", "citadel"),
+        new OptionalMixinIntegration("acceleratedrendering.render.LivingEntityRendererCitadelLodMixin", "acceleratedrendering", "citadel"),
+        new OptionalMixinIntegration("acceleratedrendering.buffer.AcceleratedBufferBuilderCitadelMixin", "acceleratedrendering", "citadel"),
+        new OptionalMixinIntegration("acceleratedrendering.buffer.AcceleratedRingBuffersCitadelMixin", "acceleratedrendering", "citadel"),
+        new OptionalMixinIntegration("acceleratedrendering.mesh.MeshUploadingDispatcherCitadelMixin", "acceleratedrendering", "citadel"),
+        new OptionalMixinIntegration("acceleratedrendering.mesh.ServerMeshBuilderCitadelMixin", "acceleratedrendering", "citadel"),
         new OptionalMixinIntegration("acceleratedrendering.", "acceleratedrendering"),
         new OptionalMixinIntegration("betterfoliage.", "betterfoliage"),
         new OptionalMixinIntegration("braziliandelight.", "braziliandelight"),
         new OptionalMixinIntegration("blueprint.", "blueprint", "neapolitan", "regions_unexplored"),
         new OptionalMixinIntegration("chloride.", "chloride"),
+        new OptionalMixinIntegration("citadel.model.Embeddium", "citadel", "embeddium"),
         new OptionalMixinIntegration("citadel.", "citadel"),
+        new OptionalMixinIntegration("delighto_flight.", "delighto_flight"),
         new OptionalMixinIntegration("extradelight.", "extradelight"),
         new OptionalMixinIntegration("eggdelight.", "eggdelight"),
+        new OptionalMixinIntegration("asyncparticles.", "asyncparticles", "fastchunkgen", "particlerain"),
         new OptionalMixinIntegration("fastchunkgen.", "fastchunkgen"),
         new OptionalMixinIntegration("farm_and_charm.", "farm_and_charm"),
         new OptionalMixinIntegration("farmersdelight.", "farmersdelight"),
@@ -42,6 +52,7 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("forestry.", "forestry"),
         new OptionalMixinIntegration("fruits_delight.", "fruitsdelight"),
         new OptionalMixinIntegration("geckolib.", "geckolib"),
+        new OptionalMixinIntegration("kaleidoscopecookery.", "kaleidoscope_cookery"),
         new OptionalMixinIntegration("kaleidoscopetavern.vinery.", "kaleidoscope_tavern", "vinery"),
         new OptionalMixinIntegration("kaleidoscopetavern.", "kaleidoscope_tavern"),
         new OptionalMixinIntegration("kubejs.", "kubejs"),
@@ -90,6 +101,11 @@ public final class FRMCMixinLoadConfig {
 
     /** Whether an optional integration mixin may load, based on the runtime mod list. */
     public static boolean isIntegrationEnabled(String mixinClassName) {
+        if (OCULUS_ENTITY_MIXIN.equals(mixinClassName)) {
+            return isModVersion("oculus", "1.8.0")
+                && isModVersion("embeddium", "0.3.31+mc1.20.1")
+                && !isModLoaded("bendylib");
+        }
         return isIntegrationEnabled(mixinClassName, FRMCMixinLoadConfig::isModLoaded);
     }
 
@@ -145,6 +161,16 @@ public final class FRMCMixinLoadConfig {
             return FMLLoader.getLoadingModList().getModFileById(modId) != null;
         } catch (Throwable ignored) {
             // During early loading, a failed availability check must disable optional mixins.
+            return false;
+        }
+    }
+
+    private static boolean isModVersion(String modId, String version) {
+        try {
+            var file = FMLLoader.getLoadingModList().getModFileById(modId);
+            return file != null && file.getMods().stream()
+                .anyMatch(mod -> modId.equals(mod.getModId()) && version.equals(mod.getVersion().toString()));
+        } catch (RuntimeException | LinkageError ignored) {
             return false;
         }
     }
