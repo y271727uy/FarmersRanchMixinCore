@@ -51,6 +51,15 @@ public final class CitadelGroundPath {
         return target;
     }
 
+    public static boolean canWalkDirectly(ServerLevel level, Mob mob, BlockPos target) {
+        return mob.onGround() && !mob.isInWaterOrBubble() && !mob.onClimbable()
+                && mob.blockPosition().getY() == target.getY()
+                && mob.getPathfindingMalus(BlockPathTypes.WALKABLE) == 0.0F
+                && isClearGroundSweep(level, mob,
+                        mob.getBoundingBox().expandTowards(DirectNavigationPath.nodePosition(mob, target).subtract(mob.position())),
+                        target.getY(), Mth.ceil(mob.getBbHeight()));
+    }
+
     public static CitadelGroundPath capture(Mob mob, BlockPos start, BlockPos target, int range) {
         if (!(mob.level() instanceof ServerLevel level) || !level.getServer().isSameThread()
                 || !mob.onGround() || mob.isInWaterOrBubble() || mob.onClimbable()
@@ -102,16 +111,8 @@ public final class CitadelGroundPath {
             Node node = path.getNode(index);
             Vec3 next = Vec3.atBottomCenterOf(new BlockPos(node.x, node.y, node.z));
             AABB sweep = body.move(previous).expandTowards(next.subtract(previous));
-            BlockPos min = BlockPos.containing(sweep.minX + 1.0E-7, start.getY(), sweep.minZ + 1.0E-7);
-            BlockPos max = BlockPos.containing(sweep.maxX - 1.0E-7, start.getY(), sweep.maxZ - 1.0E-7);
-            if (!isAvailable(level, min, max.above(Mth.ceil(body.maxY)))
-                    || level.getBlockCollisions(mob, sweep).iterator().hasNext()) {
+            if (!isClearGroundSweep(level, mob, sweep, start.getY(), Mth.ceil(body.maxY))) {
                 return false;
-            }
-            for (BlockPos cell : BlockPos.betweenClosed(min, max)) {
-                if (!isFlatCell(level, cell)) {
-                    return false;
-                }
             }
             previous = next;
         }
@@ -146,6 +147,20 @@ public final class CitadelGroundPath {
         return !level.isOutsideBuildHeight(low) && !level.isOutsideBuildHeight(high)
                 && level.getWorldBorder().isWithinBounds(low) && level.getWorldBorder().isWithinBounds(high)
                 && level.hasChunksAt(low, high);
+    }
+
+    private static boolean isClearGroundSweep(ServerLevel level, Mob mob, AABB sweep, int groundY, int height) {
+        BlockPos min = BlockPos.containing(sweep.minX + 1.0E-7, groundY, sweep.minZ + 1.0E-7);
+        BlockPos max = BlockPos.containing(sweep.maxX - 1.0E-7, groundY, sweep.maxZ - 1.0E-7);
+        if (!isAvailable(level, min, max.above(height)) || level.getBlockCollisions(mob, sweep).iterator().hasNext()) {
+            return false;
+        }
+        for (BlockPos cell : BlockPos.betweenClosed(min, max)) {
+            if (!isFlatCell(level, cell)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean isFlatCell(ServerLevel level, BlockPos pos) {

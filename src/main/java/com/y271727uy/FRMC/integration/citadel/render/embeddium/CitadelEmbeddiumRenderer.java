@@ -84,9 +84,10 @@ public final class CitadelEmbeddiumRenderer {
                 for (int i = 0; i < 4; i++) {
                     Object vertex = vertices[i];
                     Vector3f position = (Vector3f) (tabula ? CitadelGeometryAccess.tabulaPosition(vertex) : CitadelGeometryAccess.basicPosition(vertex));
-                    positions[i * 3] = position.x;
-                    positions[i * 3 + 1] = position.y;
-                    positions[i * 3 + 2] = position.z;
+                    // Citadel stores cube vertices in model pixels, while the pose uses block units.
+                    positions[i * 3] = position.x / 16.0F;
+                    positions[i * 3 + 1] = position.y / 16.0F;
+                    positions[i * 3 + 2] = position.z / 16.0F;
                     uv[i * 2] = tabula ? CitadelGeometryAccess.tabulaU(vertex) : CitadelGeometryAccess.basicU(vertex);
                     uv[i * 2 + 1] = tabula ? CitadelGeometryAccess.tabulaV(vertex) : CitadelGeometryAccess.basicV(vertex);
                 }

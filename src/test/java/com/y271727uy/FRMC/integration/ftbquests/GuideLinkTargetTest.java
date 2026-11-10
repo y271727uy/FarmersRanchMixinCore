@@ -1,7 +1,12 @@
 package com.y271727uy.FRMC.integration.ftbquests;
 
+import dev.ftb.mods.ftblibrary.util.client.ClientTextComponentUtils;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,17 +32,34 @@ class GuideLinkTargetTest {
 
     @Test
     void keepsTargetAfterFtbPropertySplit() {
-        var properties = java.util.Map.of("guideme", "ae2:guide/inscribers#presses", "text", "压印器");
-        Component component = GuideLinkComponent.parse("guideme: ae2:guide/inscribers#presses text: 压印器", properties);
+        ClientTextComponentUtils.addCustomParser(GuideLinkComponent::parse);
 
-        assertTrue(component.getString().contains("压印器"));
-        assertEquals("guideme:ae2:guide/inscribers#presses", component.getStyle().getClickEvent().getValue());
+        Component compact = ClientTextComponentUtils.parse("{guideme:ae2:guide/inscribers#presses text:Inscriber%20Press}");
+        assertEquals("Inscriber Press", compact.getString());
+        assertEquals("guideme:ae2:guide/inscribers#presses", clickTarget(compact));
+
+        Component questExample = ClientTextComponentUtils.parse("先看 {guideme: ae2:guide/inscribers#presses text: 压印器}。");
+        assertEquals("先看 压印器。", questExample.getString());
+        assertEquals("guideme:ae2:guide/inscribers#presses", clickTarget(questExample));
+
+        Component spaced = ClientTextComponentUtils.parse("{guideme: ae2:guide/inscribers.md#presses text: Inscriber Press}");
+        assertEquals("Inscriber Press", spaced.getString());
+        assertEquals("guideme:ae2:guide/inscribers.md#presses", clickTarget(spaced));
+    }
+
+    private static String clickTarget(Component component) {
+        return component.visit((style, text) -> Optional.ofNullable(style.getClickEvent())
+                        .filter(event -> event.getAction() == ClickEvent.Action.CHANGE_PAGE)
+                        .map(ClickEvent::getValue), Style.EMPTY)
+                .orElseThrow();
     }
 
     @Test
     void rejectsMalformedTargets() {
         assertTrue(GuideLinkTarget.parse("ae2:guide/machines/#top").isEmpty());
         assertTrue(GuideLinkTarget.parse("ae2:guide/bad page").isEmpty());
+        assertTrue(GuideLinkTarget.parse("ae2:guide/.md").isEmpty());
+        assertTrue(GuideLinkTarget.parse("ae2:guide/machines.md/").isEmpty());
         assertTrue(GuideLinkTarget.parse("guide/page").isEmpty());
         assertTrue(GuideLinkTarget.parse("ae2:guide/page#bad anchor").isEmpty());
         assertTrue(GuideLinkTarget.parse("").isEmpty());

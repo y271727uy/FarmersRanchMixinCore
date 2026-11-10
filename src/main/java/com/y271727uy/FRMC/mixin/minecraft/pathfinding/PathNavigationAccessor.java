@@ -14,6 +14,9 @@ public interface PathNavigationAccessor {
     @Accessor("reachRange")
     void frmc$setReachRange(int reachRange);
 
+    @Accessor("hasDelayedRecomputation")
+    boolean frmc$hasDelayedRecomputation();
+
     @Invoker("resetStuckTimeout")
     void frmc$resetStuckTimeout();
 }

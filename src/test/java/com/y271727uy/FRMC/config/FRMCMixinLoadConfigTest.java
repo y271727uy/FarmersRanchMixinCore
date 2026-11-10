@@ -11,10 +11,7 @@ class FRMCMixinLoadConfigTest {
     void keepsBothDependenciesForMovedCitadelRenderMixins() {
         String prefix = "com.y271727uy.FRMC.mixin.";
         for (String mixin : Set.of(
-                "acceleratedrendering.buffer.AcceleratedBufferBuilderCitadelMixin",
                 "acceleratedrendering.buffer.AcceleratedRingBuffersCitadelMixin",
-                "acceleratedrendering.mesh.MeshUploadingDispatcherCitadelMixin",
-                "acceleratedrendering.mesh.ServerMeshBuilderCitadelMixin",
                 "acceleratedrendering.render.LevelRendererCitadelMixin",
                 "acceleratedrendering.render.LivingEntityRendererCitadelLodMixin")) {
             assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin, "citadel"::equals));
@@ -28,6 +25,17 @@ class FRMCMixinLoadConfigTest {
                 Set.of("citadel", "acceleratedrendering")::contains));
         assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(boarLod,
                 Set.of("citadel", "acceleratedrendering", "untamedwilds")::contains));
+    }
+
+    @Test
+    void allowsSharedModelUploadMixinsWithoutCitadel() {
+        String prefix = "com.y271727uy.FRMC.mixin.acceleratedrendering.";
+        for (String mixin : Set.of("buffer.AcceleratedBufferBuilderCitadelMixin",
+                "mesh.MeshUploadingDispatcherCitadelMixin", "mesh.ServerMeshBuilderCitadelMixin")) {
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin, "geckolib"::equals));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + mixin,
+                    Set.of("geckolib", "acceleratedrendering")::contains));
+        }
     }
 
     @Test

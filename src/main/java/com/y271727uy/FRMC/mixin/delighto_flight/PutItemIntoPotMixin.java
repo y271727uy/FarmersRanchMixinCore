@@ -17,6 +17,7 @@ import vectorwing.farmersdelight.common.block.entity.CookingPotBlockEntity;
 @Pseudo
 @Mixin(value = {PutItemIntoPot.class, PutItemIntoOtherPot.class}, remap = false)
 public abstract class PutItemIntoPotMixin {
+    // 与提交pr重合
     @Inject(method = "addIngredient", at = @At("HEAD"), cancellable = true)
     private void frmc$insertWithoutDecodingBook(CookingPotBlockEntity pot, LivingEntity entity, CallbackInfo ci) {
         ci.cancel();
@@ -34,7 +35,9 @@ public abstract class PutItemIntoPotMixin {
         if (slot >= 0 && slot < count) {
             ItemStack leftover = pot.getInventory().insertItem(slot, held, false);
             entity.setItemSlot(EquipmentSlot.MAINHAND, leftover);
-            tag.putInt("Slot", slot + 1 < count ? slot + 1 : 0);
+            if (leftover.isEmpty()) {
+                tag.putInt("Slot", slot + 1 < count ? slot + 1 : 0);
+            }
         }
     }
 }

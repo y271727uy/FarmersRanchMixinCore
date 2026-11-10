@@ -15,6 +15,10 @@ public final class CitadelGpuPoseProgram {
     }
 
     static int compileProgram(String shaderName) throws IOException {
+        return compileProgram(shaderName, "");
+    }
+
+    public static int compileProgram(String shaderName, String defines) throws IOException {
         String source;
         try (InputStream resource = CitadelGpuPoseProgram.class
                 .getResourceAsStream("/assets/frmc/shaders/compute/" + shaderName)) {
@@ -23,9 +27,10 @@ public final class CitadelGpuPoseProgram {
             }
             source = new String(resource.readAllBytes(), StandardCharsets.UTF_8);
         }
+        int versionEnd = source.indexOf('\n') + 1;
         int shader = glCreateShader(GL_COMPUTE_SHADER);
         try {
-            glShaderSource(shader, source);
+            glShaderSource(shader, source.substring(0, versionEnd), defines, source.substring(versionEnd));
             glCompileShader(shader);
             if (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_FALSE) {
                 throw new IllegalStateException(glGetShaderInfoLog(shader));

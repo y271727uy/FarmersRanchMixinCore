@@ -43,6 +43,11 @@ public abstract class AcceleratedBufferBuilderCitadelMixin implements ICitadelMe
     }
 
     @Override
+    public int frmc$activeGpuPose() {
+        return activeSharing;
+    }
+
+    @Override
     public void frmc$selectGpuPose(int sharingIndex) {
         activeSharing = sharingIndex;
         sharingAddress = -1L;

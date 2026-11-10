@@ -1,5 +1,8 @@
 package com.y271727uy.FRMC.mixin.geckolib.renderer;
 
+import com.y271727uy.FRMC.integration.acceleratedrendering.ArIntegration;
+import com.y271727uy.FRMC.integration.geckolib.renderer.GeckoArModelBatch;
+import com.y271727uy.FRMC.integration.geckolib.renderer.GeckoCubePose;
 import com.y271727uy.FRMC.integration.geckolib.renderer.OculusCubeRenderer;
 import com.y271727uy.FRMC.integration.geckolib.renderer.OculusEntityVertex;
 import com.y271727uy.FRMC.integration.geckolib.renderer.EmbeddiumCubeRenderer;
@@ -10,16 +13,15 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.y271727uy.FRMC.mixin.minecraft.vertex.BufferBuilderAccessorMixin;
 import me.jellysquid.mods.sodium.client.render.vertex.buffer.SodiumBufferBuilder;
 import net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import software.bernie.geckolib.cache.object.GeoCube;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.cache.object.GeoQuad;
 import software.bernie.geckolib.cache.object.GeoVertex;
 import software.bernie.geckolib.renderer.GeoRenderer;
@@ -38,19 +40,37 @@ public interface GeoRendererMixin {
     }
 
     /**
+     * @author FRMC
+     * @reason Record the current bone pose for whole-model AR submission.
+     */
+    @Overwrite(remap = false)
+    default void renderCubesOfBone(PoseStack poseStack, GeoBone bone, VertexConsumer buffer, int light,
+                                   int overlay, float red, float green, float blue, float alpha) {
+        if (bone.isHidden()) {
+            return;
+        }
+        GeoRenderer<?> renderer = (GeoRenderer<?>) (Object) this;
+        if (ArIntegration.IS_INSTALLED && GeckoArModelBatch.capture(renderer, poseStack, bone, buffer)) {
+            return;
+        }
+        for (GeoCube cube : bone.getCubes()) {
+            poseStack.pushPose();
+            try {
+                renderer.renderCube(poseStack, cube, buffer, light, overlay, red, green, blue, alpha);
+            } finally {
+                poseStack.popPose();
+            }
+        }
+    }
+
+    /**
      * @author 1
      * @reason 我不想写这个玩意
      */
     @Overwrite(remap = false)
     default void renderCube(PoseStack poseStack, GeoCube cube, VertexConsumer buffer, int packedLight,
                             int packedOverlay, float red, float green, float blue, float alpha) {
-        Vec3 rotation = cube.rotation();
-        if (!rotation.equals(Vec3.ZERO)) {
-            Vec3 pivot = cube.pivot();
-            poseStack.rotateAround(
-                    (new Quaternionf()).rotationZYX((float) rotation.z(), (float) rotation.y(), (float) rotation.x()),
-                    (float) (pivot.x() / 16.0F), (float) (pivot.y() / 16.0F), (float) (pivot.z() / 16.0F));
-        }
+        GeckoCubePose.rotate(poseStack, cube);
 
         VertexBufferWriter writer = VertexBufferWriter.tryOf(buffer);
         if (writer != null) {

@@ -8,14 +8,21 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import com.y271727uy.FRMC.integration.citadel.render.ar.CitadelGpuMaterialMeshes;
+import com.y271727uy.FRMC.integration.acceleratedrendering.ArModelMeshUpload;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Pseudo
 @Mixin(value = MeshUploadingProgramDispatcher.class, remap = false)
 public abstract class MeshUploadingDispatcherCitadelMixin {
+    @Inject(method = "dispatch", at = @At("HEAD"))
+    private void frmc$activateCitadelUpload(CallbackInfo callback) {
+        ArModelMeshUpload.activate();
+    }
+
     @WrapOperation(method = "dispatch", at = @At(value = "INVOKE", remap = false,
             target = "Lcom/github/argon4w/acceleratedrendering/core/programs/dispatchers/meshes/DenseUploads$Group;getMesh()Lcom/github/argon4w/acceleratedrendering/core/meshes/ServerMesh;"))
     private ServerMesh frmc$captureDenseMesh(DenseUploads.Group group, Operation<ServerMesh> original,
@@ -31,8 +38,8 @@ public abstract class MeshUploadingDispatcherCitadelMixin {
                                        Operation<Integer> original,
                                        @Share("frmc$citadelMesh") LocalRef<ServerMesh> current) {
         ServerMesh mesh = current.get();
-        if (CitadelGpuMaterialMeshes.handles(mesh)) {
-            return CitadelGpuMaterialMeshes.dispatch(mesh, count, size, offset);
+        if (ArModelMeshUpload.handles(mesh)) {
+            return ArModelMeshUpload.dispatch(mesh, count, size, offset);
         }
         return original.call(uploader, count, size, offset);
     }

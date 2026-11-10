@@ -9,18 +9,13 @@ import com.github.argon4w.acceleratedrendering.core.meshes.MeshBuffer;
 import com.github.argon4w.acceleratedrendering.core.meshes.ServerMesh;
 import com.github.argon4w.acceleratedrendering.core.meshes.collectors.IMeshCollector;
 import com.github.argon4w.acceleratedrendering.core.meshes.collectors.MeshCollectorType;
-import com.github.argon4w.acceleratedrendering.core.programs.dispatchers.TransformProgramDispatcher;
-import com.github.argon4w.acceleratedrendering.core.programs.dispatchers.meshes.MeshUploadingProgramDispatcher;
 import com.github.argon4w.acceleratedrendering.core.programs.overrides.ProgramOverride;
 import com.github.argon4w.acceleratedrendering.core.utils.ByteBufferBuilder;
-import com.github.argon4w.acceleratedrendering.core.utils.RenderTypeUtils;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.logging.LogUtils;
 import com.y271727uy.FRMC.config.Config;
+import com.y271727uy.FRMC.integration.acceleratedrendering.ArModelMeshUpload;
+import com.y271727uy.FRMC.integration.acceleratedrendering.ArModelMeshUpload.Format;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -29,20 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import org.slf4j.Logger;
 
+import static com.y271727uy.FRMC.integration.acceleratedrendering.ArModelMeshUpload.VERTEX_BYTES;
 import static org.lwjgl.opengl.GL45C.*;
 
 /** Builds one immutable, bone-indexed source mesh for a Citadel model and material. */
 public final class CitadelGpuMaterialMeshes {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final int VERTEX_BYTES = 36;
-    private static final int OVERLAY_OFFSET = 24;
-    private static final int MESH_INFO_BYTES = 28;
-    private static final int VARYING_BYTES = 16;
     private static final int PART_BYTES = 32;
     private static final int MAX_VARIANTS = 16;
     private static final long MAX_MESH_BYTES = 8L * 1024 * 1024;
@@ -51,25 +40,16 @@ public final class CitadelGpuMaterialMeshes {
     private static final Map<ServerMesh, MeshDetails> MESH_DETAILS = new IdentityHashMap<>();
     private static MeshBuffer storage;
     private static MeshBuffer lodStorage;
-    private static int program;
-    private static boolean unavailable;
-    private static boolean hookActive;
 
     private CitadelGpuMaterialMeshes() {
     }
 
     static ServerMesh get(AdvancedModelBox root, BasicModelPart[] nodes, long visible,
-                          AcceleratedBufferBuilder builder, int overlay, boolean boar) {
-        RenderType material = builder.getRenderType();
+                          AcceleratedBufferBuilder builder, int overlay, boolean boar, boolean allowTranslucent) {
+        RenderType baseMaterial = ArModelMeshUpload.unwrap(builder.getRenderType());
         ProgramOverride override = builder.getProgramOverride();
-        if (!hookActive || unavailable || builder.getMode() != VertexFormat.Mode.QUADS
-                || material.format() != DefaultVertexFormat.NEW_ENTITY
-                || RenderTypeUtils.isTranslucent(material)
-                || builder.getVertexSize() != VERTEX_BYTES
-                || override.overrideId() != 0
-                || override.getMeshInfoSize() != MESH_INFO_BYTES || override.getVaryingSize() != VARYING_BYTES
-                || override.uploading().getClass() != MeshUploadingProgramDispatcher.Default.class
-                || override.transform().getClass() != TransformProgramDispatcher.Default.class) {
+        Format format = ArModelMeshUpload.formatFor(builder, allowTranslucent);
+        if (format == null) {
             return null;
         }
         MeshCollectorType collector = CoreFeature.getMeshCollectorType();
@@ -79,20 +59,23 @@ public final class CitadelGpuMaterialMeshes {
             return null;
         }
         VertexLayout layout = builder.getLayout();
-        boolean depthTested = CitadelGeometryVisibility.cullingEnabled(boar) && isVanillaCutout(material);
+        boolean depthTested = CitadelGeometryVisibility.cullingEnabled(boar) && isVanillaCutout(baseMaterial);
         List<Variant> variants = MESHES.computeIfAbsent(root, ignored -> new ArrayList<>());
         for (Variant variant : variants) {
-            if (variant.matches(material, override, layout, collector, texture, depthTested, boar, visible, nodes)) {
+            if (variant.matches(baseMaterial, override, layout, collector, texture, depthTested, boar, visible, nodes)) {
                 return variant.mesh();
             }
         }
-        if (variants.size() >= MAX_VARIANTS || !initialize()) {
+        if (variants.size() >= MAX_VARIANTS || !format.initialize()) {
             return null;
         }
+        if (storage == null) {
+            storage = new MeshBuffer(64L);
+        }
         boolean planLod = Config.citadelGeneralLodEnabled && (!boar || !Config.citadelBoarLodEnabled)
-                && isVanillaCutout(material);
+                && format == Format.VANILLA && isVanillaCutout(baseMaterial);
         ServerMesh mesh = build(nodes, visible, builder, collector, overlay, depthTested, boar, planLod,
-                storage, MAX_MESH_BYTES);
+                format, storage, MAX_MESH_BYTES);
         if (mesh != null) {
             Object[][] cubes = new Object[nodes.length][];
             for (int i = 0; i < nodes.length; i++) {
@@ -100,7 +83,7 @@ public final class CitadelGpuMaterialMeshes {
                     cubes[i] = ((AdvancedModelBox) nodes[i]).cubeList.toArray();
                 }
             }
-            variants.add(new Variant(material, override, layout, collector,
+            variants.add(new Variant(baseMaterial, override, layout, collector,
                     texture == null ? null : new WeakReference<>(texture), depthTested, boar, visible, cubes, mesh));
         }
         return mesh;
@@ -112,30 +95,12 @@ public final class CitadelGpuMaterialMeshes {
     }
 
     static boolean isVanillaCutout(RenderType material) {
-        ResourceLocation texture = RenderTypeUtils.getTextureLocation(material);
-        return texture != null && (material == RenderType.entityCutout(texture)
-                || material == RenderType.entityCutoutNoCull(texture, true)
-                || material == RenderType.entityCutoutNoCull(texture, false));
-    }
-
-    private static boolean initialize() {
-        if (program == 0) {
-            try {
-                program = CitadelGpuPoseProgram.compileProgram("citadel_model_upload.comp");
-                storage = new MeshBuffer(64L);
-            } catch (IOException | RuntimeException exception) {
-                unavailable = true;
-                release();
-                LOGGER.warn("[FRMC/CitadelGpuRender] Whole-model upload unavailable", exception);
-                return false;
-            }
-        }
-        return true;
+        return ArModelMeshUpload.isCutout(material);
     }
 
     private static ServerMesh build(BasicModelPart[] nodes, long visible, AcceleratedBufferBuilder builder,
                                     MeshCollectorType collectorType, int overlay, boolean depthTested, boolean boar,
-                                    boolean planLod, MeshBuffer destinationStorage, long maxBytes) {
+                                    boolean planLod, Format format, MeshBuffer destinationStorage, long maxBytes) {
         try (ByteBufferBuilder merged = new ByteBufferBuilder(4096); MemoryStack stack = MemoryStack.stackPush()) {
             ByteBuffer bounds = depthTested ? stack.malloc(nodes.length * PART_BYTES) : null;
             var lodBounds = planLod ? new CitadelModelLod.MeshBounds(nodes.length) : null;
@@ -156,15 +121,11 @@ public final class CitadelGpuMaterialMeshes {
                     if (count % 4 != 0) {
                         return null;
                     }
-                    int bytes = count * VERTEX_BYTES;
                     try (ByteBufferBuilder.Result result = data.build()) {
-                        long destination = merged.reserve(bytes);
-                        MemoryUtil.memCopy(MemoryUtil.memAddress(result.byteBuffer()), destination, bytes);
+                        long destination = ArModelMeshUpload.appendVertices(merged,
+                                MemoryUtil.memAddress(result.byteBuffer()), count, format, bone);
                         if (bounds != null || lodBounds != null) {
                             putPartBounds(bounds, lodBounds, bone, destination, vertices, count);
-                        }
-                        for (int vertex = 0; vertex < count; vertex++) {
-                            MemoryUtil.memPutInt(destination + (long) vertex * VERTEX_BYTES + OVERLAY_OFFSET, bone);
                         }
                     }
                     vertices += count;
@@ -187,7 +148,11 @@ public final class CitadelGpuMaterialMeshes {
                 }
                 var plan = lodBounds == null ? null : lodBounds.plan(vertices);
                 var lod = plan == null ? null : new LodVariant(plan, collectorType, depthTested, boar);
-                MESH_DETAILS.put(mesh, new MeshDetails(boar, partBounds, lod));
+                MESH_DETAILS.put(mesh, new MeshDetails(partBounds, lod));
+                PartBounds uploadBounds = partBounds;
+                ArModelMeshUpload.register(mesh, format, uploadBounds == null && !boar ? null
+                        : (count, size, meshOffset) -> CitadelGeometryVisibility.dispatch(
+                                count, size, meshOffset, uploadBounds, boar));
                 return mesh;
             }
         }
@@ -218,30 +183,6 @@ public final class CitadelGpuMaterialMeshes {
         }
     }
 
-    /** Called only from AR's dense upload, after it binds its mesh and instance SSBOs. */
-    public static boolean handles(ServerMesh mesh) {
-        hookActive = true;
-        return mesh != null && (storage != null && mesh.meshBuffer() == storage
-                || lodStorage != null && mesh.meshBuffer() == lodStorage);
-    }
-
-    public static int dispatch(ServerMesh mesh, int count, int vertices, int offset) {
-        int previous = glGetInteger(GL_CURRENT_PROGRAM);
-        try {
-            glUseProgram(program);
-            glUniform1ui(0, count);
-            glUniform1ui(1, vertices);
-            glUniform1ui(2, offset);
-            glDispatchCompute((count * vertices + 127) / 128, 1, 1);
-            MeshDetails details = MESH_DETAILS.get(mesh);
-            boolean culled = details != null && CitadelGeometryVisibility.dispatch(
-                    count, vertices, offset, details.bounds(), details.boar());
-            return GL_SHADER_STORAGE_BARRIER_BIT | (culled ? GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT : 0);
-        } finally {
-            glUseProgram(previous);
-        }
-    }
-
     public static void release() {
         CitadelGeometryVisibility.release();
         MESHES.clear();
@@ -259,16 +200,12 @@ public final class CitadelGpuMaterialMeshes {
             lodStorage.delete();
             lodStorage = null;
         }
-        if (program != 0) {
-            glDeleteProgram(program);
-            program = 0;
-        }
     }
 
     record PartBounds(int buffer, int count) {
     }
 
-    private record MeshDetails(boolean boar, PartBounds bounds, LodVariant lod) {
+    private record MeshDetails(PartBounds bounds, LodVariant lod) {
     }
 
     static final class LodVariant {
@@ -294,7 +231,7 @@ public final class CitadelGpuMaterialMeshes {
                 }
                 if (lodStorage.getPosition() + (long) plan.vertices() * VERTEX_BYTES <= MAX_LOD_BYTES) {
                     mesh = build(nodes, visible, builder, collector, overlay, depthTested, boar, false,
-                            lodStorage, MAX_LOD_BYTES);
+                            Format.VANILLA, lodStorage, MAX_LOD_BYTES);
                 }
             }
             return mesh;

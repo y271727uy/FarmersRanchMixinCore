@@ -8,10 +8,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /** Turns an FTB description token into a link the quest screen can intercept. */
 public final class GuideLinkComponent {
     public static final String KEY = "guideme";
+    private static final Pattern SPACED_LINK = Pattern.compile("guideme:\\s*(\\S+)(?:\\s+text:\\s*(.*))?");
 
     private GuideLinkComponent() {
     }
@@ -21,7 +23,18 @@ public final class GuideLinkComponent {
             return null;
         }
         String target = properties.get(KEY);
-        String label = properties.getOrDefault("text", target == null ? "" : target);
+        String label = properties.get("text");
+        if (raw != null && (target == null || target.isEmpty() || "".equals(label))) {
+            // FTB splits properties on spaces, so a space after ':' leaves an empty value.
+            var match = SPACED_LINK.matcher(raw.strip());
+            if (match.matches()) {
+                target = match.group(1);
+                label = match.group(2);
+                if (label != null) {
+                    label = label.replace("%20", " ");
+                }
+            }
+        }
         return link(label, target);
     }
 

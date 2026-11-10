@@ -56,11 +56,14 @@ public record GuideLinkTarget(ResourceLocation guideId, String pagePath, String 
 
         String guidePath = pageSplit < 0 ? path : path.substring(0, pageSplit);
         String pagePath = pageSplit < 0 ? "" : path.substring(pageSplit + 1);
-        if (folder && pagePath.isEmpty()) {
+        String pathWithoutExtension = !folder && pagePath.endsWith(".md")
+                ? pagePath.substring(0, pagePath.length() - 3)
+                : pagePath;
+        if ((pageSplit >= 0 || folder) && pathWithoutExtension.isEmpty()) {
             return Optional.empty();
         }
         try {
-            validate(pagePath);
+            validate(pathWithoutExtension);
             return Optional.of(new GuideLinkTarget(new ResourceLocation(namespace, guidePath), pagePath, anchor, folder));
         } catch (ResourceLocationException | IllegalArgumentException ignored) {
             return Optional.empty();

@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Pseudo
 @Mixin(value = MoonSlashEntity.class, remap = false)
 public abstract class MoonSlashEntityMixin {
+    // 与提交pr重合
     @WrapOperation(method = "getEffectAmplifier", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/effect/MobEffectInstance;getAmplifier()I", remap = true))
     private int frmc$useBaseDamageWhenEffectExpires(MobEffectInstance effect, Operation<Integer> original) {

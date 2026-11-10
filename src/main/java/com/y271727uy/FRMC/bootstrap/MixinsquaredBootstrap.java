@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.bootstrap;
 
 import com.y271727uy.FRMC.mixin.mixinsquared.braziliandelight.BrazilianDelightCookingPotMixinSquared;
+import com.y271727uy.FRMC.mixin.mixinsquared.delighto_flight.VillagerComfortMixinSquared;
 import com.y271727uy.FRMC.mixin.mixinsquared.manors_bounty.PoisonEffectMixinSquared;
 import com.y271727uy.FRMC.mixin.mixinsquared.modernui.MixinWindowResourcesGuard;
 import com.y271727uy.FRMC.mixin.mixinsquared.oculus.MixinProgramCancellableGuard;
@@ -12,6 +13,7 @@ public final class MixinsquaredBootstrap {
     }
 
     public static void initialize() {
+        VillagerComfortMixinSquared.register();
         MixinFabricExtras.init();
         PoisonEffectMixinSquared.register();
         MixinWindowResourcesGuard.register();

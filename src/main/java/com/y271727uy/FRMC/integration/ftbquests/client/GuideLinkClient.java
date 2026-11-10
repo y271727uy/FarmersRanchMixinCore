@@ -5,6 +5,7 @@ import com.y271727uy.FRMC.integration.ftbquests.GuideLinkTarget;
 import dev.ftb.mods.ftblibrary.util.client.ClientTextComponentUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -64,11 +65,13 @@ public final class GuideLinkClient {
             Object anchor = target.anchor().isEmpty()
                     ? anchorType.getMethod("page", ResourceLocation.class).invoke(null, pageId)
                     : anchorType.getConstructor(ResourceLocation.class, String.class).newInstance(pageId, target.anchor());
-            Object screen = screenType.getMethod("openNew", Class.forName("guideme.Guide"), anchorType).invoke(null, guide, anchor);
             Minecraft minecraft = Minecraft.getInstance();
-            screenType.getMethod("setReturnToOnClose", net.minecraft.client.gui.screens.Screen.class)
-                    .invoke(screen, minecraft.screen);
-            return minecraft.player != null;
+            Screen previousScreen = minecraft.screen;
+            Screen guideScreen = (Screen) screenType.getMethod("openNew", Class.forName("guideme.Guide"), anchorType)
+                    .invoke(null, guide, anchor);
+            screenType.getMethod("setReturnToOnClose", Screen.class).invoke(guideScreen, previousScreen);
+            minecraft.setScreen(guideScreen);
+            return true;
         } catch (ReflectiveOperationException ignored) {
             return false;
         }

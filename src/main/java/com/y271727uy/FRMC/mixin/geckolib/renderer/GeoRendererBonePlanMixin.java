@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.mixin.geckolib.renderer;
 
+import com.y271727uy.FRMC.integration.acceleratedrendering.ArIntegration;
+import com.y271727uy.FRMC.integration.geckolib.renderer.GeckoArModelBatch;
 import com.y271727uy.FRMC.integration.geckolib.renderer.plan.BoneRenderPlan;
 import com.y271727uy.FRMC.integration.geckolib.renderer.plan.BoneRenderPlanProvider;
 import com.y271727uy.FRMC.integration.geckolib.renderer.plan.BoneVisit;
@@ -37,12 +39,23 @@ public interface GeoRendererBonePlanMixin<T extends GeoAnimatable> extends BoneR
         plan.prepare(model, !renderer.getRenderLayers().isEmpty());
         renderer.updateAnimatedTextureFrame(animatable);
 
-        for (int i = 0, size = bones.size(); i < size; i++) {
-            GeoBone bone = bones.get(i);
-
-            if (plan.classify(bone) != BoneVisit.SKIP_SUBTREE) {
-                renderer.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender,
-                        partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        GeckoArModelBatch batch = ArIntegration.IS_INSTALLED
+                ? GeckoArModelBatch.begin(renderer, model, poseStack, buffer, isReRender,
+                        packedLight, packedOverlay, red, green, blue, alpha) : null;
+        try {
+            for (int i = 0, size = bones.size(); i < size; i++) {
+                GeoBone bone = bones.get(i);
+                if (plan.classify(bone) != BoneVisit.SKIP_SUBTREE) {
+                    renderer.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender,
+                            partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+                }
+            }
+            if (batch != null) {
+                batch.submit();
+            }
+        } finally {
+            if (batch != null) {
+                batch.clear();
             }
         }
     }

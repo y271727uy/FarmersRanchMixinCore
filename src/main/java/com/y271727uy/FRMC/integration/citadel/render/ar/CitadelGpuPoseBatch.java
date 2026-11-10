@@ -2,6 +2,7 @@ package com.y271727uy.FRMC.integration.citadel.render.ar;
 
 import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
 import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
+import com.github.argon4w.acceleratedrendering.core.CoreFeature;
 import com.github.argon4w.acceleratedrendering.core.buffers.accelerated.builders.AcceleratedBufferBuilder;
 import com.github.argon4w.acceleratedrendering.core.meshes.MeshType;
 import com.github.argon4w.acceleratedrendering.core.meshes.ServerMesh;
@@ -10,6 +11,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.y271727uy.FRMC.config.Config;
+import com.y271727uy.FRMC.integration.acceleratedrendering.ArModelMeshUpload;
+import com.y271727uy.FRMC.integration.alexscaves.HullbreakerRenderMaterials;
 import com.y271727uy.FRMC.integration.citadel.model.CitadelGeometrySelection;
 import com.y271727uy.FRMC.integration.citadel.model.CitadelSkeletonLayoutCache;
 import com.y271727uy.FRMC.integration.citadel.render.ar.CitadelGpuPoseProgram.BufferBinding;
@@ -70,19 +73,23 @@ public final class CitadelGpuPoseBatch {
         String modelType = model.getClass().getName();
         boolean boar = modelType.equals("untamedwilds.client.model.ModelBoar")
                 || modelType.equals("untamedwilds.client.model.ModelBoarPiglet");
-        if (!boar && (!Config.citadelGpuGeneralModelsEnabled || !Config.citadelGpuModelBatchingEnabled
+        boolean hullbreaker = modelType.equals("com.github.alexmodguy.alexscaves.client.model.HullbreakerModel")
+                && CoreFeature.shouldForceAccelerateTranslucent()
+                && (!OculusIntegration.IS_IRIS_INSTALLED || !IrisApi.getInstance().isShaderPackInUse())
+                && HullbreakerRenderMaterials.isBodyOrGlow(ArModelMeshUpload.unwrap(builder.getRenderType()));
+        if (!boar && (!Config.citadelGpuModelBatchingEnabled
                 || root.getClass() != AdvancedModelBox.class
-                || !CitadelGpuMaterialMeshes.isVanillaCutout(builder.getRenderType())
-                || (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse()))) {
+                || (!hullbreaker && (!Config.citadelGpuGeneralModelsEnabled
+                        || !CitadelGpuMaterialMeshes.isVanillaCutout(builder.getRenderType()))))) {
             return false;
         }
         CitadelGpuPoseBatch batch = buffers.frmc$citadelPoseBatch();
-        return batch.submit(root, base, builder, source, buffers, light, overlay, color, model, boar);
+        return batch.submit(root, base, builder, source, buffers, light, overlay, color, model, boar, hullbreaker);
     }
 
     private boolean submit(AdvancedModelBox root, PoseStack.Pose base, AcceleratedBufferBuilder builder,
                            ICitadelMeshSource source, ICitadelGpuBuffers buffers, int light, int overlay, int color,
-                           Object model, boolean boar) {
+                           Object model, boolean boar, boolean allowTranslucent) {
         if (offsets.position() >= MAX_BATCH || unavailable) {
             return false;
         }
@@ -113,17 +120,17 @@ public final class CitadelGpuPoseBatch {
                 geometry = CitadelGeometrySelection.omitOwnGeometry(visibleGeometry, omittedParts);
             }
             if (geometry != visibleGeometry) {
-                modelMesh = CitadelGpuMaterialMeshes.get(root, nodes, geometry, builder, overlay, boar);
+                modelMesh = CitadelGpuMaterialMeshes.get(root, nodes, geometry, builder, overlay, boar, allowTranslucent);
                 reduced = modelMesh != null;
                 if (reduced && sampleLod) {
-                    ServerMesh full = CitadelGpuMaterialMeshes.get(root, nodes, visibleGeometry, builder, overlay, boar);
+                    ServerMesh full = CitadelGpuMaterialMeshes.get(root, nodes, visibleGeometry, builder, overlay, boar, allowTranslucent);
                     if (full != null) {
                         saved = full.size() - modelMesh.size();
                     }
                 }
             }
             if (modelMesh == null) {
-                modelMesh = CitadelGpuMaterialMeshes.get(root, nodes, visibleGeometry, builder, overlay, boar);
+                modelMesh = CitadelGpuMaterialMeshes.get(root, nodes, visibleGeometry, builder, overlay, boar, allowTranslucent);
             }
             if (modelMesh != null && Config.citadelGeneralLodEnabled && (!boar || !Config.citadelBoarLodEnabled)
                     && CitadelModelLod.activeFor(model)) {

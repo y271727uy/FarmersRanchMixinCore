@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.mixin.delighto_flight;
 
 import com.cloudmeow.delightoflight.entity.ai.SetTargetFromBlockMemory;
+import com.cloudmeow.delightoflight.registry.DFMemoryTypes;
 import com.mojang.datafixers.kinds.IdF;
 import com.y271727uy.FRMC.integration.delighto_flight.AllayRelaySearch;
 import com.y271727uy.FRMC.integration.delighto_flight.ChefWalkTarget;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
@@ -33,6 +35,16 @@ public abstract class SetTargetFromBlockMemoryMixin {
             + "Lnet/minecraft/world/entity/ai/behavior/declarative/MemoryAccessor;II"
             + "Lnet/minecraft/world/entity/ai/behavior/declarative/MemoryAccessor;FI"
             + "Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/animal/allay/Allay;J)Z";
+
+    @Inject(method = "releasePoi", at = @At("HEAD"), cancellable = true)
+    private static void frmc$keepOtherMobsPoiTickets(MemoryModuleType<GlobalPos> memory, Allay allay,
+                                                    CallbackInfo ci) {
+        // These chef memories are populated by AcquirePoiNoClaim.
+        if (memory == DFMemoryTypes.BASKET.get() || memory == DFMemoryTypes.POT.get()
+                || memory == DFMemoryTypes.MORE_POT.get()) {
+            ci.cancel();
+        }
+    }
 
     @Inject(method = FRMC_WORK_TRIGGER, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/ai/util/DefaultRandomPos;getPosTowards(Lnet/minecraft/world/entity/PathfinderMob;IILnet/minecraft/world/phys/Vec3;D)Lnet/minecraft/world/phys/Vec3;",

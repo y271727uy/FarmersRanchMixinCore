@@ -1,10 +1,11 @@
 package com.y271727uy.FRMC.mixin.alexsmobs;
 
 import com.github.alexthe666.alexsmobs.entity.ai.HummingbirdAIPollinate;
+import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.y271727uy.FRMC.integration.alexsmobs.HummingbirdFlowerSections;
+import com.y271727uy.FRMC.integration.minecraft.BlockTargetSections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.PathfinderMob;
@@ -20,15 +21,15 @@ public abstract class HummingbirdPollinationSearchMixin {
     @Shadow @Final private int searchRange;
     @Shadow @Final private int verticalSearchRange;
     @Shadow protected int verticalSearchStart;
-    @Unique private HummingbirdFlowerSections frmc$flowerSections;
+    @Unique private BlockTargetSections frmc$flowerSections;
 
     @WrapMethod(method = "findNearestBlock", require = 1)
     private boolean frmc$prepareFlowerSearch(Operation<Boolean> original) {
         if (((Object) this).getClass() != HummingbirdAIPollinate.class || !(mob.level() instanceof ServerLevel level)) {
             return original.call();
         }
-        var sections = HummingbirdFlowerSections.capture(level, mob.blockPosition(), searchRange,
-                verticalSearchStart, verticalSearchRange);
+        var sections = BlockTargetSections.capture(level, mob.blockPosition(), searchRange,
+                verticalSearchStart, verticalSearchRange, state -> state.is(AMTagRegistry.HUMMINGBIRD_POLLINATES));
         if (sections != null && !sections.hasCandidates()) {
             return false;
         }

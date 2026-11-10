@@ -1,28 +1,29 @@
-package com.y271727uy.FRMC.integration.alexsmobs;
+package com.y271727uy.FRMC.integration.minecraft;
 
-import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
+import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
-/** A conservative section filter used for one vanilla pollination search. */
-public final class HummingbirdFlowerSections {
+/** A conservative section filter for a single MoveToBlockGoal search. */
+public final class BlockTargetSections {
     private final int minX;
     private final int minY;
     private final int minZ;
     private final boolean[][][] candidates;
     private boolean anyCandidates;
 
-    private HummingbirdFlowerSections(int minX, int minY, int minZ, int width, int height, int depth) {
+    private BlockTargetSections(int minX, int minY, int minZ, int width, int height, int depth) {
         this.minX = minX;
         this.minY = minY;
         this.minZ = minZ;
         candidates = new boolean[width][height][depth];
     }
 
-    public static HummingbirdFlowerSections capture(ServerLevel level, BlockPos origin, int searchRange,
-                                                     int verticalStart, int verticalRange) {
+    public static BlockTargetSections capture(ServerLevel level, BlockPos origin, int searchRange,
+            int verticalStart, int verticalRange, Predicate<BlockState> candidate) {
         if (!level.getServer().isSameThread() || searchRange < 1 || searchRange > 32
-                || verticalStart > verticalRange || verticalStart < -16 || verticalRange < 0 || verticalRange > 16) {
+                || verticalStart > verticalRange || verticalStart < -16 || verticalRange < 0 || verticalRange > 32) {
             return null;
         }
         int extent = Math.max(Math.abs(verticalStart), verticalRange);
@@ -38,17 +39,14 @@ public final class HummingbirdFlowerSections {
         int maxY = highY >> 4;
         int minZ = (origin.getZ() - radius) >> 4;
         int maxZ = (origin.getZ() + radius) >> 4;
-        var result = new HummingbirdFlowerSections(minX, minY, minZ,
+        var result = new BlockTargetSections(minX, minY, minZ,
                 maxX - minX + 1, maxY - minY + 1, maxZ - minZ + 1);
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 var chunk = level.getChunkSource().getChunkNow(x, z);
-                if (chunk == null) {
-                    return null;
-                }
                 for (int y = minY; y <= maxY; y++) {
-                    var section = chunk.getSection(level.getSectionIndexFromSectionY(y));
-                    if (section.maybeHas(state -> state.is(AMTagRegistry.HUMMINGBIRD_POLLINATES))) {
+                    // Leave unloaded chunks to the original search without loading them here.
+                    if (chunk == null || chunk.getSection(level.getSectionIndexFromSectionY(y)).maybeHas(candidate)) {
                         result.candidates[x - minX][y - minY][z - minZ] = true;
                         result.anyCandidates = true;
                     }

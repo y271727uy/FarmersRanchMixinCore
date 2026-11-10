@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
@@ -29,7 +30,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /** Shared, one-tick water samples for fish that fit inside a single block. */
-final class WaterFastPath {
+public final class WaterFastPath {
     private static final int TILE_SIZE = 4;
     private static final int MAX_SAMPLES_PER_TICK = 4;
     private static final int MAX_CELLS = 1024;
@@ -79,7 +80,11 @@ final class WaterFastPath {
         }
     }
 
-    static boolean clear(ServerLevel level, Mob mob, Vec3 from, Vec3 to) {
+    public static boolean clear(ServerLevel level, Mob mob, Vec3 from, Vec3 to) {
+        return clear(level, mob, from, to, WaterFastPath::isSourceWater);
+    }
+
+    public static boolean clear(ServerLevel level, Mob mob, Vec3 from, Vec3 to, Predicate<BlockState> sourceFluid) {
         AABB body = mob.getBoundingBox().move(from.subtract(mob.position()));
         AABB sweep = body.expandTowards(to.subtract(from));
         BlockPos min = BlockPos.containing(sweep.minX + 1.0E-7, sweep.minY + 1.0E-7, sweep.minZ + 1.0E-7);
@@ -89,7 +94,7 @@ final class WaterFastPath {
         }
         for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
             var state = level.getBlockState(pos);
-            if (!isSourceWater(state) || (pos.getY() == max.getY()
+            if (!sourceFluid.test(state) || (pos.getY() == max.getY()
                     && sweep.maxY > pos.getY() + state.getFluidState().getHeight(level, pos) + 1.0E-7)) {
                 return false;
             }

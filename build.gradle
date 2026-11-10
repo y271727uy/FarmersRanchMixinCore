@@ -178,7 +178,7 @@ dependencies {
     modCompileOnly("maven.modrinth:vintage-delight:q8Ght7Bo")
     modCompileOnly("maven.modrinth:fruits-delight:qPyefm6m")
     //modImplementation("maven.modrinth:observable:QtSVNyjm")
-    //modImplementation("maven.modrinth:spark:4FXHDE9F")
+    modImplementation("maven.modrinth:spark:4FXHDE9F")
     modImplementation ("maven.modrinth:citadel:lTAAe4sZ")
     modImplementation("curse.maven:untamedwilds-457252:4779746")
     modCompileOnly("curse.maven:mooncake-delight-1490740:7866540")
@@ -244,20 +244,21 @@ dependencies {
     modCompileOnly 'astikorcartsredux:astikorcartsredux-1.2.5'   //这个不是异步粒子
     modImplementation 'FastEvent:FastEvent-1.20.1-1.1.1'
     modCompileOnly 'EggDelight:EggDelight-v1.2-1.20.1'
-    modImplementation 'DelightoFlight:DelightoFlight-1.20.1-1.4.1'
+    modImplementation 'DelightoFlight:DelightoFlight-1.20.1-1.4.2'
     modCompileOnly 'overweightfarming:overweightfarming-1.20.1-2.1.0-forge'
     modImplementation 'oceanic_delight:oceanic_delight-1.0.4-forge-1.20.1'
+    modImplementation 'constancy:constancy:0.1.1+1.20.1.forge'
     modImplementation 'ftb-library:ftb-library-forge-2001.2.13'
     modImplementation 'ftb-quests:ftb-quests-forge-2001.4.14'
     modImplementation 'ftb-teams:ftb-teams-forge-2001.3.1'
     modImplementation 'item-filters:item-filters-forge-2001.1.0-build.59'
     modImplementation 'acceleratedrecoiling:acceleratedrecoiling-20.1.12-alpha-all' //这个是加速碰撞
     modCompileOnly 'AsyncParticles:AsyncParticles-2.0.0-beta.4+1.20.1'  //这个才是异步粒子
+    modImplementation 'twilightforest:twilightforest-1.20.1-4.3.2508-universal'
+    modCompileOnly 'entity_model_features:entity_model_features_1.20.1-forge-3.2.2'  //实体模型特性
+    modCompileOnly 'entity_texture_features:entity_texture_features_1.20.1-forge-7.1'  //实体纹理特性
     //modImplementation ''
     //modImplementation 'ImmediatelyFast:ImmediatelyFast-Forge-1.5.5+1.20.4'
-
-    modImplementation 'constancy:constancy:0.1.1+1.20.1.forge'
-    jarJar 'constancy:constancy:0.1.1+1.20.1.forge'
 
     compileOnly files('lib/MixinRuntime-mc1.20.1-1.0.jar')
     runtimeOnly files('lib/MixinRuntime-mc1.20.1-1.0.jar')

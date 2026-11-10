@@ -40,9 +40,12 @@ public abstract class GetItemFromContainerMixin {
         for (int index = 0; index < basket.getContainerSize(); index++) {
             ItemStack stack = basket.getItem(index);
             if (ItemStack.isSameItem(ingredient, stack)) {
-                stack.shrink(1);
-                entity.setItemInHand(InteractionHand.MAIN_HAND, ingredient.copy());
-                return;
+                ItemStack taken = basket.removeItem(index, 1);
+                if (!taken.isEmpty()) {
+                    basket.setChanged();
+                    entity.setItemInHand(InteractionHand.MAIN_HAND, taken);
+                    return;
+                }
             }
         }
     }

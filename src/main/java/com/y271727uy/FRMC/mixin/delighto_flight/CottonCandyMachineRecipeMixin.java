@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class CottonCandyMachineRecipeMixin {
     @Shadow @Final private NonNullList<Ingredient> inputItems;
 
+    // 与提交pr重合
     @Inject(method = "matches(Lnet/minecraftforge/items/wrapper/RecipeWrapper;Lnet/minecraft/world/level/Level;)Z",
             at = @At("HEAD"), cancellable = true)
     private void frmc$matchWithoutCopyingSlots(RecipeWrapper input, Level level, CallbackInfoReturnable<Boolean> cir) {

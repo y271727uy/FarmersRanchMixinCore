@@ -12,5 +12,7 @@ public interface ICitadelMeshSource {
 
     boolean frmc$canSubmitGpuPoses();
 
+    int frmc$activeGpuPose();
+
     void frmc$selectGpuPose(int sharingIndex);
 }

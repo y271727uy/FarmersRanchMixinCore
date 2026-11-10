@@ -1,1 +1,7 @@
 Manor’s Bounty Machine  吃不到配方搜索加速、gec的动画我觉得不一定能吃到相关的渲染优化
+
+Alex’s Caves 2.0.2 的 `EntityMixin.ac_collide` 暂缓，单独记录。
+   - [原始洞穴 Spark](https://spark.lucko.me/8GFwN9N18e) 中，整个碰撞分支占服务端主线程样本的 9.61%。其中 `collideBoundingBox` 占 6.86%，实体碰撞查询占 1.76%，移动磁块查询占 0.54%。
+   - AcceleratedReCoiling 20.1.12-alpha 优化的是 `LivingEntity.pushEntities` 的推挤和挤压。这版没有接管上述移动碰撞分支。
+   - 现在只给无移动磁块的场景加快路径，能直接瞄准的是占 0.54% 的磁块查询。只换回原版入口也仍需扫描方块碰撞形状。实际收益未做 A/B，先把方块形状扫描留作后续优化项，届时验证台阶、骑乘和移动磁块碰撞。
+
