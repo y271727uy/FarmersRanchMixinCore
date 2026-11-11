@@ -38,3 +38,5 @@ frmc-network-lib/
 MxinAgentAPI/
 MxinASMAPI/
 lib/
+log/
+logs/

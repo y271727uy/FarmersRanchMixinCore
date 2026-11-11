@@ -42,7 +42,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import org.slf4j.Logger;
 
-// Basic mod entry point.
 @Mod(FRMCMod.MODID)
 @SuppressWarnings("removal")
 public class FRMCMod {
