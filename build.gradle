@@ -244,7 +244,7 @@ dependencies {
     modCompileOnly 'astikorcartsredux:astikorcartsredux-1.2.5'   //这个不是异步粒子
     modImplementation 'FastEvent:FastEvent-1.20.1-1.1.1'
     modCompileOnly 'EggDelight:EggDelight-v1.2-1.20.1'
-    modImplementation 'DelightoFlight:DelightoFlight-1.20.1-1.4.2'
+    modImplementation 'DelightoFlight:DelightoFlight-1.20.1-1.4.3'
     modCompileOnly 'overweightfarming:overweightfarming-1.20.1-2.1.0-forge'
     modImplementation 'oceanic_delight:oceanic_delight-1.0.4-forge-1.20.1'
     modImplementation 'constancy:constancy:0.1.1+1.20.1.forge'
@@ -257,6 +257,7 @@ dependencies {
     modImplementation 'twilightforest:twilightforest-1.20.1-4.3.2508-universal'
     modCompileOnly 'entity_model_features:entity_model_features_1.20.1-forge-3.2.2'  //实体模型特性
     modCompileOnly 'entity_texture_features:entity_texture_features_1.20.1-forge-7.1'  //实体纹理特性
+    modImplementation 'touhoulittlemaid:touhoulittlemaid-1.5.3-forge+mc1.20.1'
     //modImplementation ''
     //modImplementation 'ImmediatelyFast:ImmediatelyFast-Forge-1.5.5+1.20.4'
 

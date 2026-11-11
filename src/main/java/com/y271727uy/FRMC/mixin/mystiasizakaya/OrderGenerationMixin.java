@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.mixin.mystiasizakaya;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -24,7 +26,6 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Pseudo
@@ -85,7 +86,7 @@ public abstract class OrderGenerationMixin {
         FRMC$orderFailedAttempts.remove(playerId);
     }
 
-    @Redirect(
+    @WrapOperation(
         method = "onPlayerTick",
         at = @At(
             value = "INVOKE",
@@ -93,11 +94,11 @@ public abstract class OrderGenerationMixin {
         ),
         require = 1
     )
-    private static Object frmc$disableOriginalOrderProbability(ForgeConfigSpec.DoubleValue instance) {
+    private static Object frmc$disableOriginalOrderProbability(ForgeConfigSpec.DoubleValue instance, Operation<Object> original) {
         if (instance == CommonConfig.ORDER_REFRESH_PROBABILITY) {
             return 0.0D;
         }
-        return instance.get();
+        return original.call(instance);
     }
 
     @Unique

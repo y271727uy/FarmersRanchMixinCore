@@ -1,5 +1,6 @@
 package com.y271727uy.FRMC.mixin.mystiasizakaya;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +12,6 @@ import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Pseudo
 @Mixin(targets = "org.hiedacamellia.mystiasizakaya.core.network.OpenMessage", remap = false)
@@ -22,7 +22,7 @@ public abstract class OpenMessageMixin {
     private static final String FRMC$FAILED_CUISINES = "network.mystiasizakaya.ledger.failed.cuisines";
     private static final String FRMC$FAILED_BEVERAGES = "network.mystiasizakaya.ledger.failed.beverages";
 
-    @Redirect(
+    @WrapWithCondition(
         method = "lambda$handleServer$4",
         at = @At(
             value = "INVOKE",
@@ -31,21 +31,21 @@ public abstract class OpenMessageMixin {
         require = 0,
         expect = 0
     )
-    private static void frmc$onlySendUnsatisfiedLedgerFailure(ServerPlayer player, Component component) {
+    private static boolean frmc$onlySendUnsatisfiedLedgerFailure(ServerPlayer player, Component component) {
         String key = frmc$getTranslationKey(component);
         if (FRMC$FAILED_TABLE.equals(key) && frmc$hasBoundTable(player)) {
-            return;
+            return false;
         }
 
         if (FRMC$FAILED_CUISINES.equals(key) && frmc$hasMenuEntry(player, true)) {
-            return;
+            return false;
         }
 
         if (FRMC$FAILED_BEVERAGES.equals(key) && frmc$hasMenuEntry(player, false)) {
-            return;
+            return false;
         }
 
-        player.sendSystemMessage(component);
+        return true;
     }
 
     private static String frmc$getTranslationKey(Component component) {

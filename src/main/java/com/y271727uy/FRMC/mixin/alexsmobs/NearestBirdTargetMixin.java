@@ -1,6 +1,8 @@
 package com.y271727uy.FRMC.mixin.alexsmobs;
 
 import com.github.alexthe666.alexsmobs.entity.ai.CreatureAITargetItems;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -9,7 +11,6 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Group;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Pseudo
 @Mixin(value = CreatureAITargetItems.class, targets = {
@@ -20,16 +21,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 })
 public abstract class NearestBirdTargetMixin {
     @Group(name = "frmc$nearestTarget", min = 1, max = 1)
-    @Redirect(method = "canUse", at = @At(value = "INVOKE", remap = false,
+    @WrapOperation(method = "canUse", at = @At(value = "INVOKE", remap = false,
             target = "Ljava/util/Collections;sort(Ljava/util/List;Ljava/util/Comparator;)V"), require = 0)
-    private <T> void frmc$selectFromCollectionsSort(List<T> candidates, Comparator<? super T> order) {
+    private <T> void frmc$selectFromCollectionsSort(List<T> candidates, Comparator<? super T> order, Operation<Void> original) {
         frmc$selectFirst(candidates, order);
     }
 
     @Group(name = "frmc$nearestTarget", min = 1, max = 1)
-    @Redirect(method = "canUse", at = @At(value = "INVOKE", remap = false,
+    @WrapOperation(method = "canUse", at = @At(value = "INVOKE", remap = false,
             target = "Ljava/util/List;sort(Ljava/util/Comparator;)V"), require = 0)
-    private <T> void frmc$selectFromListSort(List<T> candidates, Comparator<? super T> order) {
+    private <T> void frmc$selectFromListSort(List<T> candidates, Comparator<? super T> order, Operation<Void> original) {
         frmc$selectFirst(candidates, order);
     }
 

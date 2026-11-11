@@ -19,11 +19,14 @@ public final class FRMCMixinLoadConfig {
     private static final String FASTCHUNKGEN_DFU_MIXIN = "fastchunkgen.TypeMixin";
     private static final String FASTCHUNKGEN_DFU_TARGET = "com.misanthropy.fastchunkgen.base.common.util.CFUtil";
     private static final String OCULUS_ENTITY_MIXIN = MIXIN_PACKAGE + "oculus.EmbeddiumEntityRenderMixin";
+    private static final String AR_GECKOLIB_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.geckolib.";
+    private static final String AR_MAID_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.touhoulittlemaid.";
 
     private static final List<OptionalMixinIntegration> OPTIONAL_MIXIN_INTEGRATIONS = List.of(
         new OptionalMixinIntegration("constancy.", "constancy", "modernfix"),
         new OptionalMixinIntegration("minecraft.recipe.deduplicator.farmersdelight.", "farmersdelight"),
         new OptionalMixinIntegration("alexscaves.", "alexscaves"),
+        new OptionalMixinIntegration("alexscaves.MagneticOrbitVertexMixin", "alexscaves", "embeddium"),
         new OptionalMixinIntegration("alexsmobs.", "alexsmobs"),
         new OptionalMixinIntegration("aquaculture.", "aquaculture"),
         new OptionalMixinIntegration("oculus.", "oculus", "embeddium"),
@@ -109,6 +112,12 @@ public final class FRMCMixinLoadConfig {
 
     public static boolean isIntegrationEnabled(String mixinClassName, Predicate<String> modLoaded) {
         initializeMixinFabricExtras();
+        if (mixinClassName.startsWith(AR_GECKOLIB_MIXINS)) {
+            return useArFallback(modLoaded, "geckolib");
+        }
+        if (mixinClassName.startsWith(AR_MAID_MIXINS)) {
+            return useArFallback(modLoaded, "touhou_little_maid");
+        }
         if (!mixinClassName.startsWith(MIXIN_PACKAGE)) {
             return true;
         }
@@ -152,6 +161,11 @@ public final class FRMCMixinLoadConfig {
         } catch (Throwable ignored) {
             return false;
         }
+    }
+
+    private static boolean useArFallback(Predicate<String> modLoaded, String modelMod) {
+        return modLoaded.test("acceleratedrendering") && modLoaded.test(modelMod)
+                && !modLoaded.test("mixinbooster") && !modLoaded.test("connectormod");
     }
 
     private static boolean isModLoaded(String modId) {

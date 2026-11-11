@@ -51,6 +51,23 @@ class FabricInjectExtensionTest {
     }
 
     @Test
+    void insertsCancellableHeadCallbackBeforeTheFirstOriginalInstruction() throws Exception {
+        ClassNode target = targetClass(true);
+        MethodNode render = findMethod(target, "render");
+        var originalFirst = render.instructions.getFirst();
+        AnnotationNode head = new AnnotationNode(Type.getDescriptor(At.class));
+        head.values = List.of("value", "HEAD");
+        AnnotationNode handler = findMethod(target, HANDLER).visibleAnnotations.get(0);
+        handler.values.set(handler.values.indexOf("at") + 1, List.of(head));
+
+        new FabricInjectExtension().postApply(context(target));
+
+        assertEquals(Opcodes.ACONST_NULL, originalFirst.getOpcode());
+        assertEquals(Opcodes.IFEQ, originalFirst.getPrevious().getPrevious().getPrevious().getOpcode());
+        new Analyzer<>(new BasicInterpreter()).analyze(OWNER, render);
+    }
+
+    @Test
     void emitsNonCancellableCallbackWithoutEarlyReturn() throws Exception {
         ClassNode target = targetClass(false);
 

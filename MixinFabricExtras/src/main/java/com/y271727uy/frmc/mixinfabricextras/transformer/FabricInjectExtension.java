@@ -86,7 +86,7 @@ public final class FabricInjectExtension implements IExtension {
         }
 
         if (matches == 0) {
-            throw new IllegalStateException("@FabricInject found no matching INVOKE in " + targetClass.name + " for " + handler.name);
+            throw new IllegalStateException("@FabricInject found no matching injection point in " + targetClass.name + " for " + handler.name);
         }
         Integer require = annotationValue(annotation, "require", -1);
         Integer allow = annotationValue(annotation, "allow", -1);
@@ -101,8 +101,13 @@ public final class FabricInjectExtension implements IExtension {
     private static int applyAt(ClassNode targetClass, MethodNode targetMethod, MethodNode handler,
                                 AnnotationNode at, String callbackId, boolean cancellable) {
         String value = annotationValue(at, "value");
+        if ("HEAD".equals(value)) {
+            insertCallback(targetClass, targetMethod, handler, callbackId, cancellable,
+                    targetMethod.instructions.getFirst(), true);
+            return 1;
+        }
         if (!"INVOKE".equals(value)) {
-            throw new IllegalArgumentException("@FabricInject currently supports only @At(\"INVOKE\"): " + handler.name);
+            throw new IllegalArgumentException("@FabricInject supports only HEAD and INVOKE: " + handler.name);
         }
         String target = annotationValue(at, "target");
         int ordinal = annotationValue(at, "ordinal", -1);
@@ -122,19 +127,24 @@ public final class FabricInjectExtension implements IExtension {
                 continue;
             }
             AbstractInsnNode insertionPoint = insertionPoint(targetMethod, instruction, shift, by);
-            int local = targetMethod.maxLocals;
-            Type[] arguments = Type.getArgumentTypes(targetMethod.desc);
-            InsnList injected = callback(targetClass, targetMethod, handler, callbackId, cancellable, local, arguments);
-            if (shift == At.Shift.NONE || shift == At.Shift.BEFORE) {
-                targetMethod.instructions.insertBefore(insertionPoint, injected);
-            } else {
-                targetMethod.instructions.insert(insertionPoint, injected);
-            }
-            targetMethod.maxLocals = local + 1;
-            targetMethod.maxStack += local + 4;
+            insertCallback(targetClass, targetMethod, handler, callbackId, cancellable, insertionPoint,
+                    shift == At.Shift.NONE || shift == At.Shift.BEFORE);
             matches++;
         }
         return matches;
+    }
+
+    private static void insertCallback(ClassNode targetClass, MethodNode targetMethod, MethodNode handler,
+                                       String callbackId, boolean cancellable, AbstractInsnNode point, boolean before) {
+        int local = targetMethod.maxLocals++;
+        Type[] arguments = Type.getArgumentTypes(targetMethod.desc);
+        InsnList injected = callback(targetClass, handler, callbackId, cancellable, local, arguments);
+        if (before) {
+            targetMethod.instructions.insertBefore(point, injected);
+        } else {
+            targetMethod.instructions.insert(point, injected);
+        }
+        targetMethod.maxStack += local + 4;
     }
 
     private static AbstractInsnNode insertionPoint(MethodNode method, AbstractInsnNode instruction, At.Shift shift, int by) {
@@ -152,7 +162,7 @@ public final class FabricInjectExtension implements IExtension {
         return point;
     }
 
-    private static InsnList callback(ClassNode targetClass, MethodNode targetMethod, MethodNode handler,
+    private static InsnList callback(ClassNode targetClass, MethodNode handler,
                                      String callbackId, boolean cancellable, int local, Type[] arguments) {
         InsnList injected = new InsnList();
         injected.add(new TypeInsnNode(Opcodes.NEW, Type.getInternalName(CallbackInfo.class)));

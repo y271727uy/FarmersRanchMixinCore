@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.mixin.vinery;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.y271727uy.FRMC.integration.vinery.GrapevinePotCrusherCache;
 import com.y271727uy.frmc.mixinfabricextras.injector.FabricInject;
 import net.minecraft.core.BlockPos;
@@ -14,7 +16,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.world.entity.player.Player;
@@ -51,19 +52,19 @@ public abstract class GrapevinePotBlockMixin extends Block {
         }
     }
 
-    @Redirect(
+    @WrapOperation(
         method = {"use", "m_6227_"},
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;add(Lnet/minecraft/world/item/ItemStack;)Z", remap = true),
         require = 0,
         remap = false
     )
-    private boolean frmc$tagJuice(Inventory inventory, ItemStack output, BlockState state, Level level, BlockPos pos,
+    private boolean frmc$tagJuice(Inventory inventory, ItemStack output, Operation<Boolean> original, BlockState state, Level level, BlockPos pos,
                                    Player player, InteractionHand hand, BlockHitResult hit) {
         String crusher = level.isClientSide ? "" : GrapevinePotCrusherCache.get(level, pos);
         if (!crusher.isEmpty()) {
             output.getOrCreateTag().putString("CrusherName", crusher);
         }
-        boolean added = inventory.add(output);
+        boolean added = original.call(inventory, output);
         if (added && !crusher.isEmpty()) {
             GrapevinePotCrusherCache.clear(level, pos);
         }

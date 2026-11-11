@@ -11,6 +11,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.y271727uy.FRMC.mixin.minecraft.vertex.BufferBuilderAccessorMixin;
+import com.y271727uy.frmc.mixinfabricextras.injector.FabricInject;
 import me.jellysquid.mods.sodium.client.render.vertex.buffer.SodiumBufferBuilder;
 import net.caffeinemc.mods.sodium.api.vertex.buffer.VertexBufferWriter;
 import org.joml.Matrix3f;
@@ -20,6 +21,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import software.bernie.geckolib.cache.object.GeoCube;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.cache.object.GeoQuad;
@@ -39,27 +42,13 @@ public interface GeoRendererMixin {
         }
     }
 
-    /**
-     * @author FRMC
-     * @reason Record the current bone pose for whole-model AR submission.
-     */
-    @Overwrite(remap = false)
-    default void renderCubesOfBone(PoseStack poseStack, GeoBone bone, VertexConsumer buffer, int light,
-                                   int overlay, float red, float green, float blue, float alpha) {
-        if (bone.isHidden()) {
-            return;
-        }
-        GeoRenderer<?> renderer = (GeoRenderer<?>) (Object) this;
-        if (ArIntegration.IS_INSTALLED && GeckoArModelBatch.capture(renderer, poseStack, bone, buffer)) {
-            return;
-        }
-        for (GeoCube cube : bone.getCubes()) {
-            poseStack.pushPose();
-            try {
-                renderer.renderCube(poseStack, cube, buffer, light, overlay, red, green, blue, alpha);
-            } finally {
-                poseStack.popPose();
-            }
+    // Capture before Accelerated Rendering's hook at GeoBone.getCubes().
+    @FabricInject(method = "renderCubesOfBone", at = @At("HEAD"), cancellable = true, remap = false, require = 1)
+    default void frmc$captureBonePose(PoseStack poseStack, GeoBone bone, VertexConsumer buffer, int light,
+                                      int overlay, float red, float green, float blue, float alpha, CallbackInfo ci) {
+        if (ArIntegration.IS_INSTALLED && !bone.isHidden()
+                && GeckoArModelBatch.capture((GeoRenderer<?>) (Object) this, poseStack, bone, buffer)) {
+            ci.cancel();
         }
     }
 

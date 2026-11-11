@@ -1,12 +1,13 @@
 package com.y271727uy.FRMC.mixin.thirst;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.ghen.thirst.content.purity.WaterPurity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
  * 2026/8/20 凌晨1：15
@@ -41,13 +42,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(net.minecraft.world.item.crafting.AbstractCookingRecipe.class)
 public abstract class AbstractCookingRecipeMixin {
 
-    @Redirect(
+    @WrapOperation(
             method = "matches",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getTag()Lnet/minecraft/nbt/CompoundTag;"),
             require = 0
     )
-    private CompoundTag frmc$safeTagLookup(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+    private CompoundTag frmc$safeTagLookup(ItemStack stack, Operation<CompoundTag> original) {
+        CompoundTag tag = original.call(stack);
         if (tag == null && WaterPurity.isWaterFilledContainer(stack)) {
             return new CompoundTag();
         }

@@ -1,6 +1,8 @@
 package com.y271727uy.FRMC.mixin.delighto_flight;
 
 import com.cloudmeow.delightoflight.network.DFNetworking.StartSpinningMessage;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -12,15 +14,14 @@ import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Pseudo
 @Mixin(value = StartSpinningMessage.class, remap = false)
 public abstract class StartSpinningMessageMixin {
-    @Redirect(method = "lambda$handle$0", at = @At(value = "INVOKE",
+    @WrapOperation(method = "lambda$handle$0", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;",
             remap = true))
-    private static BlockEntity frmc$validateStart(ServerLevel level, BlockPos pos, @Local ServerPlayer player) {
+    private static BlockEntity frmc$validateStart(ServerLevel level, BlockPos pos, Operation<BlockEntity> original, @Local ServerPlayer player) {
         if (!player.isAlive() || player.isSpectator() || !player.getMainHandItem().is(Items.STICK)
                 || !player.canReach(pos, 0.0D) || !level.hasChunkAt(pos) || !level.mayInteract(player, pos)) {
             return null;
@@ -30,6 +31,6 @@ public abstract class StartSpinningMessageMixin {
                 || !blockHit.getBlockPos().equals(pos)) {
             return null;
         }
-        return level.getBlockEntity(pos);
+        return original.call(level, pos);
     }
 }

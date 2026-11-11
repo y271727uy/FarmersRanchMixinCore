@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.mixin.alexscaves;
 
 import com.y271727uy.FRMC.integration.alexscaves.MagneticParticleBatch;
+import com.y271727uy.FRMC.integration.alexscaves.RainbowParticleBatch;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,7 +16,8 @@ public abstract class CustomParticleRenderTypeMixin {
     }
 
     @Inject(method = "end", at = @At("HEAD"))
-    private void frmc$submitMagneticParticleBatch(CallbackInfo ci) {
+    private void frmc$submitCustomParticleBatches(CallbackInfo ci) {
+        RainbowParticleBatch.flush();
         MagneticParticleBatch.end();
     }
 }

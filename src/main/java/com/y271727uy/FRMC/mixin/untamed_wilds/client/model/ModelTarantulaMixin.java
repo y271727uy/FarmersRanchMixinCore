@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.mixin.untamed_wilds.client.model;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
 import com.y271727uy.FRMC.integration.diagnostics.EntityRenderDiagnostics;
 import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsBobCache;
@@ -9,7 +11,6 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import untamedwilds.client.model.ModelTarantula;
 import untamedwilds.entity.arthropod.EntityTarantula;
@@ -39,7 +40,7 @@ public abstract class ModelTarantulaMixin {
         EntityRenderDiagnostics.recordTarantula(frmc$diagnosticStart);
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "setupAnim",
             at = @At(
                     value = "INVOKE",
@@ -47,9 +48,9 @@ public abstract class ModelTarantulaMixin {
                     remap = false),
             remap = false)
     private void frmc$cachedBob(AdvancedModelBox part, float speed, float degree, boolean bounce,
-                                float offset, float weight) {
+                                float offset, float weight, Operation<Void> original) {
         if (!UntamedWildsAnimationConfig.isEnabled()) {
-            part.bob(speed, degree, bounce, offset, weight);
+            original.call(part, speed, degree, bounce, offset, weight);
             return;
         }
         UntamedWildsBobCache cache = frmc$bobCache;

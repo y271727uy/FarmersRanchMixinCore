@@ -1,5 +1,6 @@
 package com.y271727uy.FRMC.mixin.delighto_flight;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.y271727uy.FRMC.integration.delighto_flight.AllayChefPathfinding;
 import com.y271727uy.FRMC.integration.delighto_flight.ChefFlightPath;
 import com.y271727uy.FRMC.integration.delighto_flight.ChefWalkTarget;
@@ -19,7 +20,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -72,15 +72,15 @@ public abstract class PathNavigationMixin {
         }
     }
 
-    @Redirect(method = "followThePath", at = @At(value = "INVOKE",
+    @WrapWithCondition(method = "followThePath", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/pathfinder/Path;advance()V"))
-    private void frmc$finishOnlyInsideWorkRange(Path advancing) {
+    private boolean frmc$finishOnlyInsideWorkRange(Path advancing) {
         if (advancing instanceof ChefFlightPath flight && advancing.getNextNodeIndex() == advancing.getNodeCount() - 1
                 && !flight.hasArrived(mob.blockPosition())) {
             // Vanilla's waypoint tolerance can advance while the allay is still a block too low.
-            return;
+            return false;
         }
-        advancing.advance();
+        return true;
     }
 
     @Inject(method = "stop", at = @At("HEAD"))

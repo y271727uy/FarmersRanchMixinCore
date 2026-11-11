@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.mixin.forestry;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -11,13 +13,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 /** Makes Forestry fruit harvested by right-click drop into the world instead of entering the inventory. */
 @Pseudo
 @Mixin(targets = "forestry.arboriculture.blocks.BlockDefaultLeavesFruit", remap = false)
 public abstract class BlockDefaultLeavesFruitHarvestMixin {
-    @Redirect(
+    @WrapOperation(
         method = "m_6227_",
         at = @At(
             value = "INVOKE",
@@ -27,7 +28,7 @@ public abstract class BlockDefaultLeavesFruitHarvestMixin {
         require = 1,
         remap = false
     )
-    private void frmc$dropHarvestedFruit(Player targetPlayer, ItemStack stack,
+    private void frmc$dropHarvestedFruit(Player targetPlayer, ItemStack stack, Operation<Void> original,
                                           BlockState state, Level level, BlockPos pos, Player player,
                                           InteractionHand hand, BlockHitResult hit) {
         if (stack.isEmpty()) {

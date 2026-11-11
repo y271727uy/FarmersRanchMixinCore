@@ -1,5 +1,7 @@
 package com.y271727uy.FRMC.mixin.geckolib.core.animation;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.y271727uy.FRMC.integration.geckolib.animation.AnimationControllerExtension;
 import com.y271727uy.FRMC.integration.geckolib.animation.AnimationQueueManager;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -11,7 +13,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
@@ -44,7 +45,7 @@ public abstract class AnimationControllerMixin<T extends GeoAnimatable> implemen
         this.gbf$queueManager.prepare(this.boneAnimationQueues, bones);
     }
 
-    @Redirect(method = {"process", "processCurrentAnimation"}, at = @At(
+    @WrapOperation(method = {"process", "processCurrentAnimation"}, at = @At(
             value = "INVOKE",
             target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;",
             ordinal = 0
@@ -53,8 +54,8 @@ public abstract class AnimationControllerMixin<T extends GeoAnimatable> implemen
             target = "Lsoftware/bernie/geckolib/core/animation/AnimationController;boneAnimationQueues:Ljava/util/Map;",
             opcode = Opcodes.GETFIELD
     )), remap = false)
-    private Object gbf$trackActiveQueue(Map<?, ?> map, Object key) {
-        Object value = map.get(key);
+    private Object gbf$trackActiveQueue(Map<?, ?> map, Object key, Operation<Object> original) {
+        Object value = original.call(map, key);
 
         if (value instanceof BoneAnimationQueue queue) {
             this.gbf$queueManager.activate(queue);

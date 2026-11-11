@@ -2,6 +2,8 @@ package com.y271727uy.FRMC.mixin.delighto_flight;
 
 import com.cloudmeow.delightoflight.effect.ArcEffect;
 import com.cloudmeow.delightoflight.entity.ElectricCurrentEntity;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +17,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Pseudo
 @Mixin(value = ArcEffect.class, remap = false)
@@ -25,15 +26,15 @@ public abstract class ArcEffectMixin {
     private static final Map<LivingEntity, Integer> FRMC$KNOWN_ARCS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
-    @Redirect(method = {"applyEffectTick(Lnet/minecraft/world/entity/LivingEntity;I)V",
+    @WrapOperation(method = {"applyEffectTick(Lnet/minecraft/world/entity/LivingEntity;I)V",
             "m_6742_(Lnet/minecraft/world/entity/LivingEntity;I)V"},
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/level/Level;getEntitiesOfClass(Ljava/lang/Class;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;",
                     remap = true), require = 1)
     private List<ElectricCurrentEntity> frmc$findOwnedArc(Level level, Class<ElectricCurrentEntity> type,
-                                                         AABB bounds, LivingEntity owner, int amplifier) {
+                                                         AABB bounds, Operation<List<ElectricCurrentEntity>> original, LivingEntity owner, int amplifier) {
         if (!(level instanceof ServerLevel serverLevel)) {
-            return level.getEntitiesOfClass(type, bounds);
+            return original.call(level, type, bounds);
         }
 
         Integer id = FRMC$KNOWN_ARCS.get(owner);
@@ -43,7 +44,7 @@ public abstract class ArcEffectMixin {
             return List.of(arc);
         }
 
-        List<ElectricCurrentEntity> arcs = level.getEntitiesOfClass(type, bounds);
+        List<ElectricCurrentEntity> arcs = original.call(level, type, bounds);
         for (ElectricCurrentEntity arc : arcs) {
             if (frmc$isOwnedBy(arc, owner)) {
                 FRMC$KNOWN_ARCS.put(owner, arc.getId());

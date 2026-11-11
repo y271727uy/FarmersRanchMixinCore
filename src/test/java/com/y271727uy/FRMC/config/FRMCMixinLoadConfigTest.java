@@ -169,6 +169,37 @@ class FRMCMixinLoadConfigTest {
     }
 
     @Test
+    void suppliesGeckoAccelerationOnlyWhenUpstreamMixinsAreGatedOff() {
+        for (String name : Set.of("GeoBoneAccelerationMixin", "GeoRendererAccelerationMixin")) {
+            String mixin = "com.y271727uy.FRMC.mixin.acceleratedrendering.geckolib." + name;
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "geckolib"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "acceleratedrendering"::equals));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "geckolib")::contains));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "geckolib", "mixinbooster")::contains));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "geckolib", "connectormod")::contains));
+        }
+    }
+
+    @Test
+    void suppliesMaidAccelerationIndependentlyOfGeckoLib4() {
+        for (String name : Set.of("GeoBoneAccelerationMixin", "SodiumCompatMixin")) {
+            String mixin = "com.y271727uy.FRMC.mixin.acceleratedrendering.touhoulittlemaid." + name;
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "touhou_little_maid"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "geckolib")::contains));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "touhou_little_maid")::contains));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "touhou_little_maid", "mixinbooster")::contains));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
+                Set.of("acceleratedrendering", "touhou_little_maid", "connectormod")::contains));
+        }
+    }
+
+    @Test
     void keepsUnconditionalServerPlayerMixinEnabled() {
         assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.minecraft.server.ServerPlayerMixin",
