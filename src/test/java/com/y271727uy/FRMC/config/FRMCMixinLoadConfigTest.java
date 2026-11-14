@@ -185,7 +185,7 @@ class FRMCMixinLoadConfigTest {
 
     @Test
     void suppliesMaidAccelerationIndependentlyOfGeckoLib4() {
-        for (String name : Set.of("GeoBoneAccelerationMixin", "SodiumCompatMixin")) {
+        for (String name : Set.of("GeoBoneAccelerationMixin", "SodiumCompatMixin", "IGeoRendererBatchMixin")) {
             String mixin = "com.y271727uy.FRMC.mixin.acceleratedrendering.touhoulittlemaid." + name;
             assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "touhou_little_maid"::equals));
             assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
@@ -196,6 +196,15 @@ class FRMCMixinLoadConfigTest {
                 Set.of("acceleratedrendering", "touhou_little_maid", "mixinbooster")::contains));
             assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin,
                 Set.of("acceleratedrendering", "touhou_little_maid", "connectormod")::contains));
+        }
+    }
+
+    @Test
+    void maidCpuOptimizationsOnlyRequireTouhouLittleMaid() {
+        for (String name : Set.of("AnimationControllerMixin", "MolangValueMixin", "IGeoRendererCullMixin")) {
+            String mixin = "com.y271727uy.FRMC.mixin.touhoulittlemaid." + name;
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "geckolib"::equals));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(mixin, "touhou_little_maid"::equals));
         }
     }
 

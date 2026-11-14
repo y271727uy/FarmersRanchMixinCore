@@ -2,6 +2,7 @@ package com.y271727uy.FRMC.mixin.acceleratedrendering.mesh;
 
 import com.github.argon4w.acceleratedrendering.core.meshes.ServerMesh;
 import com.y271727uy.FRMC.integration.acceleratedrendering.ArModelMeshUpload;
+import com.y271727uy.FRMC.integration.acceleratedrendering.MaidModelBatch;
 import com.y271727uy.FRMC.integration.citadel.render.ar.CitadelGpuMaterialMeshes;
 import com.y271727uy.FRMC.integration.geckolib.renderer.GeckoArModelBatch;
 import net.minecraftforge.fml.loading.LoadingModList;
@@ -23,6 +24,9 @@ public abstract class ServerMeshBuilderCitadelMixin {
         }
         if (mods.getModFileById("geckolib") != null) {
             GeckoArModelBatch.release();
+        }
+        if (mods.getModFileById("touhou_little_maid") != null) {
+            MaidModelBatch.release();
         }
     }
 }

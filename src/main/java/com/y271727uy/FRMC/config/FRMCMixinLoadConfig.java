@@ -23,6 +23,7 @@ public final class FRMCMixinLoadConfig {
     private static final String AR_MAID_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.touhoulittlemaid.";
 
     private static final List<OptionalMixinIntegration> OPTIONAL_MIXIN_INTEGRATIONS = List.of(
+        new OptionalMixinIntegration("touhoulittlemaid.", "touhou_little_maid"),
         new OptionalMixinIntegration("constancy.", "constancy", "modernfix"),
         new OptionalMixinIntegration("minecraft.recipe.deduplicator.farmersdelight.", "farmersdelight"),
         new OptionalMixinIntegration("alexscaves.", "alexscaves"),

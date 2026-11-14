@@ -9,6 +9,7 @@ import com.github.tartaricacid.touhoulittlemaid.compat.sodium.SodiumCompat;
 import com.github.tartaricacid.touhoulittlemaid.geckolib3.geo.animated.AnimatedGeoBone;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.y271727uy.FRMC.integration.acceleratedrendering.MaidModelBatch;
 import net.minecraft.util.FastColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = SodiumCompat.class, remap = false)
 public abstract class SodiumCompatMixin {
-    // The maid renderer calls this after applying the bone pose and glow light.
     @Inject(method = "sodiumRenderCubesOfBone", at = @At("HEAD"), cancellable = true, require = 1)
     private static void frmc$renderAcceleratedBone(AnimatedGeoBone bone, PoseStack poseStack, VertexConsumer buffer,
                                                    int light, int overlay, float red, float green, float blue,
@@ -37,7 +37,9 @@ public abstract class SodiumCompatMixin {
             PoseStack.Pose pose = poseStack.last();
             int color = FastColor.ARGB32.color((int) (alpha * 255), (int) (red * 255),
                     (int) (green * 255), (int) (blue * 255));
-            accelerated.doRender(maidRenderer, bone, pose.pose(), pose.normal(), light, overlay, color);
+            if (!MaidModelBatch.capture(bone, poseStack, buffer, light, overlay, color)) {
+                accelerated.doRender(maidRenderer, bone, pose.pose(), pose.normal(), light, overlay, color);
+            }
         }
         cir.setReturnValue(true);
     }

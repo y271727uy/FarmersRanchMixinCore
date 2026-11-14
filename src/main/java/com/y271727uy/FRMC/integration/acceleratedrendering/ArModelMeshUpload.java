@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 
 import static org.lwjgl.opengl.GL45C.*;
 
-/** Dense AR upload for meshes whose source vertices select different bone poses. */
 public final class ArModelMeshUpload {
     public static final int VERTEX_BYTES = 36;
     private static final int OVERLAY_OFFSET = 24;
