@@ -47,6 +47,7 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("alexscaves.MagneticOrbitVertexMixin", "alexscaves", "embeddium"),
         new OptionalMixinIntegration("alexsmobs.", "alexsmobs"),
         new OptionalMixinIntegration("aquaculture.", "aquaculture"),
+        new OptionalMixinIntegration("architectury.", "architectury"),
         new OptionalMixinIntegration("oculus.", "oculus", "embeddium"),
         new OptionalMixinIntegration("acceleratedrendering.render.RendererBoarLodMixin", "acceleratedrendering", "citadel", "untamedwilds"),
         new OptionalMixinIntegration("acceleratedrendering.render.LevelRendererCitadelMixin", "acceleratedrendering", "citadel"),

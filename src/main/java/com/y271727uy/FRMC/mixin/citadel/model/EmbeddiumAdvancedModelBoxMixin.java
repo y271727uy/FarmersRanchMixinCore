@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class EmbeddiumAdvancedModelBoxMixin {
     @Shadow public ObjectList<?> cubeList;
     @Unique private CitadelEmbeddiumRenderer.Geometry frmc$geometry;
+    @Unique private boolean frmc$geometryFailed;
 
     @Inject(method = "doRender", at = @At("HEAD"), cancellable = true, remap = false)
     private void frmc$renderWithEmbeddium(PoseStack.Pose pose, VertexConsumer buffer,
@@ -29,12 +30,22 @@ public abstract class EmbeddiumAdvancedModelBoxMixin {
         if (CitadelEmbeddiumConfig.isDirectWriterEnabled()
                 && CitadelEmbeddiumRenderer.isSupported(buffer)
                 && !CitadelEmbeddiumRenderer.isArAccelerated(buffer)) {
+            if (frmc$geometryFailed) {
+                return;
+            }
+            if (frmc$geometry == null || !frmc$geometry.matchesCubes(cubeList)) {
+                try {
+                    frmc$geometry = CitadelEmbeddiumRenderer.snapshot(cubeList.toArray(), true);
+                } catch (RuntimeException | LinkageError ignored) {
+                    // 读不出几何就交还给 Citadel 自己的提交路径，不再重试。
+                    frmc$geometry = null;
+                    frmc$geometryFailed = true;
+                    return;
+                }
+            }
             callback.cancel();
             int color = ARGB32.color((int) (alpha * 255.0F), (int) (red * 255.0F),
                     (int) (green * 255.0F), (int) (blue * 255.0F));
-            if (frmc$geometry == null || !frmc$geometry.matchesCubes(cubeList)) {
-                frmc$geometry = CitadelEmbeddiumRenderer.snapshot(cubeList.toArray(), true);
-            }
             CitadelEmbeddiumRenderer.render(frmc$geometry, pose, buffer, packedLight, packedOverlay, color);
         }
     }

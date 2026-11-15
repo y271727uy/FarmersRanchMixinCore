@@ -46,6 +46,15 @@ public final class Config {
     /** Omits small projected details on compatible Citadel material batches. */
     public static volatile boolean citadelGeneralLodEnabled = false;
 
+    /**
+     * On-screen height in pixels below which a Citadel entity animates once per tick instead of once per frame.
+     * 0 disables the pose hold.
+     */
+    public static volatile int citadelPoseHoldPixels = 0;
+
+    /** Resets Citadel models to their default pose from a cached part array instead of a fresh list per call. */
+    public static volatile boolean citadelCachedDefaultPoseEnabled = false;
+
     public static boolean recipeSearchEnabled = true;
 
     /** Restricts indexed searches to vanilla RecipeTypes; disabled by default to match the generic search scope. */

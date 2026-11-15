@@ -35,6 +35,8 @@ public final class EntityRenderDiagnosticsConfig {
                 properties.setProperty("partCulling", "false");
                 properties.setProperty("boarLod", "false");
                 properties.setProperty("generalLod", "false");
+                properties.setProperty("poseHoldPixels", "0");
+                properties.setProperty("cachedDefaultPose", "false");
                 try (OutputStream output = Files.newOutputStream(path)) {
                     properties.store(output, "FRMC UW/Citadel/AR render diagnostics");
                 }
@@ -84,5 +86,17 @@ public final class EntityRenderDiagnosticsConfig {
         Config.citadelGeneralLodEnabled = Boolean.parseBoolean(
                 properties.getProperty("generalLod", "false").trim()
         );
+        Config.citadelPoseHoldPixels = parsePixels(properties.getProperty("poseHoldPixels", "0"));
+        Config.citadelCachedDefaultPoseEnabled = Boolean.parseBoolean(
+                properties.getProperty("cachedDefaultPose", "false").trim()
+        );
+    }
+
+    private static int parsePixels(String value) {
+        try {
+            return Math.max(0, Math.min(512, Integer.parseInt(value.trim())));
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
     }
 }
