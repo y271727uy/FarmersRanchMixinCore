@@ -19,6 +19,23 @@ public final class FRMCMixinLoadConfig {
     private static final String FASTCHUNKGEN_DFU_MIXIN = "fastchunkgen.TypeMixin";
     private static final String FASTCHUNKGEN_DFU_TARGET = "com.misanthropy.fastchunkgen.base.common.util.CFUtil";
     private static final String OCULUS_ENTITY_MIXIN = MIXIN_PACKAGE + "oculus.EmbeddiumEntityRenderMixin";
+    /** Emberbium 自带这些功能（modid 同为 embeddium），检测到它自己的实现类就不再重复注入。 */
+    private static final String EMBEDDIUM_GUI_MIXINS = "embeddium.gui.";
+    private static final String EMBERBIUM_GUI_ANIMATION = "org.embeddedt.embeddium.gui.animation.Animation";
+    private static final String EMBEDDIUM_FADE_MIXINS = "embeddium.fade.";
+    private static final String EMBERBIUM_CHUNK_FADE_IN = "org.embeddedt.embeddium.render.chunk.ChunkFadeIn";
+    private static final String EMBEDDIUM_PERF_MIXINS = "embeddium.perf.";
+    /** 阴影更新间隔的注入点只在 Oculus 1.8.0 上核对过；Emberlens（modid 同为 oculus）自带该功能。 */
+    private static final String OCULUS_SHADOW_MIXINS = MIXIN_PACKAGE + "oculus.shadow.";
+    private static final String EMBERLENS_PASS_TIMERS = "net.irisshaders.iris.pipeline.PassTimers";
+    private static final String EMBERBIUM_RADIX_SORT = "me.jellysquid.mods.sodium.client.util.sorting.RadixSort";
+    private static final List<String> XAERO_PERFORMANCE_MIXINS = List.of(
+        MIXIN_PACKAGE + "xaero.worldmap.RegionTextureHeightArrayMixin",
+        MIXIN_PACKAGE + "xaero.worldmap.RegionTextureUploadMixin",
+        MIXIN_PACKAGE + "xaero.worldmap.MapLimiterPollingMixin",
+        MIXIN_PACKAGE + "xaero.worldmap.MapWriterLayerMarksMixin",
+        MIXIN_PACKAGE + "xaero.worldmap.TextureUploadBenchmarkMixin"
+    );
     private static final String AR_GECKOLIB_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.geckolib.";
     private static final String AR_MAID_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.touhoulittlemaid.";
 
@@ -40,6 +57,7 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("braziliandelight.", "braziliandelight"),
         new OptionalMixinIntegration("blueprint.", "blueprint", "neapolitan", "regions_unexplored"),
         new OptionalMixinIntegration("chloride.", "chloride"),
+        new OptionalMixinIntegration("embeddium.", "embeddium"),
         new OptionalMixinIntegration("citadel.model.Embeddium", "citadel", "embeddium"),
         new OptionalMixinIntegration("citadel.", "citadel"),
         new OptionalMixinIntegration("delighto_flight.", "delighto_flight"),
@@ -103,16 +121,29 @@ public final class FRMCMixinLoadConfig {
 
     /** Whether an optional integration mixin may load, based on the runtime mod list. */
     public static boolean isIntegrationEnabled(String mixinClassName) {
+        if (XAERO_PERFORMANCE_MIXINS.contains(mixinClassName)) {
+            return isModVersion("xaeroworldmap", "1.45.0")
+                && isIntegrationEnabled(mixinClassName, FRMCMixinLoadConfig::isModLoaded);
+        }
         if (OCULUS_ENTITY_MIXIN.equals(mixinClassName)) {
             return isModVersion("oculus", "1.8.0")
                 && isModVersion("embeddium", "0.3.31+mc1.20.1")
                 && !isModLoaded("bendylib");
+        }
+        if (mixinClassName.startsWith(OCULUS_SHADOW_MIXINS)) {
+            return isModVersion("oculus", "1.8.0")
+                && isModLoaded("embeddium")
+                && !isClassPresent(EMBERLENS_PASS_TIMERS);
         }
         return isIntegrationEnabled(mixinClassName, FRMCMixinLoadConfig::isModLoaded);
     }
 
     public static boolean isIntegrationEnabled(String mixinClassName, Predicate<String> modLoaded) {
         initializeMixinFabricExtras();
+        if (XAERO_PERFORMANCE_MIXINS.contains(mixinClassName)
+                && modLoaded.test("collections_of_optimizations")) {
+            return false;
+        }
         if (mixinClassName.startsWith(AR_GECKOLIB_MIXINS)) {
             return useArFallback(modLoaded, "geckolib");
         }
@@ -147,6 +178,15 @@ public final class FRMCMixinLoadConfig {
             if (!modLoaded.test(requiredModId)) {
                 return false;
             }
+        }
+        if (relativeMixinName.startsWith(EMBEDDIUM_GUI_MIXINS) && isClassPresent(EMBERBIUM_GUI_ANIMATION)) {
+            return false;
+        }
+        if (relativeMixinName.startsWith(EMBEDDIUM_FADE_MIXINS) && isClassPresent(EMBERBIUM_CHUNK_FADE_IN)) {
+            return false;
+        }
+        if (relativeMixinName.startsWith(EMBEDDIUM_PERF_MIXINS) && isClassPresent(EMBERBIUM_RADIX_SORT)) {
+            return false;
         }
         if (VIETNAM_WORM_MIXIN.equals(relativeMixinName) && !isClassPresent(VIETNAM_WORM_TARGET)) {
             return false;

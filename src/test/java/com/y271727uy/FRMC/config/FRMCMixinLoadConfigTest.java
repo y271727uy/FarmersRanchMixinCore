@@ -80,6 +80,21 @@ class FRMCMixinLoadConfigTest {
     }
 
     @Test
+    void xaeroPerformancePatchesYieldToTheOptimizationCollection() {
+        String prefix = "com.y271727uy.FRMC.mixin.xaero.worldmap.";
+        for (String name : Set.of("RegionTextureHeightArrayMixin", "RegionTextureUploadMixin",
+                "MapLimiterPollingMixin", "MapWriterLayerMarksMixin", "TextureUploadBenchmarkMixin")) {
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + name, mod -> false));
+            assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + name, "xaeroworldmap"::equals));
+            assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + name,
+                    Set.of("xaeroworldmap", "collections_of_optimizations")::contains));
+        }
+        // Our existing map UI integration must remain usable alongside that mod.
+        assertTrue(FRMCMixinLoadConfig.isIntegrationEnabled(prefix + "GuiMapMixin",
+                Set.of("xaeroworldmap", "collections_of_optimizations")::contains));
+    }
+
+    @Test
     void mapsWorldMapAndMinimapMixinsIndependently() {
         assertFalse(FRMCMixinLoadConfig.isIntegrationEnabled(
             "com.y271727uy.FRMC.mixin.xaero.worldmap.GuiMapMixin",

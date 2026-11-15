@@ -27,7 +27,7 @@ public final class EntityRenderDiagnosticsConfig {
                 properties.setProperty("soaShadow", "false");
                 properties.setProperty("batchValidation", "false");
                 properties.setProperty("gpuPoseValidation", "false");
-                properties.setProperty("gpuPoseRendering", "false");
+                properties.setProperty("gpuPoseRendering", "true");
                 properties.setProperty("gpuGeneralModels", "false");
                 properties.setProperty("gpuModelBatching", "true");
                 properties.setProperty("bottomFaceProbe", "false");
@@ -61,7 +61,7 @@ public final class EntityRenderDiagnosticsConfig {
                 properties.getProperty("gpuPoseValidation", "false").trim()
         );
         Config.citadelGpuPoseRenderingEnabled = Boolean.parseBoolean(
-                properties.getProperty("gpuPoseRendering", "false").trim()
+                properties.getProperty("gpuPoseRendering", "true").trim()
         );
         Config.citadelGpuGeneralModelsEnabled = Boolean.parseBoolean(
                 properties.getProperty("gpuGeneralModels", "false").trim()

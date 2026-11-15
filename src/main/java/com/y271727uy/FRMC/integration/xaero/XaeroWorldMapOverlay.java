@@ -57,7 +57,9 @@ final class XaeroWorldMapOverlay {
         int visible = 0;
         LumenizedChunkLightProbe.refresh();
         graphics.enableScissor(0, 0, screen.width, screen.height);
+        int batchOwnership = 0;
         try {
+            batchOwnership = XaeroOverlayBatch.begin(graphics);
             for (ChunkPressureEntry entry : snapshot.entries()) {
                 if (!dimension.equals(entry.dimension())) {
                     continue;
@@ -76,7 +78,8 @@ final class XaeroWorldMapOverlay {
                         + (rightWorld - cameraX) * pixelsPerBlock);
                 int bottom = (int) Math.ceil(screen.height * 0.5D
                         + (bottomWorld - cameraZ) * pixelsPerBlock);
-                if (right <= left || bottom <= top) {
+                if (right <= left || bottom <= top || right <= 0 || bottom <= 0
+                        || left >= screen.width || top >= screen.height) {
                     continue;
                 }
                 visible++;
@@ -87,7 +90,11 @@ final class XaeroWorldMapOverlay {
                 }
             }
         } finally {
-            graphics.disableScissor();
+            try {
+                XaeroOverlayBatch.end(graphics, batchOwnership);
+            } finally {
+                graphics.disableScissor();
+            }
         }
 
         if (hovered != null) {

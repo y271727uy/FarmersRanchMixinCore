@@ -3,6 +3,7 @@ package com.y271727uy.FRMC;
 import com.mojang.logging.LogUtils;
 import com.y271727uy.FRMC.client.modelgap.ModelGapFixConfig;
 import com.y271727uy.FRMC.integration.citadel.render.embeddium.CitadelEmbeddiumConfig;
+import com.y271727uy.FRMC.integration.embeddium.EmbeddiumPortConfig;
 import com.y271727uy.FRMC.client.FRMCClientSetup;
 import com.y271727uy.FRMC.integration.manors_bounty.ManorsBountyIntegration;
 import com.y271727uy.FRMC.integration.mooncakedelight.MooncakeDelightCroptopiaIntegration;
@@ -70,7 +71,9 @@ public class FRMCMod {
         System.setProperty("frmc.smoothboot.ioPriority", Integer.toString(smoothBootConfig.threadPriority.io));
         System.setProperty("frmc.smoothboot.modLoading", Integer.toString(smoothBootConfig.threadPriority.modLoading));
         ModelGapFixConfig.register();
+        com.y271727uy.FRMC.integration.xaero.XaeroPerformanceConfig.register();
         CitadelEmbeddiumConfig.register();
+        EmbeddiumPortConfig.register();
         UntamedWildsFriendlyFireConfig.register();
         UntamedWildsAnimationConfig.register();
         EntityRenderDiagnosticsConfig.load();
@@ -81,6 +84,9 @@ public class FRMCMod {
         ManorsBountyIntegration.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(VineryGrapejuiceTooltip.class);
         MinecraftForge.EVENT_BUS.register(DisplayWinePlacementHandler.class);
+        if (ModList.get().isLoaded("citadel")) {
+            MinecraftForge.EVENT_BUS.register(com.y271727uy.FRMC.integration.citadel.tick.ServerLeakGuard.INSTANCE);
+        }
         if (ModList.get().isLoaded("farm_and_charm")) {
             MinecraftForge.EVENT_BUS.register(FeedingTroughInteractionHandler.class);
         }

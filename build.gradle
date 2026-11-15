@@ -253,7 +253,7 @@ dependencies {
     modImplementation 'ftb-teams:ftb-teams-forge-2001.3.1'
     modImplementation 'item-filters:item-filters-forge-2001.1.0-build.59'
     modImplementation 'acceleratedrecoiling:acceleratedrecoiling-20.1.12-alpha-all' //这个是加速碰撞
-    modCompileOnly 'AsyncParticles:AsyncParticles-2.0.0-beta.4+1.20.1'  //这个才是异步粒子
+    modCompileOnly 'AsyncParticles:AsyncParticles-20.1.4.6-1.20.1'  //这个才是异步粒子
     modImplementation 'twilightforest:twilightforest-1.20.1-4.3.2508-universal'
     modCompileOnly 'entity_model_features:entity_model_features_1.20.1-forge-3.2.2'  //实体模型特性
     modCompileOnly 'entity_texture_features:entity_texture_features_1.20.1-forge-7.1'  //实体纹理特性

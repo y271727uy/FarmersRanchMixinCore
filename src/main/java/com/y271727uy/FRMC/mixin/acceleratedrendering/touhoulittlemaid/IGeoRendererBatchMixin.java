@@ -14,7 +14,11 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(value = GeoReplacedEntityRenderer.class, remap = false)
 public abstract class IGeoRendererBatchMixin {
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target =
+    // The six-argument render overload only forwards; the model draw is in this overload.
+    @WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;"
+            + "Lcom/github/tartaricacid/touhoulittlemaid/geckolib3/core/AnimatableEntity;FF"
+            + "Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At(value = "INVOKE", target =
             "Lcom/github/tartaricacid/touhoulittlemaid/geckolib3/geo/GeoReplacedEntityRenderer;render("
             + "Lcom/github/tartaricacid/touhoulittlemaid/geckolib3/geo/animated/AnimatedGeoModel;"
             + "Ljava/lang/Object;FLnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack;"

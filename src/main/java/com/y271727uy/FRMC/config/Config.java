@@ -22,8 +22,8 @@ public final class Config {
     /** Runs a one-shot GPU pose comparison when entity render diagnostics are enabled. */
     public static boolean citadelGpuPoseValidationEnabled = false;
 
-    /** Uses the experimental Citadel GPU pose path. */
-    public static volatile boolean citadelGpuPoseRenderingEnabled = false;
+    /** Uses the Citadel GPU pose path: one whole-model submission instead of one per bone. */
+    public static volatile boolean citadelGpuPoseRenderingEnabled = true;
 
     /** Extends GPU pose rendering to other compatible Citadel models with a merged material mesh. */
     public static volatile boolean citadelGpuGeneralModelsEnabled = false;

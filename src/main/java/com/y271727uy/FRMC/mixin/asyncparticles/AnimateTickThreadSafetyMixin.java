@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Pseudo
 @Mixin(targets = "forge.fun.qu_an.minecraft.asyncparticles.client.config.ConfigHelper", remap = false)
 public abstract class AnimateTickThreadSafetyMixin {
-    @Inject(method = "asyncBlockEntityAnimate()Z", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "isAsyncAnimateTick()Z", at = @At("HEAD"), cancellable = true, require = 1, remap = false)
     private static void frmc$disableAsyncWorldAnimation(CallbackInfoReturnable<Boolean> callbackInfo) {
         callbackInfo.setReturnValue(false);
     }
