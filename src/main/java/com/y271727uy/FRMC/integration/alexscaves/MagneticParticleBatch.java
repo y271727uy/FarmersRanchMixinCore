@@ -3,7 +3,6 @@ package com.y271727uy.FRMC.integration.alexscaves;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 
@@ -17,7 +16,7 @@ public final class MagneticParticleBatch {
 
     public static void begin() {
         if (RenderSystem.isOnRenderThread()) {
-            active = !OculusIntegration.IS_IRIS_INSTALLED || !IrisApi.getInstance().isShaderPackInUse();
+            active = !OculusIntegration.isShaderPackInUse();
         }
     }
 

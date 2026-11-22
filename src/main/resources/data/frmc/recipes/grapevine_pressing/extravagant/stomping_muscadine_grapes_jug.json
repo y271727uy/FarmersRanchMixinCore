@@ -1,0 +1,12 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"}
+  ],
+  "ingredient": {"item": "extravagantdelight:muscadine_grapes"},
+  "count": 3,
+  "additive": {"item": "minecraft:sugar"},
+  "container": "extravagantdelight:wooden_jug",
+  "result": {"item": "extravagantdelight:muscadine_grapes_jug", "count": 1}
+}

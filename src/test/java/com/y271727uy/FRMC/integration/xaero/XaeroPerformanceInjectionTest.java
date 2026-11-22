@@ -75,6 +75,59 @@ class XaeroPerformanceInjectionTest {
     }
 
     @Test
+    void minimapLimiterWrapsOnlyOffscreenDrawingAndHasValidResetHooks() throws IOException {
+        ClassNode mixin = readClass("com/y271727uy/FRMC/mixin/xaero/minimap/MinimapFboRefreshMixin");
+        ClassNode target = readClass("xaero/common/minimap/render/MinimapFBORenderer");
+        MethodNode wrapper = mixin.methods.stream()
+                .filter(method -> method.name.equals("frmc$refreshCachedMap")).findFirst().orElseThrow();
+        AnnotationNode wrap = annotations(wrapper).stream()
+                .filter(annotation -> annotation.desc.endsWith("/WrapMethod;")).findFirst().orElseThrow();
+        List<String> selectors = value(wrap, "method");
+        assertEquals(List.of("renderChunksToFBO"), selectors);
+        MethodNode original = target.methods.stream()
+                .filter(method -> method.name.equals(selectors.get(0))).findFirst().orElseThrow();
+        Type[] wrapperArguments = Type.getArgumentTypes(wrapper.desc);
+        assertEquals("Lcom/llamalad7/mixinextras/injector/wrapoperation/Operation;",
+                wrapperArguments[wrapperArguments.length - 1].getDescriptor());
+        Type[] forwardedArguments = java.util.Arrays.copyOf(wrapperArguments, wrapperArguments.length - 1);
+        assertEquals(original.desc, Type.getMethodDescriptor(Type.VOID_TYPE, forwardedArguments));
+
+        MethodNode invalidator = mixin.methods.stream()
+                .filter(method -> method.name.equals("frmc$invalidateCachedMap")).findFirst().orElseThrow();
+        AnnotationNode inject = annotations(invalidator).stream()
+                .filter(annotation -> annotation.desc.endsWith("/Inject;")).findFirst().orElseThrow();
+        List<String> resetMethods = value(inject, "method");
+        assertEquals(3, resetMethods.size());
+        for (String reset : resetMethods) {
+            assertEquals(1L, target.methods.stream().filter(method -> method.name.equals(reset)).count(), reset);
+        }
+        for (var shadow : mixin.fields) {
+            boolean isShadow = shadow.visibleAnnotations != null && shadow.visibleAnnotations.stream()
+                    .anyMatch(annotation -> annotation.desc.endsWith("/Shadow;"));
+            isShadow |= shadow.invisibleAnnotations != null && shadow.invisibleAnnotations.stream()
+                    .anyMatch(annotation -> annotation.desc.endsWith("/Shadow;"));
+            if (isShadow) {
+                assertTrue(target.fields.stream().anyMatch(field -> field.name.equals(shadow.name)
+                        && field.desc.equals(shadow.desc)), "Unresolved shadow field: " + shadow.name);
+            }
+        }
+        // The outer draw must keep executing after the wrapped method. It
+        // restores the main render target and binds the cached rotation texture.
+        MethodNode outer = target.methods.stream().filter(method -> method.name.equals("renderChunks"))
+                .findFirst().orElseThrow();
+        int wrappedCalls = 0;
+        boolean restorationAfterDraw = false;
+        for (var instruction : outer.instructions) {
+            if (instruction instanceof MethodInsnNode call) {
+                if (call.name.equals("renderChunksToFBO") && call.desc.equals(original.desc)) wrappedCalls++;
+                if (wrappedCalls > 0 && call.name.equals("restoreDefaultTarget")) restorationAfterDraw = true;
+            }
+        }
+        assertEquals(1, wrappedCalls);
+        assertTrue(restorationAfterDraw);
+    }
+
+    @Test
     void arBridgeUsesTheInstalledGuiBatchApi() throws IOException {
         ClassNode controller = readClass("com/github/argon4w/acceleratedrendering/features/items/gui/GuiBatchingController");
         assertTrue(controller.methods.stream().anyMatch(method -> method.name.equals("startBatching")

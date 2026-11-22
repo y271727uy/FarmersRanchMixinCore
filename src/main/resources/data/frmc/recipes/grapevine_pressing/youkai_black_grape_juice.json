@@ -1,0 +1,11 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "vinery" },
+    { "type": "forge:mod_loaded", "modid": "youkaishomecoming" }
+  ],
+  "ingredient": { "item": "youkaishomecoming:black_grape" },
+  "count": 5,
+  "container": "minecraft:glass_bottle",
+  "result": { "item": "youkaishomecoming:black_grape_juice" }
+}

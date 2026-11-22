@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "brewincompatdelight:sweet_red_wine", "required": false},
+    {"id": "extravagantdelight:muscadine_wine", "required": false},
+    {"id": "manors_bounty:creme_de_cassis", "required": false},
+    {"id": "youkaishomecoming:van_allen_bottle", "required": false}
+  ]
+}

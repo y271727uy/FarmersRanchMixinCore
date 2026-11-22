@@ -8,6 +8,7 @@ import com.y271727uy.FRMC.client.FRMCClientSetup;
 import com.y271727uy.FRMC.integration.manors_bounty.ManorsBountyIntegration;
 import com.y271727uy.FRMC.integration.mooncakedelight.MooncakeDelightCroptopiaIntegration;
 import com.y271727uy.FRMC.integration.vinery.VineryGrapejuiceTooltip;
+import com.y271727uy.FRMC.integration.kaleidoscopetavern.TavernBarrelWine;
 import com.y271727uy.FRMC.capability.displaywine.DisplayWinePlacementHandler;
 import com.y271727uy.FRMC.integration.farm_and_charm.FeedingTroughInteractionHandler;
 import com.y271727uy.FRMC.config.Config;
@@ -19,6 +20,7 @@ import com.y271727uy.FRMC.network.EntityActivityNetwork;
 import com.y271727uy.FRMC.config.OnlineMusicConfig;
 import com.y271727uy.FRMC.config.FRMCConfigPaths;
 import com.y271727uy.FRMC.config.BlockCheckingConfig;
+import com.y271727uy.FRMC.config.VillagerOptimizationConfig;
 import com.y271727uy.FRMC.config.EntityRenderDiagnosticsConfig;
 import com.y271727uy.FRMC.config.UntamedWildsAnimationConfig;
 import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsFriendlyFireHandler;
@@ -26,6 +28,8 @@ import com.y271727uy.FRMC.integration.untamedwilds.UntamedWildsFriendlyFireConfi
 import com.y271727uy.FRMC.capability.guidance.AiGuidanceLogInjector;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingCommands;
 import com.y271727uy.FRMC.capability.blockchecking.server.BlockCheckingRuntime;
+import com.y271727uy.FRMC.capability.villager.diagnostics.VillagerProfiler;
+import com.y271727uy.FRMC.capability.villager.diagnostics.VillagerProfilerCommands;
 import com.y271727uy.FRMC.capability.data_group.DataGroupInit;
 import com.y271727uy.FRMC.network.BlockCheckingNetwork;
 import com.y271727uy.FRMC.integration.ftbquests.FtbQuestsIntegration;
@@ -80,9 +84,18 @@ public class FRMCMod {
 
         var modEventBus = MooncakeDelightCroptopiaIntegration.getModEventBus();
         AreaCacheDiagnostics.register(modEventBus);
+        com.y271727uy.FRMC.integration.alexsmobs.CreeperPredatorTracker.register();
+        com.y271727uy.FRMC.integration.alexsmobs.AlexsMobsLevelMapRelease.register();
+        com.y271727uy.FRMC.integration.kubejs.KubeJSServerResourcesRelease.register();
+        com.y271727uy.FRMC.integration.xaero.XaeroServerConfigRelease.register();
+        com.y271727uy.FRMC.capability.leak.GhostPlayerSweeper.register();
+        com.y271727uy.FRMC.capability.worldgen.BiomeLookupDiagnostics.register();
         MooncakeDelightCroptopiaIntegration.registerListeners(modEventBus);
         ManorsBountyIntegration.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(VineryGrapejuiceTooltip.class);
+        if (ModList.get().isLoaded("kaleidoscope_tavern")) {
+            MinecraftForge.EVENT_BUS.register(TavernBarrelWine.class);
+        }
         MinecraftForge.EVENT_BUS.register(DisplayWinePlacementHandler.class);
         if (ModList.get().isLoaded("citadel")) {
             MinecraftForge.EVENT_BUS.register(com.y271727uy.FRMC.integration.citadel.tick.ServerLeakGuard.INSTANCE);
@@ -97,10 +110,14 @@ public class FRMCMod {
         EntityActivityConfig.load();
         MobSpawnRateConfig.load();
         BlockCheckingConfig.load();
+        VillagerOptimizationConfig.load();
         MinecraftForge.EVENT_BUS.register(EntityActivityManager.class);
         MinecraftForge.EVENT_BUS.register(UntamedWildsFriendlyFireHandler.class);
         MinecraftForge.EVENT_BUS.register(BlockCheckingRuntime.class);
         MinecraftForge.EVENT_BUS.register(BlockCheckingCommands.class);
+        MinecraftForge.EVENT_BUS.register(VillagerProfiler.class);
+        MinecraftForge.EVENT_BUS.register(com.y271727uy.FRMC.capability.entity.manager.village.VillagerFreezeManager.class);
+        MinecraftForge.EVENT_BUS.register(VillagerProfilerCommands.class);
         DataGroupInit.init();
         FtbQuestsIntegration.register();
         // MinecraftForge.EVENT_BUS.addListener(PrefabStructureReloadListener::onAddReloadListeners);

@@ -35,6 +35,11 @@ public final class ChunkMobPressureTracker {
         return pressure == null ? 0 : pressure.totalMobs();
     }
 
+    /** The pressure entry of one chunk from the latest refresh, or null when it holds no tracked mobs. */
+    public static ChunkPressure pressure(ServerLevel level, long chunkPos) {
+        return PRESSURES.getOrDefault(level, Map.of()).get(chunkPos);
+    }
+
     public static Collection<ChunkPressure> pressures(ServerLevel level) {
         return PRESSURES.getOrDefault(level, Map.of()).values();
     }

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "kaleidoscope_tavern:block/brew/empty_wooden_mug"
+    },
+    "facing=east": {
+      "model": "kaleidoscope_tavern:block/brew/empty_wooden_mug",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "kaleidoscope_tavern:block/brew/empty_wooden_mug",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "kaleidoscope_tavern:block/brew/empty_wooden_mug",
+      "y": 270
+    }
+  }
+}

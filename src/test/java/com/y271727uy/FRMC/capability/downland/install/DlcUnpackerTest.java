@@ -87,6 +87,23 @@ class DlcUnpackerTest {
     }
 
     @Test
+    void installingAgainDoesNotEnableDisabledPack() throws IOException {
+        Path packDir = DlcPaths.packDir(tempDir, "vietnam");
+        Files.createDirectories(packDir);
+        Path marker = packDir.resolve(DlcPaths.DISABLED_MARKER);
+        Files.writeString(marker, "original marker");
+        Path archive = writeZip("vietnam.zip", Map.of("pack.toml", dlcToml("vietnam", "1.0.0")));
+        ParsedDlc dlc = new ParsedDlc("vietnam", "Vietnam", "1.0.0", "", "", "", "", "", "");
+
+        DlcUnpacker.Result result = DlcUnpacker.unpack(archive, "vietnam.zip", dlc, tempDir);
+
+        assertEquals(DlcUnpacker.Result.Status.REJECTED, result.status());
+        assertFalse(Files.exists(DlcPaths.installMarker(packDir)));
+        assertFalse(Files.exists(packDir.resolve("pack.toml")));
+        assertEquals("original marker", Files.readString(marker));
+    }
+
+    @Test
     void incompleteFolderCanBeOverwritten() throws IOException {
         Path packDir = DlcPaths.packDir(tempDir, "vietnam");
         Files.createDirectories(packDir);
@@ -105,7 +122,8 @@ class DlcUnpackerTest {
     void archiveInstallJsonIsReplacedByOurs() throws IOException {
         Path archive = writeZip("vietnam.zip", Map.of(
                 "pack.toml", dlcToml("vietnam", "1.0.0"),
-                "install.json", "{\"id\":\"forged\"}\n"
+                "install.json", "{\"id\":\"forged\"}\n",
+                "unused/../INSTALL.JSON.DISABLED", "forged disabled marker"
         ));
         ParsedDlc dlc = new ParsedDlc("vietnam", "Vietnam", "2.0.0", "", "", "", "", "", "");
 
@@ -114,6 +132,7 @@ class DlcUnpackerTest {
         String marker = Files.readString(DlcPaths.installMarker(DlcPaths.packDir(tempDir, "vietnam")));
         assertTrue(marker.contains("\"version\":\"2.0.0\""));
         assertFalse(marker.contains("forged"));
+        assertFalse(DlcPaths.isDisabled(DlcPaths.packDir(tempDir, "vietnam")));
     }
 
     @Test

@@ -1,0 +1,10 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"}
+  ],
+  "ingredient": {"item": "minecraft:cocoa_beans"},
+  "count": 4,
+  "result": {"item": "minecraft:brown_dye", "count": 6}
+}

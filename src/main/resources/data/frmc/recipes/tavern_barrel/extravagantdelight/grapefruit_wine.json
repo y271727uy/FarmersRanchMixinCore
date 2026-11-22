@@ -1,0 +1,16 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "extravagantdelight" },
+    { "type": "forge:item_exists", "item": "extravagantdelight:grapefruit_wine" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "minecraft:water",
+  "ingredients": [
+    { "item": "extravagantdelight:grapefruit_juice" },
+    { "item": "minecraft:sugar" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "extravagantdelight:grapefruit_wine" },
+  "unit_time": 100
+}

@@ -1,0 +1,12 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"}
+  ],
+  "ingredient": {"item": "extravagantdelight:boiled_quince_pulp"},
+  "count": 1,
+  "additive": {"item": "minecraft:sugar"},
+  "container": "minecraft:glass_bottle",
+  "result": {"item": "extravagantdelight:quince_juice", "count": 1}
+}

@@ -1,0 +1,10 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"}
+  ],
+  "ingredient": {"item": "minecraft:azure_bluet"},
+  "count": 4,
+  "result": {"item": "minecraft:light_gray_dye", "count": 6}
+}

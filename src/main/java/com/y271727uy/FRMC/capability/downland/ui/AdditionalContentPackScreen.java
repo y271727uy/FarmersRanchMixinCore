@@ -3,6 +3,7 @@ package com.y271727uy.FRMC.capability.downland.ui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.y271727uy.FRMC.capability.downland.ContentPackRegistry;
 import com.y271727uy.FRMC.capability.downland.fetch.DlcDownloader;
+import com.y271727uy.FRMC.capability.downland.install.DlcPaths;
 import com.y271727uy.FRMC.capability.downland.install.DlcUnpacker;
 import com.y271727uy.FRMC.capability.downland.scan.DownloadPackEntry;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -25,6 +26,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Size2i;
 import net.minecraftforge.fml.loading.StringUtils;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +54,7 @@ public final class AdditionalContentPackScreen extends Screen {
     private List<ContentPack> packs;
     private Button downloadButton;
     private Button installButton;
+    private Button toggleButton;
     private Button doneButton;
     private EditBox search;
     private String lastFilterText = "";
@@ -60,6 +63,7 @@ public final class AdditionalContentPackScreen extends Screen {
     private Component installMessage;
     private CompletableFuture<DlcDownloader.Result> pendingDownload;
     private String downloadingPackId;
+    private boolean downloading;
 
     public AdditionalContentPackScreen(Screen parentScreen) {
         this(
@@ -105,6 +109,10 @@ public final class AdditionalContentPackScreen extends Screen {
         installButton = Button.builder(Component.translatable("frmc.additional_content_pack.install"), button -> installSelected())
                 .bounds(6, y, this.listWidth, 20)
                 .build();
+        int installWidth = listWidth / 2;
+        toggleButton = Button.builder(Component.translatable("frmc.additional_content_pack.disable"), button -> toggleSelected())
+                .bounds(PADDING + installWidth + BUTTON_MARGIN, y, listWidth - installWidth - BUTTON_MARGIN, 20)
+                .build();
 
         y -= 14 + PADDING;
         search = new EditBox(getFontRenderer(), PADDING + 1, y, listWidth - 2, 14,
@@ -127,6 +135,10 @@ public final class AdditionalContentPackScreen extends Screen {
             this.addRenderableWidget(downloadButton);
         } else {
             this.addRenderableWidget(installButton);
+            this.addRenderableWidget(toggleButton);
+            if (selected == null && packList.children().size() == 1) {
+                selected = packList.children().get(0);
+            }
         }
 
         search.setFocused(false);
@@ -155,6 +167,9 @@ public final class AdditionalContentPackScreen extends Screen {
     @Override
     public void tick() {
         pollPendingDownload();
+        if (selected != null && downloading != isDownloading(selected.getPack())) {
+            updateCache();
+        }
         search.tick();
         packList.setSelected(selected);
 
@@ -263,9 +278,21 @@ public final class AdditionalContentPackScreen extends Screen {
                 this.pendingDownload = null;
                 this.downloadingPackId = null;
             } else {
-                this.installMessage = Component.translatable("frmc.additional_content_pack.download.started");
+                this.installMessage = null;
             }
         }
+        updateCache();
+    }
+
+    private void toggleSelected() {
+        if (showDownload || selected == null || !toggleButton.active) {
+            return;
+        }
+        String packId = selected.getPack().id();
+        boolean enable = DlcPaths.isDisabled(ContentPackRegistry.dlcDirectory().resolve(packId));
+        boolean changed = ContentPackRegistry.setEnabled(packId, enable);
+        String successKey = enable ? "frmc.additional_content_pack.enable.ok" : "frmc.additional_content_pack.disable.ok";
+        this.installMessage = Component.translatable(changed ? successKey : "frmc.additional_content_pack.toggle.failed");
         updateCache();
     }
 
@@ -308,10 +335,16 @@ public final class AdditionalContentPackScreen extends Screen {
         return Component.translatable("frmc.additional_content_pack.download.ok");
     }
 
+    private static boolean isDownloading(ContentPack pack) {
+        return pack.valid() && ContentPackRegistry.isDownloading(pack.id());
+    }
+
     private void updateCache() {
         if (selected == null) {
             this.downloadButton.active = false;
             this.installButton.active = false;
+            this.toggleButton.visible = false;
+            this.toggleButton.active = false;
             if (showDownload && unsortedPacks.isEmpty()) {
                 packInfo.setInfo(List.of(Component.translatable("frmc.additional_content_pack.empty").getString()), null, new Size2i(0, 0));
             } else if (showDownload) {
@@ -324,16 +357,26 @@ public final class AdditionalContentPackScreen extends Screen {
 
         ContentPack pack = selected.getPack();
         this.downloadButton.active = showDownload && pack.hasDownload();
-        boolean downloading = ContentPackRegistry.isDownloading(pack.id())
-                || (pendingDownload != null && !pendingDownload.isDone());
-        this.installButton.active = !showDownload && pack.valid() && !downloading;
-        if (installMessage == null && downloading) {
-            this.installMessage = Component.translatable("frmc.additional_content_pack.download.started");
+        this.downloading = isDownloading(pack);
+        boolean installed = false;
+        boolean disabled = false;
+        if (!showDownload && pack.valid()) {
+            Path packDir = ContentPackRegistry.dlcDirectory().resolve(pack.id());
+            disabled = DlcPaths.isDisabled(packDir);
+            installed = disabled || DlcPaths.isInstalled(packDir);
         }
+        this.installButton.active = !showDownload && pack.valid() && !downloading && !disabled;
+        this.installButton.setWidth(installed ? listWidth / 2 : listWidth);
+        this.toggleButton.visible = installed;
+        this.toggleButton.active = installed && !downloading;
+        this.toggleButton.setMessage(Component.translatable(disabled
+                ? "frmc.additional_content_pack.enable" : "frmc.additional_content_pack.disable"));
 
         List<String> lines = new ArrayList<>();
-        if (installMessage != null) {
-            lines.add(installMessage.getString());
+        Component statusMessage = downloading
+                ? Component.translatable("frmc.additional_content_pack.download.started") : installMessage;
+        if (statusMessage != null) {
+            lines.add(statusMessage.getString());
             lines.add(null);
         }
         lines.add(pack.displayName());
@@ -341,7 +384,12 @@ public final class AdditionalContentPackScreen extends Screen {
             lines.add(Component.translatable("frmc.additional_content_pack.info.file", pack.fileName()).getString());
         }
         if (pack.valid()) {
-            lines.add(Component.translatable("frmc.additional_content_pack.info.status.valid").getString());
+            String statusKey = "frmc.additional_content_pack.info.status.valid";
+            if (installed) {
+                statusKey = disabled ? "frmc.additional_content_pack.info.status.disabled"
+                        : "frmc.additional_content_pack.info.status.enabled";
+            }
+            lines.add(Component.translatable(statusKey).getString());
         } else {
             Component reason = pack.issue() == null
                     ? Component.translatable("frmc.additional_content_pack.invalid")

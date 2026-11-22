@@ -10,7 +10,6 @@ import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.RenderType;
-import net.irisshaders.iris.api.v0.IrisApi;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,7 +28,7 @@ public abstract class AmbersolBlockRendererMixin {
             remap = true))
     private static MultiBufferSource.BufferSource frmc$useShineBuffers(RenderBuffers buffers,
                                                                        Operation<MultiBufferSource.BufferSource> original) {
-        if (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse()) {
+        if (OculusIntegration.isShaderPackInUse()) {
             return original.call(buffers);
         }
         if (frmc$shineBuffers == null) {

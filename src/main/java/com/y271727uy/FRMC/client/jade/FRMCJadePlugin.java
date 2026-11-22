@@ -1,36 +1,88 @@
 package com.y271727uy.FRMC.client.jade;
 
+import com.github.ysbbbbbb.kaleidoscopetavern.blockentity.brew.DrinkBlockEntity;
+import com.github.ysbbbbbb.kaleidoscopetavern.init.ModBlocks;
+import com.github.ysbbbbbb.kaleidoscopetavern.item.BottleBlockItem;
+import com.y271727uy.FRMC.integration.kaleidoscopetavern.TavernBarrelWine;
+import com.y271727uy.FRMC.integration.kaleidoscopetavern.TavernMugs;
+import com.y271727uy.FRMC.integration.vinery.GrapevinePressingBatch;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fml.ModList;
+import net.satisfy.vinery.core.block.GrapevinePotBlock;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.ITooltip;
 import snownee.jade.api.Identifiers;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
+import snownee.jade.api.theme.IThemeHelper;
+import umpaz.farmersrespite.common.block.entity.KettleBlockEntity;
 
-/**
- * 只移除 Farm &amp; Charm 食槽在 Jade 中显示的通用物品存储行。
- *
- * <p>方块名称、模组名称以及其他正常的 Jade 方块信息都会保留。之所以
- * 隐藏物品行，是因为 Farm &amp; Charm 的动物取食目标会直接减少 {@code SIZE}，
- * 可能导致方块实体中保存的 {@code ItemStack} 暂时过期。</p>
- */
 @WailaPlugin("frmc")
 public final class FRMCJadePlugin implements IWailaPlugin {
     private static final String FEEDING_TROUGH_BLOCK_CLASS =
         "net.satisfy.farm_and_charm.core.block.FeedingTroughBlock";
 
-    /** 此兼容修复不需要注册服务端 Jade 提供器。 */
     @Override
     public void register(IWailaCommonRegistration registration) {
+        if (ModList.get().isLoaded("farmersrespite")) {
+            registration.registerFluidStorage(KettleFluidJadeProvider.INSTANCE, KettleBlockEntity.class);
+        }
+        if (ModList.get().isLoaded("vinery")) {
+            registration.registerBlockDataProvider(GrapevinePotJadeProvider.INSTANCE, GrapevinePressingBatch.class);
+        }
     }
 
-    /** 仅对食槽过滤 Jade 的通用物品存储组件。 */
     @Override
     public void registerClient(IWailaClientRegistration registration) {
+        if (ModList.get().isLoaded("farmersrespite")) {
+            registration.registerFluidStorageClient(KettleFluidJadeProvider.INSTANCE);
+        }
+        if (ModList.get().isLoaded("vinery")) {
+            registration.registerBlockComponent(GrapevinePotJadeProvider.INSTANCE, GrapevinePotBlock.class);
+        }
+        if (ModList.get().isLoaded("kaleidoscope_tavern")) {
+            registration.addTooltipCollectedCallback(0, (tooltip, accessor) -> {
+                if (accessor instanceof BlockAccessor block && !block.isFakeBlock()) {
+                    showBarrelDrinkName(tooltip, block);
+                }
+            });
+        }
+
+        // Farm & Charm reduces SIZE when animals eat, which can leave its stored stack stale.
         registration.addTooltipCollectedCallback(0, (tooltip, accessor) -> {
-            if (accessor instanceof snownee.jade.api.BlockAccessor blockAccessor
+            if (accessor instanceof BlockAccessor blockAccessor
                     && blockAccessor.getBlock().getClass().getName().equals(FEEDING_TROUGH_BLOCK_CLASS)) {
                 tooltip.remove(Identifiers.UNIVERSAL_ITEM_STORAGE);
             }
         });
+    }
+
+    private static void showBarrelDrinkName(ITooltip tooltip, BlockAccessor accessor) {
+        boolean glassOrMug = TavernBarrelWine.isCocktailDisplay(accessor.getBlockState())
+            || accessor.getBlock() instanceof TavernMugs.FilledBlock;
+        if ((!glassOrMug && !accessor.getBlockState().is(ModBlocks.WINE.get()))
+                || !(accessor.getBlockEntity() instanceof DrinkBlockEntity bottle)) {
+            return;
+        }
+
+        // The drink block gives the player the last occupied slot on pickup.
+        var items = bottle.getItems();
+        for (int slot = items.size() - 1; slot >= 0; slot--) {
+            ItemStack stack = items.get(slot);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            if ((glassOrMug || stack.is(TavernBarrelWine.OUTPUT)) && !tooltip.get(Identifiers.CORE_OBJECT_NAME).isEmpty()) {
+                tooltip.remove(Identifiers.CORE_OBJECT_NAME);
+                tooltip.add(0, IThemeHelper.get().title(stack.getHoverName()), Identifiers.CORE_OBJECT_NAME);
+                int quality = BottleBlockItem.getBrewLevel(stack);
+                if (quality > 0) {
+                    tooltip.add(1, TavernBarrelWine.qualityLine(quality));
+                }
+            }
+            return;
+        }
     }
 }

@@ -2,7 +2,10 @@ package com.y271727uy.FRMC.mixin.vinery.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.y271727uy.FRMC.capability.displaywine.client.DisplayWineRender;
 import com.y271727uy.FRMC.capability.displaywine.client.DisplayWineSafeState;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.satisfy.vinery.client.render.block.storage.BigBottleRenderer;
@@ -16,6 +19,12 @@ import org.spongepowered.asm.mixin.injection.At;
 @Pseudo
 @Mixin(value = {BigBottleRenderer.class, FourBottleRenderer.class, NineBottleRenderer.class, WineBoxRenderer.class}, remap = false)
 public abstract class SafeBottleRendererMixin {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/item/ItemStack;getItem()Lnet/minecraft/world/item/Item;", remap = true))
+    private Item frmc$displayBottle(ItemStack stack, Operation<Item> original) {
+        return DisplayWineRender.vineryBottleItem(stack, original.call(stack));
+    }
+
     @WrapOperation(
             method = "render",
             at = @At(

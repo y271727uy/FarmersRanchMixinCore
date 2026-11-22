@@ -46,11 +46,11 @@ public final class BlockCheckingConfig {
                 defaultSessionSeconds, BlockCheckingLimits.MAX_SESSION_SECONDS);
         sampleIntervalMillis = bounded(properties, "sample_interval_millis", 25,
                 BlockCheckingLimits.MIN_SAMPLE_INTERVAL_MILLIS, BlockCheckingLimits.MAX_SAMPLE_INTERVAL_MILLIS);
-        chunkSnapshotPeriodTicks = bounded(properties, "chunk_snapshot_period_ticks", 100,
+        chunkSnapshotPeriodTicks = bounded(properties, "chunk_snapshot_period_ticks", 20,
                 BlockCheckingLimits.MIN_CHUNK_SNAPSHOT_PERIOD_TICKS, BlockCheckingLimits.MAX_CHUNK_SNAPSHOT_PERIOD_TICKS);
         chunkDetectionRadius = bounded(properties, "chunk_detection_radius", 6,
                 BlockCheckingLimits.MIN_CHUNK_DETECTION_RADIUS, BlockCheckingLimits.MAX_CHUNK_DETECTION_RADIUS);
-        outputEntryLimit = bounded(properties, "output_entry_limit", 16, 1, BlockCheckingLimits.MAX_OUTPUT_ENTRIES);
+        outputEntryLimit = bounded(properties, "output_entry_limit", 32, 1, BlockCheckingLimits.MAX_OUTPUT_ENTRIES);
     }
 
     public static boolean enabled() { return enabled; }

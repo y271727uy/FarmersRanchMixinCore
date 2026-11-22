@@ -4,7 +4,6 @@ import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
 import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import org.joml.Matrix4f;
@@ -34,7 +33,7 @@ public final class CitadelModelLod {
 
     static boolean activeFor(Object model) {
         return worldEntity && model == baseModel
-                && !(OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse());
+                && !OculusIntegration.isShaderPackInUse();
     }
 
     boolean canReduce(Plan plan, BasicModelPart[] nodes, int[] parents, Matrix4f base) {

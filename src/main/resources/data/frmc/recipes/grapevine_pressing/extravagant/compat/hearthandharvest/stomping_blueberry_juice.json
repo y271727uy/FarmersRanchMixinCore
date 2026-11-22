@@ -1,0 +1,13 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"},
+    {"type": "forge:mod_loaded", "modid": "hearthandharvest"}
+  ],
+  "ingredient": {"item": "hearthandharvest:blueberries"},
+  "count": 1,
+  "additive": {"item": "minecraft:sugar"},
+  "container": "minecraft:glass_bottle",
+  "result": {"item": "hearthandharvest:blueberry_juice", "count": 1}
+}

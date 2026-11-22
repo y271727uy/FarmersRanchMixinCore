@@ -1,0 +1,12 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"},
+    {"type": "forge:mod_loaded", "modid": "fruitsdelight"}
+  ],
+  "ingredient": {"item": "fruitsdelight:kiwi"},
+  "count": 2,
+  "container": "minecraft:glass_bottle",
+  "result": {"item": "fruitsdelight:kiwi_juice", "count": 1}
+}

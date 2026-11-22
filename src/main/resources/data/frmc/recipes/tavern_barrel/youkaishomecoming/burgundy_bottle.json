@@ -1,0 +1,14 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "youkaishomecoming" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "youkaishomecoming:black_grape_juice",
+  "ingredients": [
+    { "item": "minecraft:sweet_berries" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "youkaishomecoming:burgundy_bottle", "count": 4 },
+  "unit_time": 1200
+}

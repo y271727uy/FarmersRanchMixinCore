@@ -7,11 +7,9 @@ import com.y271727uy.FRMC.capability.displaywine.DisplayWineBottles;
 import com.y271727uy.FRMC.capability.displaywine.DisplayWinePlaceholders;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Pseudo
-@Mixin(targets = "coffee.cypher.kaleidoscope_tavern.common.block.BarCabinetBlock", remap = false)
+@Mixin(value = BarCabinetBlock.class, remap = false)
 public abstract class BarCabinetBlockMixin {
     @ModifyReturnValue(method = "getBottleBlock", at = @At("RETURN"), require = 0)
     private BottleBlock frmc$allowTaggedBottles(BottleBlock original, ItemStack stack) {

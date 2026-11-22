@@ -1,0 +1,13 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"},
+    {"type": "forge:mod_loaded", "modid": "fruitsdelight"}
+  ],
+  "ingredient": {"item": "fruitsdelight:pear"},
+  "count": 1,
+  "additive": {"item": "minecraft:sugar"},
+  "container": "minecraft:glass_bottle",
+  "result": {"item": "fruitsdelight:pear_juice", "count": 1}
+}

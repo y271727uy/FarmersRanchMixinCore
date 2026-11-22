@@ -1,0 +1,12 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"},
+    {"type": "forge:mod_loaded", "modid": "fruitsdelight"}
+  ],
+  "ingredient": {"item": "fruitsdelight:bayberry"},
+  "count": 2,
+  "container": "minecraft:glass_bottle",
+  "result": {"item": "fruitsdelight:bayberry_soup", "count": 1}
+}

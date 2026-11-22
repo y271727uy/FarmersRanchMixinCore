@@ -1,0 +1,104 @@
+/*
+ * Ported from BiomeSpy 1.3.3 for Minecraft 1.20.1.
+ * Copyright (c) 2025 MoePus
+ *
+ * This file is licensed under the GNU Lesser General Public License, version 3 or later.
+ * See third_party/BiomeSpy-NOTICE.txt and third_party/BiomeSpy-LICENSE.txt.
+ *
+ * Modified for FRMC: package names, mixin wiring and the removals listed in the NOTICE.
+ */
+package com.y271727uy.FRMC.mixin.minecraft.worldgen.locate;
+
+import com.y271727uy.FRMC.capability.worldgen.locate.BiomeEnvelope;
+import com.y271727uy.FRMC.integration.terrablender.locate.IParameterListExtendedInfo;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import terrablender.api.Region;
+import terrablender.api.RegionType;
+import terrablender.api.Regions;
+import terrablender.worldgen.IExtendedParameterList;
+
+import java.util.*;
+import java.util.function.BiConsumer;
+
+@Mixin(Climate.ParameterList.class)
+public abstract class ParameterListMixin<T> implements IParameterListExtendedInfo, IExtendedParameterList<T> {
+    @Shadow
+    @Final
+    private List<Pair<Climate.ParameterPoint, T>> values;
+
+    @Unique
+    private boolean biomeSpy$initialized = false;
+
+    @Unique
+    private HashMap<T, BiomeEnvelope> biomeSpy$uniqueTrees[];
+
+    @Override
+    public void biomeSpy$gatherExtendedInfo(RegistryAccess registryAccess, RegionType regionType, long seed) {
+        if (biomeSpy$initialized) return;
+        biomeSpy$initialized = true;
+
+        biomeSpy$uniqueTrees = new HashMap[Regions.getCount(regionType)];
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
+        for (Region region : Regions.get(regionType)) {
+            int regionIndex = Regions.getIndex(regionType, region.getName());
+            if (regionIndex == 0) {
+                HashMap<T, BiomeEnvelope> biomeEnvelopeHashMap = new HashMap<>();
+                for (Pair<Climate.ParameterPoint, T> p : this.values) {
+                    T biome = p.getSecond();
+                    biomeEnvelopeHashMap.computeIfAbsent(biome, k -> new BiomeEnvelope()).add(p.getFirst());
+                }
+                this.biomeSpy$uniqueTrees[0] = biomeEnvelopeHashMap;
+            } else {
+                HashMap<T, BiomeEnvelope> biomeEnvelopeHashMap = new HashMap<>();
+                region.addBiomes(biomeRegistry, (pair) -> {
+                    Optional<Holder.Reference<Biome>> biome = biomeRegistry.getHolder(pair.getSecond());
+                    if (biome.isPresent()) {
+                        Holder<Biome> biomeHolder = biome.get();
+                        biomeEnvelopeHashMap.computeIfAbsent((T) biomeHolder, k -> new BiomeEnvelope()).add(pair.getFirst());
+                    }
+                });
+                this.biomeSpy$uniqueTrees[regionIndex] = biomeEnvelopeHashMap;
+            }
+        }
+    }
+
+    @Override
+    public BiomeEnvelope biomeSpy$getEnvelopeForBiomes(List<Holder<Biome>> biomes, int regionIndex) {
+        BiomeEnvelope combinedEnvelope = new BiomeEnvelope();
+        combinedEnvelope.impossible = true;
+        HashMap<T, BiomeEnvelope> biomeEnvelopeHashMap = this.biomeSpy$uniqueTrees[regionIndex];
+        for (Holder<Biome> biome : biomes) {
+            BiomeEnvelope envelope = biomeEnvelopeHashMap.get((T) biome);
+            if (envelope != null) {
+                combinedEnvelope.add(envelope);
+                combinedEnvelope.impossible = false;
+            }
+        }
+        return combinedEnvelope;
+    }
+
+    @Override
+    public void biomeSpy$visitAllEnvelopes(BiConsumer<Integer, HashMap<Holder<Biome>, BiomeEnvelope>> visitor) {
+        for (int i = 0; i < biomeSpy$uniqueTrees.length; i++) {
+            visitor.accept(i, (HashMap<Holder<Biome>, BiomeEnvelope>)biomeSpy$uniqueTrees[i]);
+        }
+    }
+
+    @Override
+    public boolean biomeSpy$terraBlenderEnabled() {
+        return biomeSpy$initialized;
+    }
+
+    // FRMC: BiomeSpy's public clone() override was dropped. Nothing calls it, ParameterList is not Cloneable,
+    // and TerraBlender 3.0.1.10 does not rely on it.
+}

@@ -64,6 +64,9 @@ public final class DlcUnpacker {
         }
 
         Path packDir = DlcPaths.packDir(gameDir, dlc.id());
+        if (DlcPaths.isDisabled(packDir)) {
+            return Result.rejected(packDir, "pack is disabled");
+        }
         if (DlcPaths.isInstalled(packDir)) {
             return Result.alreadyInstalled(packDir);
         }
@@ -107,27 +110,18 @@ public final class DlcUnpacker {
         var entries = zip.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            if (entry.isDirectory() || isInstallMarker(entry.getName())) {
+            if (entry.isDirectory()) {
                 continue;
             }
             Path dest = resolveInside(packDir, entry.getName());
             if (dest == null) {
                 return null;
             }
-            planned.add(new PlannedFile(entry, dest));
+            if (!DlcPaths.isMarkerPath(packDir, dest)) {
+                planned.add(new PlannedFile(entry, dest));
+            }
         }
         return planned;
-    }
-
-    private static boolean isInstallMarker(String entryName) {
-        if (entryName == null) {
-            return false;
-        }
-        String name = entryName.replace('\\', '/');
-        while (name.startsWith("./")) {
-            name = name.substring(2);
-        }
-        return DlcPaths.INSTALL_MARKER.equals(name);
     }
 
     public static Path resolveInside(Path packDir, String entryName) {

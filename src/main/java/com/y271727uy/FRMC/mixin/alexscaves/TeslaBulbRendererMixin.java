@@ -4,7 +4,6 @@ import com.github.alexmodguy.alexscaves.client.render.blockentity.TelsaBulbBlock
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +18,7 @@ public abstract class TeslaBulbRendererMixin {
             "Lcom/github/alexmodguy/alexscaves/client/render/ACRenderTypes;getTeslaBulb(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;"),
             require = 1)
     private RenderType frmc$reuseBulbType(ResourceLocation texture, Operation<RenderType> original) {
-        if (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse()) {
+        if (OculusIntegration.isShaderPackInUse()) {
             return original.call(texture);
         }
         if (frmc$bulbType == null) {

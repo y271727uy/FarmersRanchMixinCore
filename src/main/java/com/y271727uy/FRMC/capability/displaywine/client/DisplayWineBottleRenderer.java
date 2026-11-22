@@ -72,7 +72,7 @@ public class DisplayWineBottleRenderer implements StorageTypeRenderer {
     }
 
     private static void renderBottle(StorageBlockEntity entity, PoseStack pose, MultiBufferSource buffer, ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem blockItem)) {
+        if (stack.isEmpty() || !(DisplayWineRender.vineryBottleItem(stack, stack.getItem()) instanceof BlockItem blockItem)) {
             return;
         }
         BlockState state = DisplayWineRender.normalize(blockItem.getBlock().defaultBlockState());

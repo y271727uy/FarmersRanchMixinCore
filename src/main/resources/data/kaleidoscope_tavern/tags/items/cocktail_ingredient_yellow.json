@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "brewincompatdelight:peach_wine", "required": false},
+    {"id": "brewincompatdelight:tequila", "required": false},
+    {"id": "brewincompatdelight:white_wine", "required": false},
+    {"id": "extravagantdelight:starfruit_wine", "required": false},
+    {"id": "manors_bounty:champagne", "required": false},
+    {"id": "manors_bounty:starfruit_wine", "required": false},
+    {"id": "manors_bounty:white_wine", "required": false},
+    {"id": "youkaishomecoming:champagne_bottle", "required": false},
+    {"id": "youkaishomecoming:white_wine_bottle", "required": false}
+  ]
+}

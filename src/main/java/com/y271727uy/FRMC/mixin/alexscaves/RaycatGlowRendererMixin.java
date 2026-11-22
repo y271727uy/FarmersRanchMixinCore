@@ -4,7 +4,6 @@ import com.github.alexmodguy.alexscaves.client.render.entity.RaycatRenderer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
@@ -22,7 +21,7 @@ public abstract class RaycatGlowRendererMixin {
             "Lcom/github/alexmodguy/alexscaves/client/render/ACRenderTypes;getRadiationGlow(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;"),
             require = 1)
     private RenderType frmc$reuseBodyGlow(ResourceLocation texture, Operation<RenderType> original) {
-        if (!TEXTURE_BODY.equals(texture) || (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse())) {
+        if (!TEXTURE_BODY.equals(texture) || OculusIntegration.isShaderPackInUse()) {
             return original.call(texture);
         }
         if (frmc$bodyGlow == null) {

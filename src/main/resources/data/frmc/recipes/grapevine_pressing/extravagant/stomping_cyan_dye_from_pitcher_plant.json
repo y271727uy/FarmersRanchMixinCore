@@ -1,0 +1,10 @@
+{
+  "type": "frmc:grapevine_pressing",
+  "conditions": [
+    {"type": "forge:mod_loaded", "modid": "vinery"},
+    {"type": "forge:mod_loaded", "modid": "extravagantdelight"}
+  ],
+  "ingredient": {"item": "minecraft:pitcher_plant"},
+  "count": 4,
+  "result": {"item": "minecraft:cyan_dye", "count": 10}
+}

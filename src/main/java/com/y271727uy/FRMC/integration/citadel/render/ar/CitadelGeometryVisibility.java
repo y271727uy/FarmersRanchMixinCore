@@ -10,7 +10,6 @@ import com.y271727uy.FRMC.integration.citadel.render.ar.CitadelGpuMaterialMeshes
 import com.y271727uy.FRMC.integration.citadel.render.ar.CitadelGpuPoseProgram.BufferBinding;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
 import java.io.IOException;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -77,7 +76,7 @@ public final class CitadelGeometryVisibility {
         if (unavailable || (!requestProbe && !requestCull)) {
             return;
         }
-        if (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse()) {
+        if (OculusIntegration.isShaderPackInUse()) {
             warnTarget("shader pack active");
             return;
         }

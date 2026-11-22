@@ -1,0 +1,15 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "hearthandharvest" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "minecraft:water",
+  "ingredients": [
+    { "item": "hearthandharvest:raspberry_juice" },
+    { "item": "minecraft:sugar" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "hearthandharvest:raspberry_wine" },
+  "unit_time": 1600
+}

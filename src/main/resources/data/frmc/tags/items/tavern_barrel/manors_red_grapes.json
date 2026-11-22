@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "manors_bounty:grape", "required": false },
+    { "id": "#forge:red_grape_two", "required": false }
+  ]
+}

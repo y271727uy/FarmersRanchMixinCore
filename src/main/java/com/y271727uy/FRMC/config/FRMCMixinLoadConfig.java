@@ -29,6 +29,7 @@ public final class FRMCMixinLoadConfig {
     private static final String OCULUS_SHADOW_MIXINS = MIXIN_PACKAGE + "oculus.shadow.";
     private static final String EMBERLENS_PASS_TIMERS = "net.irisshaders.iris.pipeline.PassTimers";
     private static final String EMBERBIUM_RADIX_SORT = "me.jellysquid.mods.sodium.client.util.sorting.RadixSort";
+    private static final String XAERO_MINIMAP_REFRESH_MIXIN = MIXIN_PACKAGE + "xaero.minimap.MinimapFboRefreshMixin";
     private static final List<String> XAERO_PERFORMANCE_MIXINS = List.of(
         MIXIN_PACKAGE + "xaero.worldmap.RegionTextureHeightArrayMixin",
         MIXIN_PACKAGE + "xaero.worldmap.RegionTextureUploadMixin",
@@ -36,6 +37,8 @@ public final class FRMCMixinLoadConfig {
         MIXIN_PACKAGE + "xaero.worldmap.MapWriterLayerMarksMixin",
         MIXIN_PACKAGE + "xaero.worldmap.TextureUploadBenchmarkMixin"
     );
+    /** 只测量的世界生成诊断：默认不织入，由 {@link WorldgenDiagnosticsSwitch} 决定。 */
+    private static final String WORLDGEN_DIAGNOSTICS_MIXINS = MIXIN_PACKAGE + "minecraft.worldgen.diagnostics.";
     private static final String AR_GECKOLIB_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.geckolib.";
     private static final String AR_MAID_MIXINS = MIXIN_PACKAGE + "acceleratedrendering.touhoulittlemaid.";
 
@@ -44,6 +47,8 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("constancy.", "constancy", "modernfix"),
         new OptionalMixinIntegration("minecraft.recipe.deduplicator.farmersdelight.", "farmersdelight"),
         new OptionalMixinIntegration("alexscaves.", "alexscaves"),
+        // 目标是原版 Climate.ParameterList，但实现了 TerraBlender 的接口，必须装了 TerraBlender 才能加载。
+        new OptionalMixinIntegration("minecraft.worldgen.locate.ParameterListMixin", "terrablender"),
         new OptionalMixinIntegration("alexscaves.MagneticOrbitVertexMixin", "alexscaves", "embeddium"),
         new OptionalMixinIntegration("alexsmobs.", "alexsmobs"),
         new OptionalMixinIntegration("aquaculture.", "aquaculture"),
@@ -68,13 +73,24 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("fastchunkgen.", "fastchunkgen"),
         new OptionalMixinIntegration("farm_and_charm.", "farm_and_charm"),
         new OptionalMixinIntegration("farmersdelight.", "farmersdelight"),
+        new OptionalMixinIntegration("farmersrespite.", "farmersrespite"),
+        new OptionalMixinIntegration("farmersrespite.client.jei.", "farmersrespite", "jei"),
         new OptionalMixinIntegration("ftbquests.", "ftbquests"),
         new OptionalMixinIntegration("foragersinsight.", "foragersinsight"),
         new OptionalMixinIntegration("forestry.", "forestry"),
         new OptionalMixinIntegration("fruits_delight.", "fruitsdelight"),
         new OptionalMixinIntegration("geckolib.", "geckolib"),
+        new OptionalMixinIntegration("hearthandharvest.", "hearthandharvest"),
+        new OptionalMixinIntegration("brewinandchewin.client.", "brewinandchewin", "jei"),
+        new OptionalMixinIntegration("brewinandchewin.", "brewinandchewin"),
         new OptionalMixinIntegration("kaleidoscopecookery.", "kaleidoscope_cookery"),
+        new OptionalMixinIntegration("kaleidoscopetavern.brewery.bac.", "kaleidoscope_tavern", "brewery", "brewinandchewin"),
+        new OptionalMixinIntegration("alcocraftplus.", "alcocraftplus", "brewinandchewin"),
+        new OptionalMixinIntegration("yeastnfeast.", "yeastnfeast", "brewinandchewin"),
+        new OptionalMixinIntegration("kaleidoscopetavern.brewery.", "kaleidoscope_tavern", "brewery"),
         new OptionalMixinIntegration("kaleidoscopetavern.vinery.", "kaleidoscope_tavern", "vinery"),
+        new OptionalMixinIntegration("kaleidoscopetavern.client.BarrelRecipeCategoryMixin", "kaleidoscope_tavern", "jei"),
+        new OptionalMixinIntegration("kaleidoscopetavern.client.ShakerRecipeCategoryMixin", "kaleidoscope_tavern", "jei"),
         new OptionalMixinIntegration("kaleidoscopetavern.", "kaleidoscope_tavern"),
         new OptionalMixinIntegration("kubejs.", "kubejs"),
         new OptionalMixinIntegration("manors_bounty.", "manors_bounty"),
@@ -95,7 +111,10 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("sinytra_connector.", "connectormod"),
         new OptionalMixinIntegration("thirst.", "thirst"),
         new OptionalMixinIntegration("untamed_wilds.", "untamedwilds"),
+        // The direct-route check lives in CitadelGroundPath, which also references Citadel's path nodes.
+        new OptionalMixinIntegration("untamed_wilds.TerrestrialPathNavigationMixin", "untamedwilds", "citadel"),
         new OptionalMixinIntegration("unusualfishmod.", "unusualfishmod"),
+        new OptionalMixinIntegration("vietnam_delight.cooking.", "vietnam_delight", "farmersdelight"),
         new OptionalMixinIntegration("vietnam_delight.", "vietnam_delight"),
         new OptionalMixinIntegration("vinery.", "vinery"),
         new OptionalMixinIntegration("xaero.minimap.", "xaerominimap"),
@@ -122,6 +141,10 @@ public final class FRMCMixinLoadConfig {
 
     /** Whether an optional integration mixin may load, based on the runtime mod list. */
     public static boolean isIntegrationEnabled(String mixinClassName) {
+        if (XAERO_MINIMAP_REFRESH_MIXIN.equals(mixinClassName)) {
+            return isModVersion("xaerominimap", "26.4.2")
+                && isIntegrationEnabled(mixinClassName, FRMCMixinLoadConfig::isModLoaded);
+        }
         if (XAERO_PERFORMANCE_MIXINS.contains(mixinClassName)) {
             return isModVersion("xaeroworldmap", "1.45.0")
                 && isIntegrationEnabled(mixinClassName, FRMCMixinLoadConfig::isModLoaded);
@@ -130,6 +153,9 @@ public final class FRMCMixinLoadConfig {
             return isModVersion("oculus", "1.8.0")
                 && isModVersion("embeddium", "0.3.31+mc1.20.1")
                 && !isModLoaded("bendylib");
+        }
+        if (mixinClassName.startsWith(WORLDGEN_DIAGNOSTICS_MIXINS)) {
+            return WorldgenDiagnosticsSwitch.biomeLookupDiagnostics();
         }
         if (mixinClassName.startsWith(OCULUS_SHADOW_MIXINS)) {
             return isModVersion("oculus", "1.8.0")
@@ -141,10 +167,6 @@ public final class FRMCMixinLoadConfig {
 
     public static boolean isIntegrationEnabled(String mixinClassName, Predicate<String> modLoaded) {
         initializeMixinFabricExtras();
-        if (XAERO_PERFORMANCE_MIXINS.contains(mixinClassName)
-                && modLoaded.test("collections_of_optimizations")) {
-            return false;
-        }
         if (mixinClassName.startsWith(AR_GECKOLIB_MIXINS)) {
             return useArFallback(modLoaded, "geckolib");
         }

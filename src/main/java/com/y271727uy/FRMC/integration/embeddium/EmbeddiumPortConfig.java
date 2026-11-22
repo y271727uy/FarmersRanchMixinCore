@@ -14,6 +14,7 @@ public final class EmbeddiumPortConfig {
     public static final ForgeConfigSpec.BooleanValue BLOCK_ENTITY_BOX_CACHE;
     public static final ForgeConfigSpec.BooleanValue SPRITE_MARKING_PER_TICK;
     public static final ForgeConfigSpec.BooleanValue BLOCK_TINT_CACHE;
+    public static final ForgeConfigSpec.BooleanValue SHADER_SOURCE_CACHE;
     public static final ForgeConfigSpec.IntValue SHADOW_UPDATE_INTERVAL;
     public static final ForgeConfigSpec.IntValue CHUNK_UPLOAD_BUDGET_KB;
 
@@ -64,6 +65,13 @@ public final class EmbeddiumPortConfig {
                 "Biome-blended colors (grass, foliage, water) and color providers registered by other mods are never cached."
             )
             .define("block_tint_cache", true);
+        SHADER_SOURCE_CACHE = builder
+            .comment(
+                "Keep each chunk shader source after it is first read instead of reading it again on every renderer reload.",
+                "Embeddium reads these files from mod jars through the class loader, which searches every jar each time;",
+                "their contents cannot change while the game runs, so the cached text is identical."
+            )
+            .define("shader_source_cache", true);
         SHADOW_UPDATE_INTERVAL = builder
             .comment(
                 "With an Oculus shader pack active, render the shadow map once every N frames (1 = every frame).",
@@ -111,6 +119,10 @@ public final class EmbeddiumPortConfig {
 
     public static boolean blockTintCache() {
         return SPEC.isLoaded() && BLOCK_TINT_CACHE.get();
+    }
+
+    public static boolean shaderSourceCache() {
+        return SPEC.isLoaded() && SHADER_SOURCE_CACHE.get();
     }
 
     public static int shadowUpdateInterval() {

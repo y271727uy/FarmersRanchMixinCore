@@ -13,6 +13,7 @@ public final class XaeroPerformanceConfig {
     private static final ForgeConfigSpec.BooleanValue ORPHAN_UPLOAD_PBO;
     private static final ForgeConfigSpec.BooleanValue BATCH_OVERLAY;
     private static final ForgeConfigSpec.IntValue VRAM_POLL_INTERVAL;
+    private static final ForgeConfigSpec.IntValue MINIMAP_REFRESH_FPS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -34,6 +35,11 @@ public final class XaeroPerformanceConfig {
         BATCH_OVERLAY = builder.comment("Batch FRMC's chunk-pressure overlay with Accelerated Rendering's GUI pipeline when available.",
                 "Respects AR's GUI batching options. Does not replace Xaero's own multi-texture renderer.")
                 .define("ar_batch_pressure_overlay", true);
+        MINIMAP_REFRESH_FPS = builder.comment("Maximum minimap off-screen content redraws per second. 0 restores every-frame redraws.",
+                "The cached map texture is still displayed every game frame.",
+                "Terrain, map rotation and radar elements share the FBO, so their motion is capped too.",
+                "World/session, zoom, view size and framebuffer changes bypass this cap.")
+                .defineInRange("minimap_refresh_fps", 60, 0, 1000);
         SPEC = builder.build();
     }
 
@@ -62,6 +68,10 @@ public final class XaeroPerformanceConfig {
 
     public static boolean batchOverlay() {
         return SPEC.isLoaded() && BATCH_OVERLAY.get();
+    }
+
+    public static int minimapRefreshFps() {
+        return SPEC.isLoaded() ? MINIMAP_REFRESH_FPS.get() : 0;
     }
 
     @SuppressWarnings("removal")

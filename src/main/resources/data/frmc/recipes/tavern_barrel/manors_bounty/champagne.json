@@ -1,0 +1,16 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "manors_bounty" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "minecraft:water",
+  "ingredients": [
+    { "item": "manors_bounty:white_wine" },
+    { "item": "minecraft:dragon_breath" },
+    { "item": "minecraft:sugar" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "manors_bounty:champagne" },
+  "unit_time": 6000
+}

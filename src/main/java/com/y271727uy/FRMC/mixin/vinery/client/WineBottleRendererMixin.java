@@ -1,6 +1,7 @@
 package com.y271727uy.FRMC.mixin.vinery.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.y271727uy.FRMC.capability.displaywine.DisplayWineBottles;
 import com.y271727uy.FRMC.capability.displaywine.client.DisplayWineBottleRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.NonNullList;
@@ -30,7 +31,8 @@ public abstract class WineBottleRendererMixin {
             NonNullList<ItemStack> stacks,
             CallbackInfo ci) {
         for (ItemStack stack : stacks) {
-            if (!stack.isEmpty() && !(stack.getItem() instanceof DrinkBlockItem) && stack.getItem() instanceof BlockItem) {
+            if (!stack.isEmpty() && !(stack.getItem() instanceof DrinkBlockItem)
+                    && (stack.getItem() instanceof BlockItem || DisplayWineBottles.isBottle(stack))) {
                 frmc$renderer.render(entity, pose, buffer, stacks);
                 ci.cancel();
                 return;

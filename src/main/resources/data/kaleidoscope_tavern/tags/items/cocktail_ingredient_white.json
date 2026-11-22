@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "brewincompatdelight:moonshine", "required": false},
+    {"id": "manors_bounty:gin", "required": false},
+    {"id": "manors_bounty:sake", "required": false},
+    {"id": "manors_bounty:vodka", "required": false}
+  ]
+}

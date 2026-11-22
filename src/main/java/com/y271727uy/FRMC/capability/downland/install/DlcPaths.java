@@ -11,6 +11,7 @@ import java.nio.file.Path;
 public final class DlcPaths {
     public static final String DIRECTORY_NAME = "dlc";
     public static final String INSTALL_MARKER = "install.json";
+    public static final String DISABLED_MARKER = INSTALL_MARKER + ".disabled";
 
     private DlcPaths() {}
 
@@ -27,7 +28,27 @@ public final class DlcPaths {
     }
 
     public static boolean isInstalled(Path packDir) {
-        return Files.isRegularFile(installMarker(packDir));
+        return Files.isRegularFile(installMarker(packDir)) && !isDisabled(packDir);
+    }
+
+    public static boolean isDisabled(Path packDir) {
+        return Files.isRegularFile(packDir.resolve(DISABLED_MARKER));
+    }
+
+    public static void setEnabled(Path packDir, boolean enabled) throws IOException {
+        Path install = installMarker(packDir);
+        Path disabled = packDir.resolve(DISABLED_MARKER);
+        Path source = enabled ? disabled : install;
+        if (!Files.isRegularFile(source)) {
+            throw new IOException("Missing DLC marker: " + source);
+        }
+        Files.move(source, enabled ? install : disabled);
+    }
+
+    public static boolean isMarkerPath(Path packDir, Path destination) {
+        Path relative = packDir.toAbsolutePath().normalize().relativize(destination);
+        String name = relative.getName(0).toString();
+        return INSTALL_MARKER.equalsIgnoreCase(name) || DISABLED_MARKER.equalsIgnoreCase(name);
     }
 
     public static void ensureRoot(Path gameDir) throws IOException {

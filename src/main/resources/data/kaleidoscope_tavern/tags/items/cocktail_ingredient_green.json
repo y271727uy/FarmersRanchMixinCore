@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "hearthandharvest:green_grape_wine", "required": false},
+    {"id": "manors_bounty:absinthe", "required": false}
+  ]
+}

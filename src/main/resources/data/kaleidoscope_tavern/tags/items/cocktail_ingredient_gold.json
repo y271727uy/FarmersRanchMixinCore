@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "extravagantdelight:mango_wine", "required": false},
+    {"id": "extravagantdelight:quince_wine", "required": false},
+    {"id": "hearthandharvest:mead", "required": false},
+    {"id": "manors_bounty:beer", "required": false},
+    {"id": "manors_bounty:brandy", "required": false},
+    {"id": "manors_bounty:kvass", "required": false},
+    {"id": "manors_bounty:rum", "required": false},
+    {"id": "manors_bounty:umeshu", "required": false},
+    {"id": "manors_bounty:whiskey", "required": false}
+  ]
+}

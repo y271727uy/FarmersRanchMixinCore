@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    { "id": "manors_bounty:enchanted_golden_apple_slice", "required": false },
+    { "id": "some_assembly_required:enchanted_golden_apple_slices", "required": false }
+  ]
+}

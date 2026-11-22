@@ -197,18 +197,20 @@ class DlcDownloaderTest {
     }
 
     @Test
-    void installJsonPathIsBlocked() {
+    void installMarkerPathsAreBlocked() {
         RecordingClient http = new RecordingClient();
         http.bodies.put(MODRINTH, BODY);
 
         DlcDownloader.Result result = DlcDownloader.download(
                 packDir,
-                index(remote("install.json", List.of(MODRINTH))),
+                index(remote("install.json", List.of(MODRINTH)),
+                        remote("unused/../INSTALL.JSON.DISABLED", List.of(MODRINTH))),
                 http
         );
 
-        assertEquals(1, result.failed());
+        assertEquals(2, result.failed());
         assertEquals("blocked path", result.files().get(0).detail());
+        assertEquals("blocked path", result.files().get(1).detail());
         assertTrue(http.fetched.isEmpty());
     }
 

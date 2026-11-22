@@ -1,0 +1,17 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "manors_bounty" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "minecraft:water",
+  "ingredients": [
+    { "item": "manors_bounty:champagne" },
+    { "tag": "frmc:tavern_barrel/enchanted_apple_slices" },
+    { "item": "manors_bounty:starfruit_slice" },
+    { "item": "minecraft:pitcher_pod" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "manors_bounty:starfruit_wine" },
+  "unit_time": 6000
+}

@@ -1,0 +1,12 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "youkaishomecoming" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "youkaishomecoming:red_grape_juice",
+  "ingredients": [],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "youkaishomecoming:red_wine_bottle", "count": 4 },
+  "unit_time": 900
+}

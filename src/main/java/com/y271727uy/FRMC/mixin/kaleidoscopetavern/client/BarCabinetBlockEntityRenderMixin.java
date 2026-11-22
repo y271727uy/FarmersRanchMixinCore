@@ -8,8 +8,9 @@ import com.y271727uy.FRMC.capability.displaywine.client.DisplayWineRender;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
@@ -17,9 +18,14 @@ import org.spongepowered.asm.mixin.injection.At;
  * 森罗物语：兼容（kaleidoscope_compat）Redirect 了后者，两边共存会炸。
  * Wrap 这个调用点它可以共存；重复归一化是幂等的。
  */
-@Pseudo
-@Mixin(targets = "coffee.cypher.kaleidoscope_tavern.client.render.BarCabinetBlockEntityRender", remap = false)
+@Mixin(value = BarCabinetBlockEntityRender.class, remap = false)
 public abstract class BarCabinetBlockEntityRenderMixin {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/item/ItemStack;getItem()Lnet/minecraft/world/item/Item;", remap = true))
+    private Item frmc$displayBottle(ItemStack stack, Operation<Item> original) {
+        return DisplayWineRender.bottleItem(stack, original.call(stack));
+    }
+
     @WrapOperation(
             method = "render",
             at = @At(

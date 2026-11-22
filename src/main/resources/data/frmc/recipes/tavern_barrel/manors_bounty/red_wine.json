@@ -1,0 +1,16 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "manors_bounty" }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "minecraft:water",
+  "ingredients": [
+    { "tag": "frmc:tavern_barrel/manors_red_grapes" },
+    { "item": "minecraft:sugar" },
+    { "item": "manors_bounty:bottled_water" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "manors_bounty:red_wine" },
+  "unit_time": 6000
+}

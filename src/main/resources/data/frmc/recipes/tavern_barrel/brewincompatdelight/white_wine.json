@@ -1,0 +1,16 @@
+{
+  "conditions": [
+    { "type": "forge:mod_loaded", "modid": "kaleidoscope_tavern" },
+    { "type": "forge:mod_loaded", "modid": "brewincompatdelight" },
+    { "type": "forge:not", "value": { "type": "forge:tag_empty", "tag": "forge:green_grapes" } }
+  ],
+  "type": "kaleidoscope_tavern:barrel",
+  "fluid": "minecraft:water",
+  "ingredients": [
+    { "tag": "forge:green_grapes" },
+    { "item": "minecraft:sugar" }
+  ],
+  "carrier": { "item": "kaleidoscope_tavern:empty_bottle" },
+  "result": { "item": "brewincompatdelight:white_wine" },
+  "unit_time": 4800
+}

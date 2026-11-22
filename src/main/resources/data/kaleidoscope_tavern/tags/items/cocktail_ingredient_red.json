@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "brewincompatdelight:red_wine", "required": false},
+    {"id": "extravagantdelight:grapefruit_wine", "required": false},
+    {"id": "extravagantdelight:rhubarb_wine", "required": false},
+    {"id": "hearthandharvest:cherry_wine", "required": false},
+    {"id": "hearthandharvest:raspberry_wine", "required": false},
+    {"id": "hearthandharvest:red_grape_wine", "required": false},
+    {"id": "hearthandharvest:sweet_berry_wine", "required": false},
+    {"id": "manors_bounty:red_wine", "required": false},
+    {"id": "youkaishomecoming:burgundy_bottle", "required": false},
+    {"id": "youkaishomecoming:red_wine_bottle", "required": false}
+  ]
+}

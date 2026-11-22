@@ -3,6 +3,7 @@ package com.y271727uy.FRMC.mixin.blacklist;
 import com.y271727uy.FRMC.config.FRMCMixinLoadConfig;
 import com.y271727uy.FRMC.mixin.blacklist.application.FRMCMixinBlacklistApplication;
 import com.y271727uy.FRMC.bootstrap.MixinsquaredBootstrap;
+import com.y271727uy.FRMC.coremod.mcreator.FRMCLaunchPlugin;
 
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,11 @@ public final class FRMCMixinConfigPlugin implements IMixinConfigPlugin {
             MixinsquaredBootstrap.initialize();
         } catch (Throwable exception) {
             System.err.println("[FRMC] Failed to initialize MixinSquared integration: " + exception);
+        }
+        try {
+            FRMCLaunchPlugin.install();
+        } catch (Throwable exception) {
+            System.err.println("[FRMC] Failed to install MCreator scan launch plugin: " + exception);
         }
     }
 

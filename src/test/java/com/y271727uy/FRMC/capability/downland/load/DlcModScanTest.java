@@ -56,6 +56,28 @@ class DlcModScanTest {
     }
 
     @Test
+    void disablingAndEnablingPackChangesScanWithoutChangingItsFiles() throws IOException {
+        Path jar = writeInstalledDlcJar("vietnam", "vietnamfood.jar", "vietnamfood");
+        Path packDir = DlcPaths.packDir(gameDir, "vietnam");
+        Path install = DlcPaths.installMarker(packDir);
+        Path disabled = packDir.resolve("install.json.disabled");
+        String marker = Files.readString(install);
+
+        DlcPaths.setEnabled(packDir, false);
+
+        assertFalse(Files.exists(install));
+        assertEquals(marker, Files.readString(disabled));
+        assertTrue(DlcModScan.installedModJars(gameDir).isEmpty());
+        assertTrue(Files.isRegularFile(jar));
+
+        DlcPaths.setEnabled(packDir, true);
+
+        assertFalse(Files.exists(disabled));
+        assertEquals(marker, Files.readString(install));
+        assertEquals(List.of(jar.toAbsolutePath().normalize()), DlcModScan.installedModJars(gameDir));
+    }
+
+    @Test
     void dlcCollisionsKeepFirstPackThenFirstFileName() throws IOException {
         Path alpha = writeInstalledDlcJar("alpha", "z-last.jar", "shared");
         writeInstalledDlcJar("alpha", "a-first.jar", "shared");

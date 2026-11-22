@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashSet;
 import java.util.Set;
-import net.irisshaders.iris.api.v0.IrisApi;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.slf4j.Logger;
@@ -75,7 +74,7 @@ public final class CitadelGpuPoseBatch {
                 || modelType.equals("untamedwilds.client.model.ModelBoarPiglet");
         boolean hullbreaker = modelType.equals("com.github.alexmodguy.alexscaves.client.model.HullbreakerModel")
                 && CoreFeature.shouldForceAccelerateTranslucent()
-                && (!OculusIntegration.IS_IRIS_INSTALLED || !IrisApi.getInstance().isShaderPackInUse())
+                && !OculusIntegration.isShaderPackInUse()
                 && HullbreakerRenderMaterials.isBodyOrGlow(ArModelMeshUpload.unwrap(builder.getRenderType()));
         if (!boar && (!Config.citadelGpuModelBatchingEnabled
                 || root.getClass() != AdvancedModelBox.class

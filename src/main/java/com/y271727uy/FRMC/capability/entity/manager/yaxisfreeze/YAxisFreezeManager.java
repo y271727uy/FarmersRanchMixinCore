@@ -2,6 +2,7 @@ package com.y271727uy.FRMC.capability.entity.manager.yaxisfreeze;
 
 import com.y271727uy.FRMC.config.EntityActivityConfig;
 import com.y271727uy.FRMC.capability.entity.manager.entityactivity.EntityVisibilityPolicy;
+import com.y271727uy.FRMC.capability.entity.manager.entityactivity.MobFreeze;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
@@ -32,7 +33,9 @@ public final class YAxisFreezeManager {
             return false;
         }
         mob.getNavigation().stop();
-        FROZEN.add(mob);
+        if (FROZEN.add(mob)) {
+            MobFreeze.haltInputs(mob);
+        }
         return true;
     }
 

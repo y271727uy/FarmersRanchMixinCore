@@ -4,7 +4,6 @@ import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
 import java.util.WeakHashMap;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
 import untamedwilds.client.model.ModelBoar;
@@ -29,7 +28,7 @@ public final class CitadelBoarLod {
 
     public static long omittedParts(Object model, BasicModelPart[] nodes, Matrix4f base) {
         EntityBoar boar = entity;
-        if (boar == null || (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse())) {
+        if (boar == null || OculusIntegration.isShaderPackInUse()) {
             return 0;
         }
         Matrix4f projection = RenderSystem.getProjectionMatrix();

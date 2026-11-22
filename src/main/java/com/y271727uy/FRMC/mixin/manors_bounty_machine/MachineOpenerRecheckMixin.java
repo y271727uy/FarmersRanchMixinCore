@@ -23,7 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
         "net.zhaiji.manorsbountymachine.block.entity.TeapotBlockEntity"
 }, remap = false)
 public abstract class MachineOpenerRecheckMixin extends BlockEntity {
-    @Shadow
+    // Mixin rejects remappable @Shadow/@Overwrite members in a mixin with several targets, whatever the class-level remap.
+    @Shadow(remap = false)
     @Final
     public ContainerOpenersCounter openersCounter;
 

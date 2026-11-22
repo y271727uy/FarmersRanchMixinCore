@@ -101,12 +101,15 @@ public final class DlcDownloader {
             return new FileResult("", FileStatus.FAILED, "missing file");
         }
         String relative = file.path();
-        if (relative.isBlank() || DlcPaths.INSTALL_MARKER.equals(relative)) {
+        if (relative.isBlank()) {
             return new FileResult(relative, FileStatus.FAILED, "blocked path");
         }
         Path dest = DlcUnpacker.resolveInside(packDir, relative);
         if (dest == null) {
             return new FileResult(relative, FileStatus.FAILED, "path escape");
+        }
+        if (DlcPaths.isMarkerPath(packDir, dest)) {
+            return new FileResult(relative, FileStatus.FAILED, "blocked path");
         }
         Path part = partPath(dest);
         if (!inside(packDir, part)) {

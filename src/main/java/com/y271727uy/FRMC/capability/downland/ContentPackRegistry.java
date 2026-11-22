@@ -105,7 +105,7 @@ public final class ContentPackRegistry {
         return null;
     }
 
-    public static InstallJob install(DownloadPackEntry entry) {
+    public static synchronized InstallJob install(DownloadPackEntry entry) {
         ensureDlcDirectory();
         DlcUnpacker.Result result = DlcUnpacker.unpack(entry, FMLPaths.GAMEDIR.get());
         switch (result.status()) {
@@ -120,6 +120,20 @@ public final class ContentPackRegistry {
             downloads = startRemoteDownload(result.packDir());
         }
         return new InstallJob(result, downloads);
+    }
+
+    public static synchronized boolean setEnabled(String packId, boolean enabled) {
+        if (!DownloadPackRules.isValidPackId(packId) || isDownloading(packId)) {
+            return false;
+        }
+        Path packDir = dlcDirectory().resolve(packId);
+        try {
+            DlcPaths.setEnabled(packDir, enabled);
+            return true;
+        } catch (IOException exception) {
+            LOGGER.warn("Failed to set DLC {} enabled={}", packId, enabled, exception);
+            return false;
+        }
     }
 
     public static boolean isDownloading(String packId) {

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "extravagantdelight:sloe_berry_wine", "required": false},
+    {"id": "hearthandharvest:blueberry_wine", "required": false}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "kaleidoscope_tavern:block/mixology/mystery_cocktail"
+    },
+    "facing=east": {
+      "model": "kaleidoscope_tavern:block/mixology/mystery_cocktail",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "kaleidoscope_tavern:block/mixology/mystery_cocktail",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "kaleidoscope_tavern:block/mixology/mystery_cocktail",
+      "y": 270
+    }
+  }
+}

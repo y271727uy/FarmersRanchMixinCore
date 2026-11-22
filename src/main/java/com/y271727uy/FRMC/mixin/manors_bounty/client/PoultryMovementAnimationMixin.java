@@ -5,10 +5,12 @@ import net.mcreator.manors_bounty.entity.MallardDuckEntity;
 import net.mcreator.manors_bounty.entity.TurkeyEntity;
 import net.minecraft.world.entity.animal.Animal;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
@@ -23,17 +25,17 @@ public abstract class PoultryMovementAnimationMixin {
     @Unique
     private static final RawAnimation[] FRMC$TURKEY_MOVEMENT = frmc$movementAnimations("turkey");
 
-    @Shadow
+    // Mixin rejects remappable @Shadow members, and @Overwrite of anything but public static methods,
+    // in a mixin with several targets. The field is the mod's own, so it is never remapped anyway.
+    @Shadow(remap = false)
     public String animationprocedure;
 
-    /**
-     * @author FRMC
-     * @reason Reuse the three fixed movement animation sequences for each bird.
-     */
-    @Overwrite(remap = false)
-    private PlayState movementPredicate(AnimationState<?> event) {
+    /** Reuses the three fixed movement animation sequences for each bird instead of building them per call. */
+    @Inject(method = "movementPredicate", at = @At("HEAD"), cancellable = true)
+    private void frmc$reuseMovementAnimations(AnimationState<?> event, CallbackInfoReturnable<PlayState> cir) {
         if (!this.animationprocedure.equals("empty")) {
-            return PlayState.STOP;
+            cir.setReturnValue(PlayState.STOP);
+            return;
         }
 
         Animal bird = (Animal) (Object) this;
@@ -45,11 +47,12 @@ public abstract class PoultryMovementAnimationMixin {
         }
 
         if (!bird.onGround()) {
-            return event.setAndContinue(animations[2]);
+            cir.setReturnValue(event.setAndContinue(animations[2]));
+            return;
         }
         float swing = event.getLimbSwingAmount();
         boolean walking = event.isMoving() || !(swing > -0.15F && swing < 0.15F);
-        return event.setAndContinue(animations[walking ? 1 : 0]);
+        cir.setReturnValue(event.setAndContinue(animations[walking ? 1 : 0]));
     }
 
     @Unique

@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.y271727uy.FRMC.integration.alexscaves.HullbreakerRenderMaterials;
 import com.y271727uy.FRMC.integration.oculus.OculusIntegration;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,7 @@ public abstract class HullbreakerGlowLayerMixin {
             "Lcom/github/alexmodguy/alexscaves/client/render/ACRenderTypes;getEyesAlphaEnabled(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;"),
             require = 1)
     private RenderType frmc$reuseGlowType(ResourceLocation texture, Operation<RenderType> original) {
-        if (OculusIntegration.IS_IRIS_INSTALLED && IrisApi.getInstance().isShaderPackInUse()) {
+        if (OculusIntegration.isShaderPackInUse()) {
             return original.call(texture);
         }
         return HullbreakerRenderMaterials.glow(() -> original.call(texture));

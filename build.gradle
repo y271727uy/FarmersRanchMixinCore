@@ -165,8 +165,6 @@ obfuscation {
 }
 
 dependencies {
-    // If you wish to declare dependencies against mods, make sure to use the 'mod*' configurations so that they're remapped.
-	// See https://github.com/neoforged/ModDevGradle/blob/main/LEGACY.md#remapping-mod-dependencies for more information.
     modImplementation 'FarmersDelight:FarmersDelight-1.20.1-1.3.4'
     modImplementation("maven.modrinth:jei:p7yZWpEg")
     modImplementation 'geckolib:geckolib-forge-1.20.1-4.8.4'
@@ -174,7 +172,7 @@ dependencies {
     modCompileOnly 'xaerolib:xaerolib-forge-1.20.1-1.7.1'
     modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
     modCompileOnly("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
-    modCompileOnly("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
+    modImplementation("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
     modCompileOnly("maven.modrinth:vintage-delight:q8Ght7Bo")
     modCompileOnly("maven.modrinth:fruits-delight:qPyefm6m")
     //modImplementation("maven.modrinth:observable:QtSVNyjm")
@@ -189,11 +187,14 @@ dependencies {
     modImplementation 'AI-Improvements:AI-Improvements-1.20-0.5.2'
     modImplementation 'chloride:chloride-FORGE-mc1.20.1-v1.8.1'
     modImplementation 'embeddium:embeddium-0.3.31+mc1.20.1'
-    modImplementation 'oculus:oculus-mc1.20.1-1.8.0'
+    modCompileOnly 'oculus:oculus-mc1.20.1-1.8.0'
     modImplementation 'modernfix:modernfix-forge-5.27.85+mc1.20.1'
     modImplementation 'ferritecore:ferritecore-6.0.1-forge'
-    modCompileOnly 'letsdo-vinery:letsdo-vinery-forge-1.4.41'
+    modImplementation 'flerovium:flerovium-forge-1.20.1-1.2.19-all'
+    modImplementation 'radium:radium-mc1.20.1-0.12.4+git.26c9d8e'
+    modImplementation 'letsdo-vinery:letsdo-vinery-forge-1.4.41'
     modCompileOnly 'letsdo-nethervinery:letsdo-nethervinery-forge-1.2.19'
+    modImplementation 'letsdo-brewery:letsdo-brewery-forge-2.0.6'
     modImplementation 'Jade:Jade-1.20.1-Forge-11.13.3'
     modCompileOnly 'StardewValleyFood:StardewValleyFood_1.20.1_0.3.3_Forge'
     modCompileOnly 'polymorph:polymorph-forge-0.49.10+1.20.1'
@@ -208,8 +209,8 @@ dependencies {
     modCompileOnly 'starlight:starlight-1.1.2+forge.1cda73c'
     modCompileOnly 'create:create-1.20.1-6.0.8'
     modCompileOnly 'betterfoliage:betterfoliage-5.0.2'
-    modCompileOnly 'kaleidoscopetavern:kaleidoscopetavern-1.2.0-forge+mc1.20.1'
-    modImplementation 'kaleidoscopecookery:kaleidoscopecookery-1.5.0-forge+mc1.20.1'  //森罗厨房
+    modImplementation 'kaleidoscopetavern:kaleidoscopetavern-1.2.0-forge+mc1.20.1'
+    modCompileOnly 'kaleidoscopecookery:kaleidoscopecookery-1.5.0-forge+mc1.20.1'  //森罗厨房
     modCompileOnly 'kubejs:kubejs-forge-2001.6.5-build.26'
     modCompileOnly 'rhino:rhino-forge-2001.2.3-build.10'
     modImplementation 'xaeroworldmap:xaeroworldmap-forge-1.20.1-1.45.0'
@@ -218,7 +219,7 @@ dependencies {
     modImplementation 'GlitchCore:GlitchCore-forge-1.20.1-0.0.1.1'
     modImplementation 'SereneSeasons:SereneSeasons-forge-1.20.1-9.1.0.3'
     modImplementation 'netmusic:netmusic-1.5.2-forge+mc1.20.1'
-    modImplementation 'ForgifiedFabricAPI:fabric-api-0.92.6+1.11.15+1.20.1'
+    modCompileOnly 'ForgifiedFabricAPI:fabric-api-0.92.6+1.11.15+1.20.1'
     modCompileOnly 'Sinytraconnector:Connector-1.0.0-beta.49+1.20.1'
     modCompileOnly 'ftb-library:ftb-library-forge-2001.2.13'
     modImplementation 'acceleratedrendering:acceleratedrendering-1.0.14-1.20.1-alpha'
@@ -236,7 +237,7 @@ dependencies {
     modCompileOnly 'vietnam_delight:vietnam_delight-1.1.3'
     modCompileOnly 'PrettyRain:PrettyRain-1.20.1-Forge-1.1.3'
     //modImplementation 'BuildCraft:BuildCraft-Community-Edition-8.0.23+1.20.1+forge'
-    modCompileOnly 'BrewinAndChewin:BrewinAndChewin-1.20.1-3.2.1'
+    modImplementation 'BrewinAndChewin:BrewinAndChewin-1.20.1-3.2.1'
     modCompileOnly 'nether-s-exoticism:nether-s-exoticism-1.20.1-1.2.9'
     modImplementation 'ldlib:ldlib-forge-1.20.1-1.0.52.a'
     modImplementation 'fastchunkgen:fastchunkgen-0.40-all'
@@ -244,9 +245,10 @@ dependencies {
     modCompileOnly 'astikorcartsredux:astikorcartsredux-1.2.5'   //这个不是异步粒子
     modImplementation 'FastEvent:FastEvent-1.20.1-1.1.1'
     modCompileOnly 'EggDelight:EggDelight-v1.2-1.20.1'
-    modImplementation 'DelightoFlight:DelightoFlight-1.20.1-1.4.3'
+    modCompileOnly 'DelightoFlight:DelightoFlight-1.20.1-1.4.3'
     modCompileOnly 'overweightfarming:overweightfarming-1.20.1-2.1.0-forge'
-    modImplementation 'oceanic_delight:oceanic_delight-1.0.4-forge-1.20.1'
+    modCompileOnly 'oceanic_delight:oceanic_delight-1.0.4-forge-1.20.1'
+    modImplementation 'farmersrespite:farmersrespite-1.20.1-2.1.2'
     modImplementation 'constancy:constancy:0.1.1+1.20.1.forge'
     modImplementation 'ftb-library:ftb-library-forge-2001.2.13'
     modImplementation 'ftb-quests:ftb-quests-forge-2001.4.14'
@@ -257,7 +259,7 @@ dependencies {
     modImplementation 'twilightforest:twilightforest-1.20.1-4.3.2508-universal'
     modCompileOnly 'entity_model_features:entity_model_features_1.20.1-forge-3.2.2'  //实体模型特性
     modCompileOnly 'entity_texture_features:entity_texture_features_1.20.1-forge-7.1'  //实体纹理特性
-    modImplementation 'touhoulittlemaid:touhoulittlemaid-1.5.3-forge+mc1.20.1'
+    modCompileOnly 'touhoulittlemaid:touhoulittlemaid-1.5.3-forge+mc1.20.1'
     //modImplementation ''
     //modImplementation 'ImmediatelyFast:ImmediatelyFast-Forge-1.5.5+1.20.4'
 
@@ -348,6 +350,12 @@ tasks.named('compileTestJava') {
         rename { 'RecipeSearch-LICENSE.txt' }
     }
     from('third_party/RecipeSearch-NOTICE.txt') {
+        into 'META-INF'
+    }
+    from('third_party/BiomeSpy-LICENSE.txt') {
+        into 'META-INF/licenses'
+    }
+    from('third_party/BiomeSpy-NOTICE.txt') {
         into 'META-INF'
     }
 }

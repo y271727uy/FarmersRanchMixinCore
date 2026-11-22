@@ -23,6 +23,7 @@ public final class AreaCacheDiagnostics {
     private static final ForgeConfigSpec.BooleanValue SKIP_INACTIVE_SURFACE_DISPATCH;
     private static final ForgeConfigSpec.BooleanValue SURFACE_BUILD_DIAGNOSTICS;
     private static final ForgeConfigSpec.BooleanValue SURFACE_DISPATCH_DIAGNOSTICS;
+    private static final ForgeConfigSpec.BooleanValue DEDUPE_STACKED_SURFACE_RULES;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -31,19 +32,24 @@ public final class AreaCacheDiagnostics {
             .define("areaCacheDiagnostics", false);
         CACHE_SURFACE_RULE_DISPATCH = builder
             .comment("Reuse the selected TerraBlender surface rule while the biome is unchanged. Restart to apply changes.")
-            .define("cacheSurfaceRuleDispatch", false);
+            .define("cacheSurfaceRuleDispatch", true);
         CACHE_SECOND_SURFACE_BIOME = builder
             .comment("Keep a second biome in the surface rule dispatch cache. Requires cacheSurfaceRuleDispatch. Restart to apply changes.")
-            .define("cacheSecondSurfaceBiome", false);
+            .define("cacheSecondSurfaceBiome", true);
         SKIP_INACTIVE_SURFACE_DISPATCH = builder
             .comment("Skip biome dispatch when all namespace rules are gated off by vanilla terrain conditions. Requires cacheSurfaceRuleDispatch. Restart to apply changes.")
-            .define("skipInactiveSurfaceDispatch", false);
+            .define("skipInactiveSurfaceDispatch", true);
         SURFACE_BUILD_DIAGNOSTICS = builder
             .comment("Log chunk surface build times for A/B testing. Restart to apply changes.")
             .define("surfaceBuildDiagnostics", false);
         SURFACE_DISPATCH_DIAGNOSTICS = builder
             .comment("Log surface rule dispatch cache hit counts from sampled contexts. Requires cacheSurfaceRuleDispatch. Restart to apply changes.")
             .define("surfaceDispatchDiagnostics", false);
+        DEDUPE_STACKED_SURFACE_RULES = builder
+            .comment("Drop TerraBlender surface rule layers that repeat an outer layer exactly. Inline noise settings get one more",
+                "wrapped copy of every mod's surface rules per world load; a repeated layer can only be reached after the identical",
+                "rules returned nothing, so removing it never changes a surface block. Distinct older layers are kept. Restart to apply changes.")
+            .define("dedupeStackedSurfaceRules", true);
         CONFIG = builder.build();
     }
 
@@ -72,6 +78,7 @@ public final class AreaCacheDiagnostics {
     private static volatile boolean skipInactiveSurfaceDispatch;
     private static volatile boolean surfaceBuildDiagnostics;
     private static volatile boolean surfaceDispatchDiagnostics;
+    private static volatile boolean dedupeStackedSurfaceRules = true;
     private static long lastReport = System.nanoTime();
 
     private AreaCacheDiagnostics() {
@@ -96,6 +103,7 @@ public final class AreaCacheDiagnostics {
         skipInactiveSurfaceDispatch = cacheSurfaceRuleDispatch && SKIP_INACTIVE_SURFACE_DISPATCH.get();
         surfaceBuildDiagnostics = SURFACE_BUILD_DIAGNOSTICS.get();
         surfaceDispatchDiagnostics = cacheSurfaceRuleDispatch && SURFACE_DISPATCH_DIAGNOSTICS.get();
+        dedupeStackedSurfaceRules = DEDUPE_STACKED_SURFACE_RULES.get();
         if (enabled) {
             LOGGER.info("Area cache diagnostics enabled, sampling 1 in {} lookups on average", SAMPLE_INTERVAL);
         }
@@ -118,6 +126,10 @@ public final class AreaCacheDiagnostics {
 
     public static boolean skipInactiveSurfaceDispatch() {
         return skipInactiveSurfaceDispatch;
+    }
+
+    public static boolean dedupeStackedSurfaceRules() {
+        return dedupeStackedSurfaceRules;
     }
 
     public static boolean surfaceBuildDiagnostics() {

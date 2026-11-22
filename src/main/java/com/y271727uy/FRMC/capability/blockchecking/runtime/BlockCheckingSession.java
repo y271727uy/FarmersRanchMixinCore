@@ -7,6 +7,12 @@ import com.y271727uy.FRMC.capability.blockchecking.model.WorkObservation;
 /** Thread-safe lifecycle for the sole active block-checking session. */
 public final class BlockCheckingSession {
     private boolean active;
+    /**
+     * Lock-free mirror of {@link #active}, written only while holding the monitor.
+     * Hot tick paths poll {@link #active()} for every entity/block entity/chunk; since JDK 15 removed
+     * biased locking, a synchronized getter there costs an atomic CAS per call even when idle.
+     */
+    private volatile boolean activeMirror;
     private long startedAtNanos;
     private long deadlineNanos;
     private ReportAggregator aggregator;
@@ -17,6 +23,7 @@ public final class BlockCheckingSession {
             return false;
         }
         active = true;
+        activeMirror = true;
         startedAtNanos = nowNanos;
         deadlineNanos = nowNanos + seconds * 1_000_000_000L;
         aggregator = new ReportAggregator();
@@ -43,8 +50,8 @@ public final class BlockCheckingSession {
         return active && finish(nowNanos, outputLimit);
     }
 
-    public synchronized boolean active() {
-        return active;
+    public boolean active() {
+        return activeMirror;
     }
 
     public synchronized BlockCheckingReport lastReport() {
@@ -53,6 +60,7 @@ public final class BlockCheckingSession {
 
     public synchronized void clear() {
         active = false;
+        activeMirror = false;
         aggregator = null;
         lastReport = null;
         startedAtNanos = 0L;
@@ -62,6 +70,7 @@ public final class BlockCheckingSession {
     private boolean finish(long nowNanos, int outputLimit) {
         lastReport = aggregator.finish(startedAtNanos, nowNanos, outputLimit);
         active = false;
+        activeMirror = false;
         aggregator = null;
         return true;
     }

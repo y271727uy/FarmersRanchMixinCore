@@ -2,6 +2,7 @@ package com.y271727uy.FRMC.capability.entity.manager.entityactivity;
 
 import com.y271727uy.FRMC.capability.entity.manager.districtpressure.ChunkMobPressureTracker;
 import com.y271727uy.FRMC.capability.entity.manager.mobspawnclean.EntityOverloadCleanupManager;
+import com.y271727uy.FRMC.capability.entity.manager.village.VillagerFreezeManager;
 import com.y271727uy.FRMC.capability.entity.manager.yaxisfreeze.YAxisFreezeManager;
 import com.y271727uy.FRMC.config.EntityActivityConfig;
 import net.minecraft.server.level.ServerLevel;
@@ -32,7 +33,7 @@ public final class EntityActivityManager {
     }
 
     public static boolean isSleeping(Mob mob) {
-        return SLEEPING.contains(mob);
+        return SLEEPING.contains(mob) || VillagerFreezeManager.isFrozen(mob);
     }
 
     public static boolean isThrottled(Mob mob) {
@@ -60,7 +61,7 @@ public final class EntityActivityManager {
      * skip one distributed step out of five, preserving an average 80% AI frequency.
      */
     public static boolean shouldSkipAiStep(Mob mob) {
-        if (SLEEPING.contains(mob) || YAxisFreezeManager.isFrozen(mob)) {
+        if (SLEEPING.contains(mob) || YAxisFreezeManager.isFrozen(mob) || VillagerFreezeManager.isFrozen(mob)) {
             return true;
         }
         return THROTTLED.contains(mob) && Math.floorMod(mob.tickCount + mob.getId(), 5) == 0;
@@ -70,6 +71,7 @@ public final class EntityActivityManager {
         restoreFullAi(mob);
         HIDDEN_SINCE_TICK.remove(mob);
         YAxisFreezeManager.wake(mob);
+        VillagerFreezeManager.wake(mob);
     }
 
     /**
@@ -119,6 +121,7 @@ public final class EntityActivityManager {
             THROTTLED.clear();
             HIDDEN_SINCE_TICK.clear();
             YAxisFreezeManager.clear();
+            VillagerFreezeManager.clear();
             return;
         }
         if (evaluationCountdown > 0) {
@@ -134,12 +137,21 @@ public final class EntityActivityManager {
             ServerLevel level = levelEntry.getKey();
             List<ServerPlayer> players = activePlayers(level);
             ChunkMobPressureTracker.refresh(level, levelEntry.getValue());
+            VillagerFreezeManager.updatePressure(level.getServer());
             var iterator = levelEntry.getValue().iterator();
             while (iterator.hasNext()) {
                 Mob mob = iterator.next();
                 if (mob.isRemoved() || mob.level() != level) {
                     iterator.remove();
                     wake(mob);
+                    continue;
+                }
+                if (VillagerFreezeManager.manages(mob)) {
+                    // Vanilla villagers follow their own rules; none of the generic states may linger on them.
+                    restoreFullAi(mob);
+                    HIDDEN_SINCE_TICK.remove(mob);
+                    YAxisFreezeManager.wake(mob);
+                    VillagerFreezeManager.evaluate(level, mob, players);
                     continue;
                 }
                 if (YAxisFreezeManager.update(mob, players)) {
@@ -167,7 +179,9 @@ public final class EntityActivityManager {
                 } else {
                     mob.getNavigation().stop();
                     THROTTLED.remove(mob);
-                    SLEEPING.add(mob);
+                    if (SLEEPING.add(mob)) {
+                        MobFreeze.haltInputs(mob);
+                    }
                 }
             }
             EntityOverloadCleanupManager.evaluate(level, players);
