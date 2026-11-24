@@ -14,12 +14,13 @@ import net.minecraft.resources.ResourceLocation;
 public final class ShakerJeiLayout {
     public static final ResourceLocation TEXTURE = new ResourceLocation(FRMCMod.MODID,
             "textures/gui/jei/tavern/shaker_six.png");
+    public static final int WIDTH = 156;
 
     private static final int INPUT_X = 47;
     private static final int INPUT_Y = 14;
-    private static final int COLUMN_SPACING = 22;
+    private static final int COLUMN_SPACING = 23;
     private static final int ROW_SPACING = 18;
-    private static final int OUTPUT_X = 123;
+    private static final int OUTPUT_X = 130;
     private static final int OUTPUT_Y = 36;
 
     private ShakerJeiLayout() {
@@ -27,35 +28,30 @@ public final class ShakerJeiLayout {
 
     public static void addSlots(IRecipeLayoutBuilder builder, ShakerRecipe recipe) {
         var ingredients = recipe.getIngredients();
-        int count = Math.min(ShakerIngredients.MAX_INPUTS, ingredients.size());
-        for (int index = 0; index < count; index++) {
-            var ingredient = ingredients.get(index);
-            if (!ingredient.isEmpty()) {
-                builder.addSlot(RecipeIngredientRole.INPUT, inputX(index), inputY(index))
-                        .setSlotName(inputName(index)).addIngredients(ingredient);
+        for (int index = 0; index < ShakerIngredients.MAX_INPUTS; index++) {
+            var slot = builder.addSlot(RecipeIngredientRole.INPUT, inputX(index), inputY(index))
+                    .setStandardSlotBackground().setSlotName(inputName(index));
+            if (index < ingredients.size() && !ingredients.get(index).isEmpty()) {
+                slot.addIngredients(ingredients.get(index));
             }
         }
-        builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, OUTPUT_Y).addItemStack(recipe.result());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, OUTPUT_Y)
+                .setOutputSlotBackground().addItemStack(recipe.result());
     }
 
     public static void drawColors(GuiGraphics graphics, IRecipeSlotsView slots, ShakerRecipe recipe) {
-        var ingredients = recipe.getIngredients();
         var colors = recipe.ingredientColors();
-        int count = Math.min(ShakerIngredients.MAX_INPUTS, ingredients.size());
-        for (int index = 0; index < count; index++) {
-            if (ingredients.get(index).isEmpty()) {
-                continue;
-            }
-            ChatFormatting formatting = colors.get(index);
-            if (formatting == null || formatting.getColor() == null) {
-                formatting = slots.findSlotByName(inputName(index))
-                        .flatMap(IRecipeSlotView::getDisplayedItemStack)
-                        .map(ShakerIngredients::displayColor)
-                        .orElse(ChatFormatting.GRAY);
-            }
-            int x = inputX(index) + 18;
-            int y = inputY(index) + 4;
-            graphics.fill(x, y, x + 2, y + 8, 0xFF000000 | formatting.getColor());
+        for (int index = 0; index < ShakerIngredients.MAX_INPUTS; index++) {
+            ChatFormatting definedColor = colors.get(index);
+            ChatFormatting formatting = slots.findSlotByName(inputName(index))
+                    .flatMap(IRecipeSlotView::getDisplayedItemStack)
+                    .filter(stack -> !stack.isEmpty())
+                    .map(stack -> definedColor != null && definedColor.getColor() != null
+                            ? definedColor : ShakerIngredients.displayColor(stack))
+                    .orElse(ChatFormatting.GRAY);
+            int x = inputX(index) + 14;
+            int y = inputY(index);
+            graphics.fill(x, y, x + 8, y + 16, 0xFF000000 | formatting.getColor());
         }
     }
 

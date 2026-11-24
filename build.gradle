@@ -172,7 +172,7 @@ dependencies {
     modCompileOnly 'xaerolib:xaerolib-forge-1.20.1-1.7.1'
     modImplementation("maven.modrinth:architectury-api:1MKTLiiG")
     modCompileOnly("maven.modrinth:kotlin-for-forge:Zsh14XeQ")
-    modImplementation("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
+    modCompileOnly("maven.modrinth:lets-do-farm-charm:9fzY3YV6")
     modCompileOnly("maven.modrinth:vintage-delight:q8Ght7Bo")
     modCompileOnly("maven.modrinth:fruits-delight:qPyefm6m")
     //modImplementation("maven.modrinth:observable:QtSVNyjm")
@@ -202,8 +202,8 @@ dependencies {
     modCompileOnly 'manors_bounty:manors_bounty-0.3.3.1-forge-1.20.1'
     modCompileOnly 'manors_bounty_machine:manors_bounty_machine_forge_1.20.1-1.0.8'
     modCompileOnly 'ThirstWasTaken:ThirstWasTaken-1.20.1-1.4.0'
-    modImplementation 'alexsmobs:alexsmobs-1.22.9'
-    modImplementation 'alexscave:alexscaves-2.0.2'
+    modCompileOnly 'alexsmobs:alexsmobs-1.22.9'
+    modCompileOnly 'alexscave:alexscaves-2.0.2'
     modCompileOnly 'Aquaculture:Aquaculture-1.20.1-2.5.7'
     modCompileOnly 'unusualfishmod:unusualfishmod-1.1.8'
     modCompileOnly 'starlight:starlight-1.1.2+forge.1cda73c'
@@ -226,8 +226,8 @@ dependencies {
     modCompileOnly 'astikorcartsredux:astikorcartsredux-1.2.5'
     modCompileOnly 'foragersinsight:foragersinsight-1.20.1-ITW2-3.55'
     modCompileOnly 'blueprint:blueprint-1.20.1-7.1.5'
-    modImplementation 'RegionsUnexplored:RegionsUnexploredForge-0.5.6+1.20.1'
-    modImplementation 'TerraBlender:TerraBlender-forge-1.20.1-3.0.1.10'
+    modCompileOnly 'RegionsUnexplored:RegionsUnexploredForge-0.5.6+1.20.1'
+    modCompileOnly 'TerraBlender:TerraBlender-forge-1.20.1-3.0.1.10'
     modCompileOnly 'neapolitan:neapolitan-1.20.1-5.1.0'
     modCompileOnly 'Patchouli:Patchouli-1.20.1-85-FORGE'
     modCompileOnly 'forestry:forestry-1.20.1-2.11.1'
@@ -239,6 +239,7 @@ dependencies {
     //modImplementation 'BuildCraft:BuildCraft-Community-Edition-8.0.23+1.20.1+forge'
     modImplementation 'BrewinAndChewin:BrewinAndChewin-1.20.1-3.2.1'
     modCompileOnly 'nether-s-exoticism:nether-s-exoticism-1.20.1-1.2.9'
+    modImplementation 'vital_herbs:vital_herbs-6.1.1-forge-1.20.1'
     modImplementation 'ldlib:ldlib-forge-1.20.1-1.0.52.a'
     modImplementation 'fastchunkgen:fastchunkgen-0.40-all'
     modImplementation 'noisium:noisium-forge-2.3.0+mc1.20-1.20.1'
@@ -256,7 +257,7 @@ dependencies {
     modImplementation 'item-filters:item-filters-forge-2001.1.0-build.59'
     modImplementation 'acceleratedrecoiling:acceleratedrecoiling-20.1.12-alpha-all' //这个是加速碰撞
     modCompileOnly 'AsyncParticles:AsyncParticles-20.1.4.6-1.20.1'  //这个才是异步粒子
-    modImplementation 'twilightforest:twilightforest-1.20.1-4.3.2508-universal'
+    modCompileOnly 'twilightforest:twilightforest-1.20.1-4.3.2508-universal'
     modCompileOnly 'entity_model_features:entity_model_features_1.20.1-forge-3.2.2'  //实体模型特性
     modCompileOnly 'entity_texture_features:entity_texture_features_1.20.1-forge-7.1'  //实体纹理特性
     modCompileOnly 'touhoulittlemaid:touhoulittlemaid-1.5.3-forge+mc1.20.1'

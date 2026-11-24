@@ -117,6 +117,7 @@ public final class FRMCMixinLoadConfig {
         new OptionalMixinIntegration("vietnam_delight.cooking.", "vietnam_delight", "farmersdelight"),
         new OptionalMixinIntegration("vietnam_delight.", "vietnam_delight"),
         new OptionalMixinIntegration("vinery.", "vinery"),
+        new OptionalMixinIntegration("vitalherbs.", "vital_herbs"),
         new OptionalMixinIntegration("xaero.minimap.", "xaerominimap"),
         new OptionalMixinIntegration("xaero.worldmap.", "xaeroworldmap"),
         new OptionalMixinIntegration("youkaishomecoming.vinery.", "youkaishomecoming", "vinery"),

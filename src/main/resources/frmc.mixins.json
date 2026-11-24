@@ -108,6 +108,7 @@
     "farmersrespite.KettleMenuMixin",
     "farmersrespite.KettleRecipeMixin",
     "farmersrespite.KettleRecipeSerializerMixin",
+    "vitalherbs.TeapotBrewingMixin",
     "alcocraftplus.MugItemMixin",
     "yeastnfeast.MeadItemMixin",
     "kaleidoscopetavern.vinery.BottleBlockFakeModelMixin",
